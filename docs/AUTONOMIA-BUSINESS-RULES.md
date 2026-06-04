@@ -237,6 +237,24 @@ promocional mientras permanezcan en el mismo plan o suban a un plan superior.
 
 Si bajan de modalidad, pierden el precio de lanzamiento y se aplica el precio
 normal vigente.
+
+### Alta autónoma desde landing
+
+AutonomIA permite que un cliente cree una prueba gratuita desde `/onboarding`
+sin aprobación manual previa del superadmin.
+
+Reglas:
+
+- El cliente introduce empresa, contacto, email, teléfono, ciudad, sector,
+  objetivo, tono IA y contraseña.
+- Se crea usuario Auth real con `force_password_change = false`.
+- Se crea perfil, empresa, relación `company_admin`, suscripción Gratuita en
+  trial y módulos iniciales.
+- SocialIA queda activo.
+- Los módulos recomendados por sector quedan en estado recomendado.
+- El origen se registra como `landing` en `demo_requests` y `superadmin_notes`.
+- El superadmin puede revisar después la actividad, cambiar plan, activar Acceso
+  VIP, conceder demo ilimitada, suspender o archivar.
 - Configuración avanzada.
 
 ## 4. Módulos

@@ -101,6 +101,18 @@ Sí, el modelo previsto permite cambiar de plan cuando la plataforma tenga activ
 
 Los cambios de plan podrán afectar a módulos, precio, límites y periodo facturado.
 
+## Puedo empezar sin esperar aprobación
+
+Sí. Desde la landing puedes crear una prueba gratuita de AutonomIA mediante el
+onboarding inicial.
+
+El cliente introduce sus datos de empresa, sector, objetivo, tono IA, email y
+contraseña. Después se crea una cuenta con plan Gratuito y acceso inmediato al
+dashboard.
+
+El superadmin puede revisar después la actividad y, si procede, cambiar el plan,
+activar Acceso VIP, conceder una demo ilimitada o acompañar la conversión a pago.
+
 ## Qué es el acceso VIP
 
 El acceso VIP es una condición especial concedida por AutonomIA a determinados clientes, partners, beta testers o pruebas estratégicas.

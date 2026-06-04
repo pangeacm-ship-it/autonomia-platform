@@ -416,6 +416,42 @@ Regla de lanzamiento:
 - Si baja de modalidad, pierde el precio de lanzamiento y se aplica el precio
   normal vigente.
 
+## Onboarding de demo
+
+La primera versión vendible debe permitir crear una prueba gratuita desde la
+landing sin aprobación manual previa del superadmin.
+
+Datos mínimos de la solicitud:
+
+- Datos de empresa.
+- Nombre de contacto.
+- Email.
+- Teléfono.
+- Sector elegido.
+- Objetivo principal.
+- Tono IA.
+- Módulos recomendados según sector.
+- Contraseña creada por el cliente.
+
+Si el cliente selecciona `Otro` como objetivo, debe poder describir qué necesita
+en un campo libre.
+
+Flujo esperado:
+
+1. El cliente llega desde la landing.
+2. Completa onboarding.
+3. Crea su cuenta con email y contraseña.
+4. AutonomIA crea usuario Auth, perfil, empresa, relación `company_admin`,
+   suscripción Gratuita en trial y módulos iniciales.
+5. SocialIA queda activo.
+6. Los módulos recomendados por sector quedan como recomendados.
+7. Se registra el origen `landing` en `demo_requests` y `superadmin_notes`.
+8. El cliente entra directamente al dashboard.
+
+El superadmin no aprueba la entrada inicial. Puede intervenir después para
+cambiar plan, activar Acceso VIP, conceder demo ilimitada, suspender, archivar o
+convertir a pago.
+
 Motivo:
 
 - Precio suficiente para validar disposición de pago.

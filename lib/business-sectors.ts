@@ -30,8 +30,8 @@ export const businessSectors: BusinessSector[] = [
     },
   },
   {
-    key: "belleza",
-    name: "Belleza",
+    key: "belleza_estetica",
+    name: "Belleza y estética",
     description:
       "Peluquerías, barberías y centros de estética que trabajan con citas, tratamientos, promociones y fidelización.",
     compatibleModules: ["SocialIA", "ReviewIA", "ReservaIA", "WhatsAppIA", "Calendario IA"],
@@ -45,8 +45,8 @@ export const businessSectors: BusinessSector[] = [
     },
   },
   {
-    key: "salud",
-    name: "Salud",
+    key: "salud_clinicas",
+    name: "Salud y clínicas",
     description:
       "Clínicas, fisioterapia, dental y bienestar con necesidad de citas, reputación, recordatorios y educación al paciente.",
     compatibleModules: ["ReviewIA", "ReservaIA", "WhatsAppIA", "LeadIA", "InsightIA"],
@@ -75,8 +75,8 @@ export const businessSectors: BusinessSector[] = [
     },
   },
   {
-    key: "comercio",
-    name: "Comercio",
+    key: "comercio_local",
+    name: "Comercio local",
     description:
       "Tiendas locales que quieren comunicar novedades, promociones, disponibilidad de producto y campañas.",
     compatibleModules: ["SocialIA", "Google Business", "ReviewIA", "InsightIA", "WhatsAppIA"],
@@ -90,8 +90,8 @@ export const businessSectors: BusinessSector[] = [
     },
   },
   {
-    key: "inmobiliaria",
-    name: "Inmobiliaria",
+    key: "inmobiliarias",
+    name: "Inmobiliarias",
     description:
       "Agencias que gestionan visitas, captación de propietarios, anuncios, leads y seguimiento comercial.",
     compatibleModules: ["LeadIA", "SocialIA", "ReservaIA", "WhatsAppIA", "InsightIA"],
@@ -181,7 +181,7 @@ export const businessSectors: BusinessSector[] = [
   },
   {
     key: "servicios_hogar",
-    name: "Servicios del hogar",
+    name: "Servicios para el hogar",
     description:
       "Reformas, limpieza, climatización y mantenimiento con presupuestos, avisos y reputación local.",
     compatibleModules: ["LeadIA", "WhatsAppIA", "ReviewIA", "SocialIA", "InsightIA"],
@@ -237,6 +237,21 @@ export const businessSectors: BusinessSector[] = [
       clientes: "clientes",
       reservas: "reuniones",
       servicios: "soluciones",
+    },
+  },
+  {
+    key: "otro",
+    name: "Otro",
+    description:
+      "Negocios con necesidades específicas que requieren una recomendación personalizada.",
+    compatibleModules: ["SocialIA", "LeadIA", "InsightIA", "Calendario IA"],
+    socialContentTypes: ["Presentación", "Servicio", "Promoción", "Caso real", "Pregunta frecuente"],
+    bookingLabel: "Solicitud personalizada",
+    leadLabel: "Consultas personalizadas",
+    terminology: {
+      clientes: "clientes",
+      reservas: "solicitudes",
+      servicios: "servicios",
     },
   },
 ];

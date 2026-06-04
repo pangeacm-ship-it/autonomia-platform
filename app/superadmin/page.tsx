@@ -39,6 +39,7 @@ import type {
   CompanyUser,
   DemoRequest,
   Module,
+  Plan,
   Subscription,
   SuperadminNote,
   UsageEvent,
@@ -303,9 +304,11 @@ function buildClients(
   subscriptions: Subscription[],
   companyModules: CompanyModule[],
   modules: Module[],
+  plans: Plan[],
   notesByCompany: Record<string, SuperadminNote[]> = {},
 ) {
   const moduleById = new Map(modules.map((module) => [module.id, module.name]));
+  const planById = new Map(plans.map((plan) => [plan.id, plan]));
 
   return companies.slice(0, 8).map((company) => {
     const users = companyUsers.filter(
@@ -313,6 +316,10 @@ function buildClients(
     );
     const subscription = subscriptions.find(
       (item) => item.company_id === company.id,
+    );
+    const plan = subscription ? planById.get(subscription.plan_id) : null;
+    const onboardingNote = notesByCompany[company.id]?.find((note) =>
+      note.note.toLowerCase().includes("onboarding_created:landing"),
     );
     const countsRevenue = subscription
       ? shouldCountTowardsMRR(subscription, company, notesByCompany[company.id])
@@ -330,7 +337,7 @@ function buildClients(
     return {
       id: company.id,
       name: company.name,
-      plan: subscription?.plan_id?.replace("plan-", "") ?? "Sin plan",
+      plan: plan?.name ?? subscription?.plan_id?.replace("plan-", "") ?? "Sin plan",
       status: clientStatus(company),
       city: company.city ?? "Sin ciudad",
       users: String(users.length || 1),
@@ -339,7 +346,10 @@ function buildClients(
         ? `${formatCurrency(subscription?.monthly_price_cents)}/mes`
         : "No facturable",
       lastAccess: formatShortDate(lastAccess),
-      modules: activeModules.length ? activeModules : ["SocialIA"],
+      modules: [
+        ...(onboardingNote ? ["Origen: Landing"] : []),
+        ...(activeModules.length ? activeModules : ["SocialIA"]),
+      ],
     };
   });
 }
@@ -416,23 +426,31 @@ function buildModuleManagement(
 }
 
 function buildDemoRequests(demos: DemoRequest[]) {
-  return demos.slice(0, 8).map((demo) => ({
-    company: demo.company_name,
-    city: demo.city ?? "Sin ciudad",
-    interest: demo.interested_module
-      ? `Interesado en ${demo.interested_module}`
-      : demo.industry ?? "Interés por demo",
-    status:
-      demo.status === "new"
-        ? "Nuevo"
-        : demo.status === "pending"
-          ? "Pendiente"
-          : demo.status === "contacted"
-            ? "Contactado"
-            : demo.status === "converted"
-              ? "Convertido"
-              : "Archivado",
-  }));
+  return demos.slice(0, 8).map((demo) => {
+    const fromLanding = demo.notes?.toLowerCase().includes("onboarding_source:landing");
+
+    return {
+      company: demo.company_name,
+      city: demo.city ?? "Sin ciudad",
+      interest: fromLanding
+        ? `Plan Gratuito · Origen: Landing · ${demo.industry ?? "Sector pendiente"}`
+        : demo.interested_module
+          ? `Interesado en ${demo.interested_module}`
+          : demo.industry ?? "Interés por demo",
+      status:
+        fromLanding
+          ? "Nuevo registro"
+          : demo.status === "new"
+            ? "Nuevo"
+            : demo.status === "pending"
+              ? "Pendiente"
+              : demo.status === "contacted"
+                ? "Contactado"
+                : demo.status === "converted"
+                  ? "Convertido"
+                  : "Archivado",
+    };
+  });
 }
 
 function buildUsage(usageEvents: UsageEvent[]) {
@@ -622,6 +640,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
     realSubscriptions,
     realCompanyModules,
     realModules,
+    realPlans,
     notesByCompany,
   );
   const clients = realClients.length ? realClients : fallbackClients;
