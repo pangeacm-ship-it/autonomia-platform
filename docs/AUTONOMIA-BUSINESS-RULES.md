@@ -807,3 +807,44 @@ Conservación fiscal y documental:
 Nota técnica:
 
 El estado `archived` y el estado de usuario `inactive` requieren la migración `007_company_offboarding.sql` para ampliar las restricciones actuales de Supabase.
+
+## 24. Métricas económicas y empresas excluidas de ingresos
+
+Las métricas económicas del Superadmin deben reflejar únicamente ingresos reales.
+
+Empresa facturable:
+
+- Empresa con estado `active`.
+- Empresa con estado `past_due`, porque sigue representando una renovación real pendiente de resolver.
+
+Empresa no facturable:
+
+- `demo`.
+- `trial` gratuito.
+- Demo ilimitada.
+- Demo VIP.
+- Demo Partner.
+- Beta tester.
+- Prueba interna.
+- Empresa exenta de pago.
+- Empresa suspendida, cancelada o archivada.
+
+Reglas de cálculo:
+
+- MRR, ARR, ingresos mensuales, ingresos anuales, ARPU y renovaciones previstas solo deben incluir empresas facturables.
+- Las demos ilimitadas, VIP, Partner, beta testers y pruebas internas deben quedar excluidas aunque tengan un plan asignado.
+- Si todavía no existe una columna específica para marcar exenciones, la exclusión puede detectarse desde `superadmin_notes`.
+- Las notas internas válidas para exclusión incluyen marcas como `demo_unlimited`, `company_created:vip`, `company_created:partner`, `beta`, `tester`, `interna`, `exento de pago` o equivalentes.
+
+Métricas comerciales separadas:
+
+- Clientes de pago.
+- Clientes demo.
+- Clientes VIP.
+- Clientes Partner.
+- Clientes beta.
+- Clientes suspendidos.
+- Demos ilimitadas.
+- Porcentaje de clientes de pago.
+
+El Superadmin debe separar visualmente `Ingresos reales` de `Empresas en prueba` para no confundir tracción comercial con facturación real.

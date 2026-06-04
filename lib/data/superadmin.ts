@@ -8,6 +8,7 @@ import type {
   Module,
   Plan,
   Subscription,
+  SuperadminNote,
   UsageEvent,
 } from "@/types/database";
 import {
@@ -142,6 +143,18 @@ const fallbackUsageEvents: UsageEvent[] = [
     quantity: 16,
     metadata: {},
     created_at: "2026-06-03T09:00:00.000Z",
+  },
+];
+
+const fallbackSuperadminNotes: SuperadminNote[] = [
+  {
+    id: "demo-note-bar-la-plaza",
+    company_id: mockCompany.id,
+    profile_id: mockProfile.id,
+    note: "company_created:normal:Empresa demo facturable para panel de ejemplo.",
+    visibility: "internal",
+    created_at: "2026-01-15T09:00:00.000Z",
+    updated_at: "2026-01-15T09:00:00.000Z",
   },
 ];
 
@@ -309,6 +322,22 @@ export async function getSuperadminUsageEvents(): Promise<UsageEvent[]> {
   return error || !data?.length ? fallbackUsageEvents : data;
 }
 
+export async function getSuperadminNotes(): Promise<SuperadminNote[]> {
+  const supabase = await getSuperadminClient();
+
+  if (!supabase) {
+    return fallbackSuperadminNotes;
+  }
+
+  const { data, error } = await supabase
+    .from("superadmin_notes")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(1000);
+
+  return error ? fallbackSuperadminNotes : data ?? [];
+}
+
 export async function getSuperadminCompanyModules() {
   const supabase = await getSuperadminClient();
 
@@ -322,4 +351,69 @@ export async function getSuperadminCompanyModules() {
     .order("created_at", { ascending: false });
 
   return error || !data?.length ? mockCompanyModules : data;
+}
+
+function hasRevenueExclusionNote(notes: SuperadminNote[] = []) {
+  return notes.some((note) => {
+    const value = note.note.toLowerCase();
+
+    return [
+      "demo_unlimited",
+      "sin límite",
+      "sin limite",
+      "unlimited",
+      "company_created:vip",
+      "company_created:partner",
+      "demo vip",
+      "demo partner",
+      "partner",
+      "vip",
+      "beta",
+      "tester",
+      "interna",
+      "interno",
+      "exenta de pago",
+      "exento de pago",
+      "payment_exempt",
+    ].some((term) => value.includes(term));
+  });
+}
+
+export function isRevenueEligibleCompany(
+  company: Company | null | undefined,
+  notes: SuperadminNote[] = [],
+) {
+  if (!company) {
+    return false;
+  }
+
+  if (company.status !== "active" && company.status !== "past_due") {
+    return false;
+  }
+
+  return !hasRevenueExclusionNote(notes);
+}
+
+export function shouldCountTowardsMRR(
+  subscription: Subscription,
+  company: Company | null | undefined,
+  notes: SuperadminNote[] = [],
+) {
+  if (!isRevenueEligibleCompany(company, notes)) {
+    return false;
+  }
+
+  if (subscription.status !== "active" && subscription.status !== "past_due") {
+    return false;
+  }
+
+  return (subscription.monthly_price_cents ?? 0) > 0;
+}
+
+export function shouldCountTowardsARR(
+  subscription: Subscription,
+  company: Company | null | undefined,
+  notes: SuperadminNote[] = [],
+) {
+  return shouldCountTowardsMRR(subscription, company, notes);
 }

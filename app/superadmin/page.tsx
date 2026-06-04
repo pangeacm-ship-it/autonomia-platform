@@ -21,9 +21,13 @@ import {
   getSuperadminCompanyUsers,
   getSuperadminDemoRequests,
   getSuperadminModules,
+  getSuperadminNotes,
   getSuperadminPlans,
   getSuperadminSubscriptions,
   getSuperadminUsageEvents,
+  isRevenueEligibleCompany,
+  shouldCountTowardsARR,
+  shouldCountTowardsMRR,
 } from "@/lib/data/superadmin";
 import { getCurrentProfileContext } from "@/lib/data/profiles";
 import { getSupabaseConfig } from "@/lib/supabase/config";
@@ -34,6 +38,7 @@ import type {
   DemoRequest,
   Module,
   Subscription,
+  SuperadminNote,
   UsageEvent,
 } from "@/types/database";
 
@@ -408,6 +413,7 @@ function buildClients(
   subscriptions: Subscription[],
   companyModules: CompanyModule[],
   modules: Module[],
+  notesByCompany: Record<string, SuperadminNote[]> = {},
 ) {
   const moduleById = new Map(modules.map((module) => [module.id, module.name]));
 
@@ -418,6 +424,9 @@ function buildClients(
     const subscription = subscriptions.find(
       (item) => item.company_id === company.id,
     );
+    const countsRevenue = subscription
+      ? shouldCountTowardsMRR(subscription, company, notesByCompany[company.id])
+      : false;
     const activeModules = companyModules
       .filter((item) => item.company_id === company.id && item.status === "active")
       .map((item) => moduleById.get(item.module_id))
@@ -436,7 +445,9 @@ function buildClients(
       city: company.city ?? "Sin ciudad",
       users: String(users.length || 1),
       userLimit: subscription?.plan_id?.includes("local") ? "5" : "2",
-      mrr: `${formatCurrency(subscription?.monthly_price_cents)}/mes`,
+      mrr: countsRevenue
+        ? `${formatCurrency(subscription?.monthly_price_cents)}/mes`
+        : "No facturable",
       lastAccess: formatShortDate(lastAccess),
       modules: activeModules.length ? activeModules : ["SocialIA"],
     };
@@ -583,6 +594,44 @@ function isSensitiveEconomicMetric(label: string) {
   ].some((term) => normalized.includes(term));
 }
 
+function buildNotesByCompany(notes: SuperadminNote[]) {
+  return notes.reduce<Record<string, SuperadminNote[]>>((acc, note) => {
+    if (!note.company_id) {
+      return acc;
+    }
+
+    acc[note.company_id] = [...(acc[note.company_id] ?? []), note];
+    return acc;
+  }, {});
+}
+
+function hasCommercialNote(notes: SuperadminNote[] | undefined, terms: string[]) {
+  return (notes ?? []).some((note) => {
+    const value = note.note.toLowerCase();
+    return terms.some((term) => value.includes(term));
+  });
+}
+
+function isVipCompany(notes: SuperadminNote[] | undefined) {
+  return hasCommercialNote(notes, ["company_created:vip", "demo vip", " vip"]);
+}
+
+function isPartnerCompany(notes: SuperadminNote[] | undefined) {
+  return hasCommercialNote(notes, ["company_created:partner", "demo partner", "partner"]);
+}
+
+function isBetaCompany(notes: SuperadminNote[] | undefined) {
+  return hasCommercialNote(notes, ["beta", "tester", "interna", "interno"]);
+}
+
+function isUnlimitedDemoCompany(notes: SuperadminNote[] | undefined) {
+  return hasCommercialNote(notes, ["demo_unlimited", "unlimited", "sin límite", "sin limite"]);
+}
+
+function isTrialOrDemoCompany(company: Company) {
+  return company.status === "demo" || company.status === "trial";
+}
+
 function UnauthorizedSuperadmin() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#050816] px-6 text-white">
@@ -629,6 +678,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
     realCompanyModules,
     realPlans,
     realBusinessSectors,
+    realSuperadminNotes,
   ] = await Promise.all([
     getSuperadminCompanies(),
     getSuperadminCompanyUsers(),
@@ -639,13 +689,56 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
     getSuperadminCompanyModules(),
     getSuperadminPlans(),
     getSuperadminBusinessSectors(),
+    getSuperadminNotes(),
   ]);
+  const notesByCompany = buildNotesByCompany(realSuperadminNotes);
+  const companyById = new Map(realCompanies.map((company) => [company.id, company]));
+  const revenueEligibleCompanies = realCompanies.filter((company) =>
+    isRevenueEligibleCompany(company, notesByCompany[company.id]),
+  );
+  const revenueSubscriptions = realSubscriptions.filter((subscription) =>
+    shouldCountTowardsMRR(
+      subscription,
+      companyById.get(subscription.company_id),
+      notesByCompany[subscription.company_id],
+    ),
+  );
+  const arrSubscriptions = realSubscriptions.filter((subscription) =>
+    shouldCountTowardsARR(
+      subscription,
+      companyById.get(subscription.company_id),
+      notesByCompany[subscription.company_id],
+    ),
+  );
+  const vipCompanies = realCompanies.filter((company) =>
+    isVipCompany(notesByCompany[company.id]),
+  );
+  const partnerCompanies = realCompanies.filter((company) =>
+    isPartnerCompany(notesByCompany[company.id]),
+  );
+  const betaCompanies = realCompanies.filter((company) =>
+    isBetaCompany(notesByCompany[company.id]),
+  );
+  const unlimitedDemoCompanies = realCompanies.filter((company) =>
+    isUnlimitedDemoCompany(notesByCompany[company.id]),
+  );
+  const demoCompanies = realCompanies.filter(
+    (company) =>
+      isTrialOrDemoCompany(company) &&
+      !isVipCompany(notesByCompany[company.id]) &&
+      !isPartnerCompany(notesByCompany[company.id]) &&
+      !isBetaCompany(notesByCompany[company.id]),
+  );
+  const suspendedCompanies = realCompanies.filter(
+    (company) => company.status === "suspended" || company.status === "canceled",
+  );
   const realClients = buildClients(
     realCompanies,
     realCompanyUsers,
     realSubscriptions,
     realCompanyModules,
     realModules,
+    notesByCompany,
   );
   const clients = realClients.length ? realClients : fallbackClients;
   const realDemoRequestCards = buildDemoRequests(realDemoRequests);
@@ -659,18 +752,38 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
   const realAiUsage = buildAiUsage(realUsageEvents);
   const aiUsage = realAiUsage.length ? realAiUsage : fallbackAiUsage;
   const activeCompanies = realCompanies.filter((company) => company.status === "active");
-  const totalMrr = realSubscriptions.reduce(
+  const totalMrr = revenueSubscriptions.reduce(
     (sum, subscription) => sum + (subscription.monthly_price_cents ?? 0),
     0,
   );
+  const totalArr = arrSubscriptions.reduce(
+    (sum, subscription) => sum + (subscription.monthly_price_cents ?? 0),
+    0,
+  ) * 12;
+  const pastDueRevenueSubscriptions = revenueSubscriptions.filter(
+    (subscription) => subscription.status === "past_due",
+  );
+  const upcomingRevenueRenewals = revenueSubscriptions.filter(
+    (subscription) => subscription.current_period_end,
+  );
+  const paymentCustomerPercentage = realCompanies.length
+    ? Math.round((revenueEligibleCompanies.length / realCompanies.length) * 100)
+    : 0;
+  const demoConversionRate = realDemoRequests.length
+    ? Math.round(
+      (realDemoRequests.filter((demo) => demo.status === "converted").length /
+        realDemoRequests.length) *
+        100,
+    )
+    : 0;
   const kpis = realCompanies.length ? [
-    { label: "Clientes activos", value: String(activeCompanies.length), change: "Datos Supabase/demo", tone: "emerald" },
-    { label: "MRR", value: formatCurrency(totalMrr), change: "Suscripciones actuales", tone: "violet" },
-    { label: "ARR estimado", value: formatCurrency(totalMrr * 12), change: "Anualizado", tone: "sky" },
+    { label: "Clientes activos", value: String(activeCompanies.length), change: "Incluye clientes facturables y operativos", tone: "emerald" },
+    { label: "MRR", value: formatCurrency(totalMrr), change: "Solo incluye clientes facturables", tone: "violet" },
+    { label: "ARR estimado", value: formatCurrency(totalArr), change: "Solo incluye clientes facturables", tone: "sky" },
     { label: "Usuarios activos", value: String(realCompanyUsers.filter((user) => user.status === "active").length), change: "Sesiones y equipos", tone: "cyan" },
     { label: "Empresas en límite", value: String(clients.filter((client) => client.users === client.userLimit).length), change: "Usuarios por plan", tone: "amber" },
     { label: "Churn", value: "3.2%", change: "Pendiente de cálculo real", tone: "emerald" },
-    { label: "Renovaciones fallidas", value: String(realSubscriptions.filter((subscription) => subscription.status === "past_due").length), change: "Suscripciones past_due", tone: "amber" },
+    { label: "Renovaciones fallidas", value: String(pastDueRevenueSubscriptions.length), change: "Solo clientes facturables", tone: "amber" },
     { label: "Demos solicitadas", value: String(realDemoRequests.length), change: "Solicitudes registradas", tone: "rose" },
     { label: "Uso IA", value: `${realUsageEvents.reduce((sum, event) => sum + event.quantity, 0)} acciones`, change: "Eventos usage_events", tone: "violet" },
   ] : fallbackKpis;
@@ -689,7 +802,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
     });
   const onlineUsers = realOnlineUsers.length ? realOnlineUsers : fallbackOnlineUsers;
   const realPlanDistribution = Object.entries(
-    realSubscriptions.reduce<Record<string, { clients: number; revenue: number }>>(
+    revenueSubscriptions.reduce<Record<string, { clients: number; revenue: number }>>(
       (acc, subscription) => {
         const key = subscription.plan_id.replace("plan-", "") || "Sin plan";
         acc[key] = {
@@ -714,12 +827,12 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
     {
       label: "ARPU medio",
       value: formatCurrency(
-        realSubscriptions.length ? Math.round(totalMrr / realSubscriptions.length) : 0,
+        revenueSubscriptions.length ? Math.round(totalMrr / revenueSubscriptions.length) : 0,
       ),
     },
-    { label: "Renovaciones fallidas", value: String(realSubscriptions.filter((subscription) => subscription.status === "past_due").length) },
+    { label: "Renovaciones fallidas", value: String(pastDueRevenueSubscriptions.length) },
     { label: "Tarjetas caducadas", value: "Pendiente" },
-    { label: "Próximos cobros", value: String(realSubscriptions.filter((subscription) => subscription.current_period_end).length) },
+    { label: "Próximos cobros", value: String(upcomingRevenueRenewals.length) },
   ] : fallbackRevenueMetrics;
   const realLocations = Object.entries(
     realCompanies.reduce<Record<string, number>>((acc, company) => {
@@ -735,11 +848,30 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
   }));
   const locations = realLocations.length ? realLocations : fallbackLocations;
   const demoSummary = realCompanies.length || realDemoRequests.length ? [
-    { label: "Demos activas", value: String(realCompanies.filter((company) => company.status === "demo" || company.status === "trial").length), detail: "Empresas trial/demo", tone: "sky" },
-    { label: "Demos VIP", value: "0", detail: "Pendiente de campo real", tone: "violet" },
+    { label: "Demos activas", value: String(demoCompanies.length), detail: "Empresas trial/demo no facturables", tone: "sky" },
+    { label: "Demos VIP", value: String(vipCompanies.length), detail: "Excluidas de ingresos", tone: "violet" },
     { label: "Caducan pronto", value: "0", detail: "Pendiente de fechas demo", tone: "amber" },
-    { label: "Conversiones del mes", value: String(realDemoRequests.filter((demo) => demo.status === "converted").length), detail: "Solicitudes convertidas", tone: "emerald" },
+    { label: "Conversiones del mes", value: String(realDemoRequests.filter((demo) => demo.status === "converted").length), detail: `${demoConversionRate}% demo a cliente`, tone: "emerald" },
   ] : fallbackDemoSummary;
+  const commercialMetrics = realCompanies.length ? [
+    { label: "Clientes de pago", value: String(revenueEligibleCompanies.length), detail: "active/past_due facturables", tone: "emerald" },
+    { label: "Clientes demo", value: String(demoCompanies.length), detail: "Pruebas sin ingreso", tone: "sky" },
+    { label: "Clientes VIP", value: String(vipCompanies.length), detail: "Excluidos de MRR", tone: "violet" },
+    { label: "Clientes partner", value: String(partnerCompanies.length), detail: "Excluidos de MRR", tone: "cyan" },
+    { label: "Clientes beta", value: String(betaCompanies.length), detail: "Pruebas internas", tone: "amber" },
+    { label: "Clientes suspendidos", value: String(suspendedCompanies.length), detail: "Sin ingreso operativo", tone: "rose" },
+    { label: "Demos ilimitadas", value: String(unlimitedDemoCompanies.length), detail: "Sin límite, sin MRR", tone: "violet" },
+    { label: "% clientes de pago", value: `${paymentCustomerPercentage}%`, detail: "Sobre empresas totales", tone: "emerald" },
+  ] : [
+    { label: "Clientes de pago", value: "4", detail: "active/past_due facturables", tone: "emerald" },
+    { label: "Clientes demo", value: "3", detail: "Pruebas sin ingreso", tone: "sky" },
+    { label: "Clientes VIP", value: "1", detail: "Excluidos de MRR", tone: "violet" },
+    { label: "Clientes partner", value: "1", detail: "Excluidos de MRR", tone: "cyan" },
+    { label: "Clientes beta", value: "1", detail: "Pruebas internas", tone: "amber" },
+    { label: "Clientes suspendidos", value: "1", detail: "Sin ingreso operativo", tone: "rose" },
+    { label: "Demos ilimitadas", value: "1", detail: "Sin límite, sin MRR", tone: "violet" },
+    { label: "% clientes de pago", value: "62%", detail: "Sobre empresas totales", tone: "emerald" },
+  ];
   const realManagedDemos = buildManagedDemos(
     realCompanies,
     realSubscriptions,
@@ -1032,8 +1164,47 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
               >
                 {kpi.change}
               </p>
+              {isSensitiveEconomicMetric(kpi.label) ? (
+                <p className="mt-3 text-xs font-bold text-slate-500">
+                  Solo incluye clientes facturables
+                </p>
+              ) : null}
             </article>
           ))}
+        </section>
+
+        <section className="mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <h2 className="text-2xl font-black">Ingresos reales y empresas en prueba</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+                Los ingresos excluyen demos ilimitadas, VIP, partners, beta
+                testers, pruebas internas y empresas no facturables.
+              </p>
+            </div>
+            <span className="w-fit rounded-full border border-emerald-400/20 bg-emerald-500/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-200">
+              MRR limpio
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {commercialMetrics.map((metric) => (
+              <article
+                key={metric.label}
+                className="rounded-2xl border border-white/10 bg-[#0b1024] p-4"
+              >
+                <p className="text-sm text-slate-400">{metric.label}</p>
+                <p className="mt-2 text-2xl font-black">{metric.value}</p>
+                <p
+                  className={`mt-3 w-fit rounded-full border px-3 py-1 text-[11px] font-bold ${toneClass(
+                    metric.tone,
+                  )}`}
+                >
+                  {metric.detail}
+                </p>
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_420px]">
@@ -1211,6 +1382,10 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
 
           <article className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
             <h2 className="text-2xl font-black">Ingresos y planes</h2>
+            <p className="mt-2 text-xs font-bold text-slate-500">
+              Solo incluye clientes facturables. Demos, VIP, partners, beta e
+              internas quedan fuera del cálculo económico.
+            </p>
             <div className="mt-5 space-y-3">
               {planDistribution.map((plan) => (
                 <div

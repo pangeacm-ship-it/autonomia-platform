@@ -649,3 +649,31 @@ Reglas:
 Migración necesaria:
 
 - `supabase/migrations/007_company_offboarding.sql`
+
+### Métricas económicas reales
+
+El MVP debe evitar que demos o pruebas internas aparezcan como ingresos.
+
+Solo cuentan para ingresos reales:
+
+- Empresas `active` facturables.
+- Empresas `past_due` facturables.
+
+No cuentan para ingresos:
+
+- Demos.
+- Trial gratuito.
+- Demos ilimitadas.
+- Clientes VIP.
+- Partners.
+- Beta testers.
+- Pruebas internas.
+- Empresas exentas de pago.
+- Empresas suspendidas, canceladas o archivadas.
+
+Reglas para Superadmin:
+
+- MRR, ARR, ARPU, ingresos mensuales y renovaciones previstas solo usan clientes facturables.
+- Las empresas en prueba deben verse en métricas separadas.
+- Mientras no exista una columna específica de exención, las marcas se pueden leer desde `superadmin_notes`.
+- El panel debe mostrar claramente `Ingresos reales` y `Empresas en prueba`.
