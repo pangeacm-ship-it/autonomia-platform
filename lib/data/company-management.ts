@@ -729,6 +729,152 @@ export async function updateCompanyStatus(input: {
   return { ok: true, message: "Estado actualizado correctamente." };
 }
 
+async function hasProtectedBillingData(
+  supabase: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  companyId: string,
+) {
+  const protectedTables = [
+    "invoices",
+    "payments",
+    "billing_events",
+    "fiscal_records",
+  ] as const;
+
+  for (const table of protectedTables) {
+    const { count, error } = await supabase
+      .from(table)
+      .select("id", { count: "exact", head: true })
+      .eq("company_id", companyId);
+
+    if (error) {
+      return {
+        blocked: true,
+        reason: `No se pudo comprobar ${table}: ${error.message}`,
+      };
+    }
+
+    if ((count ?? 0) > 0) {
+      return {
+        blocked: true,
+        reason: `Existen datos de ${table}. Archiva el cliente para conservar la trazabilidad fiscal/documental.`,
+      };
+    }
+  }
+
+  return { blocked: false, reason: null };
+}
+
+export async function archiveCompany(companyId: string): Promise<ActionResult> {
+  const auth = await getAuthorizedAdminClient();
+
+  if (!auth.ok) return { ok: false, message: auth.message };
+
+  const now = new Date().toISOString();
+  const { error: companyError } = await auth.supabase
+    .from("companies")
+    .update({ status: "archived", updated_at: now })
+    .eq("id", companyId);
+
+  if (companyError) return { ok: false, message: companyError.message };
+
+  await auth.supabase
+    .from("subscriptions")
+    .update({
+      status: "canceled",
+      canceled_at: now,
+      cancel_at_period_end: false,
+      updated_at: now,
+    })
+    .eq("company_id", companyId);
+
+  await auth.supabase
+    .from("company_users")
+    .update({ status: "inactive", updated_at: now })
+    .eq("company_id", companyId);
+
+  await addNote(
+    auth.supabase,
+    companyId,
+    auth.profileId,
+    "company_archived:Cliente archivado desde Superadmin. Datos conservados.",
+  );
+  revalidatePath("/superadmin");
+  revalidatePath(`/superadmin/empresas/${companyId}`);
+
+  return { ok: true, message: "Cliente archivado correctamente." };
+}
+
+export async function suspendCompany(companyId: string): Promise<ActionResult> {
+  const auth = await getAuthorizedAdminClient();
+
+  if (!auth.ok) return { ok: false, message: auth.message };
+
+  const now = new Date().toISOString();
+  const { error: companyError } = await auth.supabase
+    .from("companies")
+    .update({ status: "suspended", updated_at: now })
+    .eq("id", companyId);
+
+  if (companyError) return { ok: false, message: companyError.message };
+
+  await auth.supabase
+    .from("subscriptions")
+    .update({ status: "suspended", suspended_at: now, updated_at: now })
+    .eq("company_id", companyId);
+
+  await addNote(
+    auth.supabase,
+    companyId,
+    auth.profileId,
+    "company_suspended:Acceso suspendido desde Superadmin sin eliminar datos.",
+  );
+  revalidatePath("/superadmin");
+  revalidatePath(`/superadmin/empresas/${companyId}`);
+
+  return { ok: true, message: "Cliente suspendido correctamente." };
+}
+
+export async function deleteCompanyPermanently(
+  companyId: string,
+): Promise<ActionResult> {
+  const auth = await getAuthorizedAdminClient();
+
+  if (!auth.ok) return { ok: false, message: auth.message };
+
+  const protectedData = await hasProtectedBillingData(auth.supabase, companyId);
+
+  if (protectedData.blocked) {
+    await addNote(
+      auth.supabase,
+      companyId,
+      auth.profileId,
+      `company_delete_blocked:${protectedData.reason}`,
+    );
+
+    return {
+      ok: false,
+      message:
+        protectedData.reason ??
+        "No se puede eliminar definitivamente. Archiva el cliente.",
+    };
+  }
+
+  await addNote(
+    auth.supabase,
+    companyId,
+    auth.profileId,
+    "company_deleted:Eliminación definitiva aprobada. No existían datos fiscales protegidos.",
+  );
+
+  const { error } = await auth.supabase.from("companies").delete().eq("id", companyId);
+
+  if (error) return { ok: false, message: error.message };
+
+  revalidatePath("/superadmin");
+
+  return { ok: true, message: "Cliente eliminado definitivamente." };
+}
+
 export async function updateCompanyModules(input: {
   companyId: string;
   moduleIds: string[];
@@ -856,6 +1002,40 @@ export async function resetCompanyAdminAccessFormAction(formData: FormData) {
     temporaryPassword: String(formData.get("temporaryPassword") ?? "") || null,
     sendInvitation: formData.get("sendInvitation") === "on",
   });
+
+  redirectWithResultTo(`/superadmin/empresas/${companyId}`, result);
+}
+
+export async function archiveCompanyFormAction(formData: FormData) {
+  const companyId = String(formData.get("companyId") ?? "");
+  const result = await archiveCompany(companyId);
+
+  redirectWithResultTo(`/superadmin/empresas/${companyId}`, result);
+}
+
+export async function suspendCompanyFormAction(formData: FormData) {
+  const companyId = String(formData.get("companyId") ?? "");
+  const result = await suspendCompany(companyId);
+
+  redirectWithResultTo(`/superadmin/empresas/${companyId}`, result);
+}
+
+export async function deleteCompanyPermanentlyFormAction(formData: FormData) {
+  const companyId = String(formData.get("companyId") ?? "");
+  const confirmation = String(formData.get("deleteConfirmation") ?? "");
+
+  if (confirmation !== "ELIMINAR") {
+    redirectWithResultTo(`/superadmin/empresas/${companyId}`, {
+      ok: false,
+      message: "Escribe ELIMINAR para confirmar la eliminación definitiva.",
+    });
+  }
+
+  const result = await deleteCompanyPermanently(companyId);
+
+  if (result.ok) {
+    redirectWithResult(result);
+  }
 
   redirectWithResultTo(`/superadmin/empresas/${companyId}`, result);
 }

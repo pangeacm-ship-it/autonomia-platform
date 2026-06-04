@@ -763,3 +763,47 @@ Reglas de experiencia:
 - Si la suscripción está `past_due`, debe mostrarse aviso superior.
 - Si la suscripción está `suspended`, debe redirigirse a pantalla de facturación requerida.
 - No se debe bloquear agresivamente si no hay Supabase o si la app está en modo demo.
+
+## 23. Política de baja de clientes
+
+Cuando un cliente ya no está interesado, el Superadmin debe priorizar acciones reversibles y seguras.
+
+Opciones:
+
+- Archivar cliente.
+- Suspender acceso.
+- Eliminar definitivamente.
+
+Archivar cliente:
+
+- Es la opción recomendada por defecto.
+- Cambia `companies.status` a `archived`.
+- Cancela la suscripción interna si procede.
+- Marca usuarios de empresa como `inactive`.
+- Conserva datos operativos, notas y trazabilidad.
+- Registra nota interna en `superadmin_notes`.
+
+Suspender cliente:
+
+- Cambia `companies.status` a `suspended`.
+- Cambia `subscriptions.status` a `suspended`.
+- Bloquea acceso operativo sin eliminar datos.
+- Registra nota interna.
+
+Eliminar definitivamente:
+
+- Solo puede ejecutarlo un `superadmin`.
+- Debe comprobar antes si existen datos fiscales o de cobro.
+- No debe borrar `invoices`, `payments`, `billing_events` ni `fiscal_records`.
+- Si existen datos protegidos, debe bloquearse la eliminación y recomendar archivar.
+- Si no existen datos protegidos, puede borrar la empresa y datos dependientes no fiscales según las reglas de cascada del esquema.
+
+Conservación fiscal y documental:
+
+- Las facturas emitidas, pagos, eventos de cobro y registros fiscales deben conservarse según normativa aplicable.
+- No deben eliminarse datos fiscales por comodidad operativa.
+- La eliminación definitiva debe reservarse para demos o altas sin facturación ni obligaciones documentales.
+
+Nota técnica:
+
+El estado `archived` y el estado de usuario `inactive` requieren la migración `007_company_offboarding.sql` para ampliar las restricciones actuales de Supabase.

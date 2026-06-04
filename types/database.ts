@@ -21,7 +21,7 @@ export type Company = {
   tax_id: string | null;
   city: string | null;
   country: string;
-  status: "trial" | "active" | "past_due" | "suspended" | "canceled" | "demo";
+  status: "trial" | "active" | "past_due" | "suspended" | "canceled" | "demo" | "archived";
   industry: string | null;
   sector_id: string | null;
   owner_name: string | null;
@@ -37,7 +37,7 @@ export type Profile = {
   full_name: string | null;
   avatar_url: string | null;
   phone: string | null;
-  status: "active" | "invited" | "disabled";
+  status: "active" | "invited" | "disabled" | "inactive";
   created_at: string;
   updated_at: string;
 };
@@ -47,7 +47,7 @@ export type CompanyUser = {
   company_id: string | null;
   profile_id: string;
   role_id: string;
-  status: "active" | "invited" | "disabled";
+  status: "active" | "invited" | "disabled" | "inactive";
   invited_at: string | null;
   last_access_at: string | null;
   created_at: string;
@@ -166,6 +166,11 @@ export type SuperadminNote = {
   updated_at: string;
 };
 
+export type BillingProtectedRow = {
+  id: string;
+  company_id: string | null;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -239,6 +244,30 @@ export type Database = {
         Row: SuperadminNote;
         Insert: Partial<SuperadminNote>;
         Update: Partial<SuperadminNote>;
+        Relationships: [];
+      };
+      invoices: {
+        Row: BillingProtectedRow;
+        Insert: Partial<BillingProtectedRow>;
+        Update: Partial<BillingProtectedRow>;
+        Relationships: [];
+      };
+      payments: {
+        Row: BillingProtectedRow;
+        Insert: Partial<BillingProtectedRow>;
+        Update: Partial<BillingProtectedRow>;
+        Relationships: [];
+      };
+      billing_events: {
+        Row: BillingProtectedRow;
+        Insert: Partial<BillingProtectedRow>;
+        Update: Partial<BillingProtectedRow>;
+        Relationships: [];
+      };
+      fiscal_records: {
+        Row: BillingProtectedRow;
+        Insert: Partial<BillingProtectedRow>;
+        Update: Partial<BillingProtectedRow>;
         Relationships: [];
       };
     };

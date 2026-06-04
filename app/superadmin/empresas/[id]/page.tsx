@@ -1,7 +1,11 @@
 import Link from "next/link";
+import PasswordInput from "@/components/PasswordInput";
 import {
+  archiveCompanyFormAction,
+  deleteCompanyPermanentlyFormAction,
   resetCompanyAdminAccessFormAction,
   getCompanyManagementDetail,
+  suspendCompanyFormAction,
   updateCompanyFormAction,
   updateCompanyModulesFormAction,
   updateCompanyPlanFormAction,
@@ -341,7 +345,7 @@ export default async function CompanyDetailPage({
                 type="hidden"
                 value={detail.adminProfile?.full_name ?? detail.company.owner_name ?? ""}
               />
-              <input
+              <PasswordInput
                 name="temporaryPassword"
                 className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-3 outline-none"
                 placeholder="Nueva contraseña temporal"
@@ -370,6 +374,75 @@ export default async function CompanyDetailPage({
             ) : (
               <p className="text-sm text-slate-400">Sin notas internas todavía.</p>
             )}
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-[2rem] border border-rose-400/20 bg-rose-500/10 p-6">
+          <div className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.22em] text-rose-200">
+                Zona de baja
+              </p>
+              <h2 className="mt-3 text-3xl font-black">Gestionar cliente no interesado</h2>
+              <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300">
+                Archivar es la opción recomendada cuando un cliente ya no está
+                interesado. Suspender bloquea acceso sin borrar datos. Eliminar
+                definitivamente solo está permitido si no existe facturación ni
+                trazabilidad fiscal asociada.
+              </p>
+            </div>
+            <span className="w-fit rounded-full bg-rose-500/20 px-4 py-2 text-xs font-black text-rose-200">
+              Acciones sensibles
+            </span>
+          </div>
+
+          <div className="mt-6 grid gap-5 lg:grid-cols-3">
+            <article className="rounded-[2rem] border border-white/10 bg-[#0b1024] p-5">
+              <h3 className="text-xl font-black">Archivar cliente</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-400">
+                Recomendado si el cliente no sigue. Cancela la suscripción
+                interna, inactiva usuarios y conserva datos.
+              </p>
+              <form action={archiveCompanyFormAction} className="mt-5">
+                <input name="companyId" type="hidden" value={detail.company.id} />
+                <button className="rounded-2xl bg-white px-5 py-3 text-sm font-black text-slate-950">
+                  Archivar cliente
+                </button>
+              </form>
+            </article>
+
+            <article className="rounded-[2rem] border border-white/10 bg-[#0b1024] p-5">
+              <h3 className="text-xl font-black">Suspender acceso</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-400">
+                Bloquea el acceso operativo sin eliminar datos ni cancelar
+                documentación interna.
+              </p>
+              <form action={suspendCompanyFormAction} className="mt-5">
+                <input name="companyId" type="hidden" value={detail.company.id} />
+                <button className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-5 py-3 text-sm font-black text-amber-200">
+                  Suspender acceso
+                </button>
+              </form>
+            </article>
+
+            <article className="rounded-[2rem] border border-rose-400/30 bg-rose-500/10 p-5">
+              <h3 className="text-xl font-black">Eliminar definitivamente</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                Solo si no hay facturas, pagos, eventos de cobro ni registros
+                fiscales. Escribe ELIMINAR para confirmar.
+              </p>
+              <form action={deleteCompanyPermanentlyFormAction} className="mt-5 grid gap-3">
+                <input name="companyId" type="hidden" value={detail.company.id} />
+                <input
+                  name="deleteConfirmation"
+                  className="rounded-2xl border border-rose-400/20 bg-[#0b1024] px-4 py-3 text-white outline-none"
+                  placeholder="ELIMINAR"
+                />
+                <button className="rounded-2xl bg-rose-500/20 px-5 py-3 text-sm font-black text-rose-200 hover:bg-rose-500/30">
+                  Eliminar definitivamente
+                </button>
+              </form>
+            </article>
           </div>
         </section>
       </section>

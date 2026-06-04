@@ -1,5 +1,9 @@
 import Link from "next/link";
 import LogoutButton from "@/components/LogoutButton";
+import PasswordInput from "@/components/PasswordInput";
+import SensitiveValue, {
+  SensitiveValuesToggle,
+} from "@/components/SensitiveValue";
 import { isSuperadmin } from "@/lib/auth/roles";
 import { createCompanyWithAdminFormAction } from "@/lib/data/company-management";
 import {
@@ -564,6 +568,21 @@ function buildAiUsage(usageEvents: UsageEvent[]) {
   ];
 }
 
+function isSensitiveEconomicMetric(label: string) {
+  const normalized = label.toLowerCase();
+
+  return [
+    "mrr",
+    "arr",
+    "ingreso",
+    "facturación",
+    "facturacion",
+    "arpu",
+    "cobro",
+    "renovaciones fallidas",
+  ].some((term) => normalized.includes(term));
+}
+
 function UnauthorizedSuperadmin() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#050816] px-6 text-white">
@@ -775,6 +794,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
+              <SensitiveValuesToggle />
               <button className="rounded-2xl border border-white/10 px-5 py-3 text-sm font-bold hover:bg-white/10">
                 Exportar informe
               </button>
@@ -893,9 +913,8 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
 
               <label className="grid gap-2 text-sm font-bold text-slate-200">
                 Contraseña temporal opcional
-                <input
+                <PasswordInput
                   name="temporaryPassword"
-                  type="text"
                   className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-3 text-white outline-none focus:border-cyan-300/50"
                   placeholder="Ej. Autonomia2026!"
                 />
@@ -999,7 +1018,13 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
               className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-5"
             >
               <p className="text-sm text-slate-400">{kpi.label}</p>
-              <p className="mt-3 text-3xl font-black">{kpi.value}</p>
+              <p className="mt-3 text-3xl font-black">
+                {isSensitiveEconomicMetric(kpi.label) ? (
+                  <SensitiveValue value={kpi.value} />
+                ) : (
+                  kpi.value
+                )}
+              </p>
               <p
                 className={`mt-4 w-fit rounded-full border px-3 py-1 text-xs font-bold ${toneClass(
                   kpi.tone,
@@ -1073,7 +1098,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                           MRR
                         </p>
                         <p className="mt-2 font-bold text-slate-200">
-                          {client.mrr}
+                          <SensitiveValue value={client.mrr} />
                         </p>
                       </div>
                       <div>
@@ -1202,7 +1227,9 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                         {plan.users}
                       </p>
                     </div>
-                    <p className="font-bold text-emerald-300">{plan.revenue}</p>
+                    <p className="font-bold text-emerald-300">
+                      <SensitiveValue value={plan.revenue} />
+                    </p>
                   </div>
                 </div>
               ))}
@@ -1211,7 +1238,13 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
               {revenueMetrics.map((metric) => (
                 <div key={metric.label} className="rounded-2xl bg-black/20 p-4">
                   <p className="text-xs text-slate-400">{metric.label}</p>
-                  <p className="mt-2 font-black">{metric.value}</p>
+                  <p className="mt-2 font-black">
+                    {isSensitiveEconomicMetric(metric.label) ? (
+                      <SensitiveValue value={metric.value} />
+                    ) : (
+                      metric.value
+                    )}
+                  </p>
                 </div>
               ))}
             </div>

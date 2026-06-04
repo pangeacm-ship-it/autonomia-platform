@@ -628,3 +628,24 @@ Protección por plan:
 - Enterprise: configurable.
 
 Las páginas no incluidas en el plan deben mostrar una tarjeta de acceso limitado con enlace a planes y solicitud de ampliación.
+
+### Baja de cliente desde Superadmin
+
+El MVP debe permitir gestionar clientes que dejan de estar interesados sin comprometer datos fiscales ni trazabilidad.
+
+Acciones:
+
+- Archivar cliente: opción recomendada.
+- Suspender acceso: bloquea la cuenta sin borrar datos.
+- Eliminar definitivamente: solo si no hay facturas, pagos, eventos de cobro ni registros fiscales.
+
+Reglas:
+
+- La baja debe ejecutarse solo por `superadmin`.
+- La eliminación definitiva debe exigir confirmación visual.
+- Si hay datos protegidos, la eliminación se bloquea y se recomienda archivar.
+- Las facturas y registros fiscales no deben borrarse desde la app.
+
+Migración necesaria:
+
+- `supabase/migrations/007_company_offboarding.sql`

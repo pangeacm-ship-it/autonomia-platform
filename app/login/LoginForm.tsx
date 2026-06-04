@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import PasswordInput from "@/components/PasswordInput";
 import { isUserRole } from "@/lib/auth/roles";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Role } from "@/types/database";
@@ -226,8 +227,7 @@ export default function LoginForm({ isSupabaseConfigured }: LoginFormProps) {
           Contraseña
         </label>
 
-        <input
-          type="password"
+        <PasswordInput
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           placeholder="••••••••"

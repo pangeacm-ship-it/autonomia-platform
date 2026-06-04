@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function RegistroPage() {
   return (
@@ -49,8 +50,7 @@ export default function RegistroPage() {
               Contraseña
             </label>
 
-            <input
-              type="password"
+            <PasswordInput
               placeholder="Crea una contraseña"
               className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-slate-500 focus:border-violet-400"
             />
@@ -61,8 +61,7 @@ export default function RegistroPage() {
               Confirmar contraseña
             </label>
 
-            <input
-              type="password"
+            <PasswordInput
               placeholder="Repite la contraseña"
               className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-slate-500 focus:border-violet-400"
             />
