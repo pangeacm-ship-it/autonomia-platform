@@ -538,12 +538,26 @@ Reglas:
 
 - El cliente puede cancelar su suscripción.
 - Mantiene acceso hasta el fin del periodo pagado.
+- Para evitar la siguiente renovación, debe cancelar antes de la fecha de renovación mensual.
 - No se renueva el siguiente periodo.
 - Después pasa a estado `canceled`.
 - Tras `canceled`, no tiene acceso operativo.
 - Los datos se conservan según política definida, obligaciones legales y condiciones del servicio.
 
 Debe evitarse borrar datos de forma inmediata sin una política clara de retención, exportación y cumplimiento.
+
+## 15.1 Confianza comercial y cargos
+
+Reglas comerciales:
+
+- No debe haber costes ocultos.
+- No debe haber permanencia general en planes estándar.
+- La suscripción es mensual.
+- Los módulos, límites y precios deben estar claros antes de contratar.
+- Si hay un cargo por error atribuible a AutonomIA, debe revisarse y devolverse si corresponde.
+- Si el problema viene de una actuación, configuración o falta de cancelación del cliente, AutonomIA debe intentar ofrecer una solución razonable.
+
+Este mensaje debe aparecer de forma clara en la landing, especialmente cerca de la zona de precios.
 
 ## 16. Seguridad
 

@@ -37,11 +37,25 @@ Los precios definitivos deberán confirmarse antes de producción.
 
 El modelo previsto es mensual, sin permanencia general, salvo condiciones específicas en planes Enterprise o acuerdos personalizados.
 
+En planes estándar, el cliente puede cancelar antes de la siguiente renovación mensual.
+
 ## Cómo cancelar
 
 El cliente podrá cancelar desde la plataforma o solicitándolo a soporte cuando esa funcionalidad esté habilitada.
 
 La cancelación mantiene el acceso hasta el final del periodo ya pagado.
+
+Para evitar un nuevo cargo, la cancelación debe realizarse antes de la siguiente renovación.
+
+## Hay costes ocultos
+
+No. AutonomIA debe mostrar de forma clara el plan, el precio mensual, los módulos incluidos y cualquier coste adicional antes de contratar.
+
+## Qué ocurre si hay un cargo por error
+
+Si el cargo se ha realizado por error atribuible a AutonomIA, se revisará y, si corresponde, se devolverá.
+
+Si el problema viene de una configuración, uso, falta de cancelación o incidencia del cliente, AutonomIA intentará buscar una solución razonable caso por caso.
 
 ## Qué ocurre si falla el pago
 

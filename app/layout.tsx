@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ElenaWidget from "@/components/elena/ElenaWidget";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" data-scroll-behavior="smooth">
-      <body>{children}</body>
+      <body>
+        {children}
+        <ElenaWidget />
+      </body>
     </html>
   );
 }

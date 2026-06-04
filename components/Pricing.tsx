@@ -1,4 +1,5 @@
 import Link from "next/link";
+import TrustGuarantee from "@/components/TrustGuarantee";
 
 const plans = [
   {
@@ -116,6 +117,8 @@ export default function Pricing() {
           mantengas activa tu suscripción.
         </p>
       </div>
+
+      <TrustGuarantee />
 
       <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
         {plans.map((plan) => (

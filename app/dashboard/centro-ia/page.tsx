@@ -74,6 +74,56 @@ const businessHealth = [
   },
 ];
 
+const elenaConversations = [
+  {
+    title: "Plan semanal de publicaciones",
+    type: "Elena Cliente",
+    status: "Abierta",
+  },
+  {
+    title: "Recomendación para reseñas",
+    type: "Elena Proactiva",
+    status: "Pendiente",
+  },
+  {
+    title: "Objetivos de junio",
+    type: "Elena Coach",
+    status: "En seguimiento",
+  },
+];
+
+const elenaRecommendations = [
+  "Activar recordatorio de reseñas los lunes por la mañana.",
+  "Preparar una campaña de fin de semana para reservas.",
+  "Mantener tono cercano, directo y local en publicaciones.",
+];
+
+const elenaReminders = [
+  {
+    type: "publication_reminder",
+    text: "Aprobar 2 publicaciones para Instagram y Facebook.",
+  },
+  {
+    type: "review_reminder",
+    text: "Responder la reseña pendiente antes de cerrar el día.",
+  },
+  {
+    type: "lead_followup",
+    text: "Contactar los leads sin seguimiento de las últimas 48 horas.",
+  },
+  {
+    type: "seasonal_suggestion",
+    text: "Preparar una propuesta de verano para clientes recurrentes.",
+  },
+];
+
+const elenaObjectives = [
+  "Publicar con constancia cada semana.",
+  "Mejorar reputación online.",
+  "Convertir más consultas en reservas.",
+  "Reducir tareas manuales repetitivas.",
+];
+
 export default function CentroIAPage() {
   return (
     <section className="p-4 sm:p-6 lg:p-10">
@@ -170,6 +220,93 @@ export default function CentroIAPage() {
           ))}
         </div>
       </div>
+
+      <section className="mb-8 rounded-[2rem] border border-cyan-400/20 bg-cyan-500/10 p-6 lg:p-8">
+        <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-cyan-200">
+              Elena IA
+            </p>
+            <h2 className="mt-3 text-3xl font-black">
+              Asistente inteligente de AutonomIA
+            </h2>
+            <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300">
+              Elena ayuda a priorizar conversaciones, recomendaciones,
+              recordatorios y objetivos del negocio. Esta sección está preparada
+              con datos simulados para futura conexión IA.
+            </p>
+          </div>
+          <span className="w-fit rounded-full border border-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-100">
+            Sin conexión OpenAI todavía
+          </span>
+        </div>
+
+        <div className="mt-6 grid gap-5 xl:grid-cols-4">
+          <article className="rounded-3xl border border-white/10 bg-[#0b1024] p-5 xl:col-span-1">
+            <h3 className="text-xl font-black">Conversaciones</h3>
+            <div className="mt-4 space-y-3">
+              {elenaConversations.map((conversation) => (
+                <div
+                  key={conversation.title}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                >
+                  <p className="font-bold">{conversation.title}</p>
+                  <p className="mt-2 text-xs text-slate-400">
+                    {conversation.type} · {conversation.status}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <article className="rounded-3xl border border-white/10 bg-[#0b1024] p-5 xl:col-span-1">
+            <h3 className="text-xl font-black">Recomendaciones</h3>
+            <div className="mt-4 space-y-3">
+              {elenaRecommendations.map((recommendation) => (
+                <p
+                  key={recommendation}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-6 text-slate-300"
+                >
+                  {recommendation}
+                </p>
+              ))}
+            </div>
+          </article>
+
+          <article className="rounded-3xl border border-white/10 bg-[#0b1024] p-5 xl:col-span-1">
+            <h3 className="text-xl font-black">Recordatorios</h3>
+            <div className="mt-4 space-y-3">
+              {elenaReminders.map((reminder) => (
+                <div
+                  key={reminder.type}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                >
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-cyan-300">
+                    {reminder.type}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                    {reminder.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <article className="rounded-3xl border border-white/10 bg-[#0b1024] p-5 xl:col-span-1">
+            <h3 className="text-xl font-black">Objetivos</h3>
+            <div className="mt-4 space-y-3">
+              {elenaObjectives.map((objective) => (
+                <div
+                  key={objective}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm font-bold text-slate-200"
+                >
+                  {objective}
+                </div>
+              ))}
+            </div>
+          </article>
+        </div>
+      </section>
 
       <div className="grid gap-6 xl:min-h-[740px] xl:grid-cols-[300px_1fr_360px]">
         <ConversationSidebar conversations={conversations} />

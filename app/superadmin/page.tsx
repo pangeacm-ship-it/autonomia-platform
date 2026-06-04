@@ -4,6 +4,7 @@ import PasswordInput from "@/components/PasswordInput";
 import SensitiveValue, {
   SensitiveValuesToggle,
 } from "@/components/SensitiveValue";
+import SuperadminSidebar from "@/components/superadmin/SuperadminSidebar";
 import { isSuperadmin } from "@/lib/auth/roles";
 import { createCompanyWithAdminFormAction } from "@/lib/data/company-management";
 import {
@@ -903,7 +904,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
   return (
     <main className="min-h-screen bg-[#050816] text-white">
       <section className="mx-auto max-w-[1600px] px-5 py-6 sm:px-6 lg:px-10">
-        <header className="rounded-[2rem] border border-white/10 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-sky-500/10 p-6 lg:p-8">
+        <header id="resumen" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-sky-500/10 p-6 lg:p-8">
           <div className="flex flex-col justify-between gap-6 xl:flex-row xl:items-end">
             <div>
               <div className="flex flex-wrap items-center gap-3">
@@ -956,7 +957,11 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
           </div>
         ) : null}
 
-        <section className="mt-6 rounded-[2rem] border border-cyan-400/20 bg-cyan-500/10 p-6">
+        <div className="mt-6 grid gap-6 lg:grid-cols-[240px_1fr]">
+          <SuperadminSidebar />
+
+          <div className="min-w-0">
+        <section id="clientes" className="scroll-mt-6 rounded-[2rem] border border-cyan-400/20 bg-cyan-500/10 p-6">
           <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.22em] text-cyan-200">
@@ -1305,7 +1310,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
           </div>
 
           <aside className="space-y-6">
-            <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
+            <section id="usuarios" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
               <h2 className="text-2xl font-black">Usuarios online</h2>
               <div className="mt-5 space-y-3">
                 {onlineUsers.map((user) => (
@@ -1358,7 +1363,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
         </section>
 
         <section className="mt-6 grid gap-6 xl:grid-cols-3">
-          <article className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
+          <article id="modulos" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
             <h2 className="text-2xl font-black">Módulos más usados</h2>
             <div className="mt-6 space-y-5">
               {moduleUsage.map((module) => (
@@ -1380,7 +1385,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
             </div>
           </article>
 
-          <article className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
+          <article id="suscripciones" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
             <h2 className="text-2xl font-black">Ingresos y planes</h2>
             <p className="mt-2 text-xs font-bold text-slate-500">
               Solo incluye clientes facturables. Demos, VIP, partners, beta e
@@ -1453,7 +1458,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
           </article>
         </section>
 
-        <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_420px]">
+        <section id="demos" className="mt-6 scroll-mt-6 grid gap-6 xl:grid-cols-[1fr_420px]">
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
             <h2 className="text-2xl font-black">Solicitudes de demo</h2>
             <div className="mt-5 space-y-4">
@@ -1493,7 +1498,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
           </div>
 
           <aside className="space-y-6">
-            <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
+            <section id="analitica" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
               <h2 className="text-2xl font-black">Analítica de uso IA</h2>
               <div className="mt-5 space-y-4">
                 {aiUsage.map((item) => (
@@ -1513,7 +1518,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
+            <section id="configuracion" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
               <h2 className="text-2xl font-black">Acciones rápidas</h2>
               <div className="mt-5 grid gap-3">
                 {quickActions.map((action) =>
@@ -1944,7 +1949,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
             </div>
           </div>
 
-          <aside className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
+          <aside id="soporte" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
                 <h2 className="text-2xl font-black">Soporte y tickets</h2>
@@ -1980,6 +1985,8 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
             </div>
           </aside>
         </section>
+          </div>
+        </div>
       </section>
     </main>
   );

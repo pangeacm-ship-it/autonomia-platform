@@ -1,4 +1,5 @@
 import BusinessCases from "@/components/BusinessCases";
+import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
@@ -18,6 +19,7 @@ export default function Home() {
       <BusinessCases />
       <Industries />
       <HowItWorks />
+      <FAQ />
       <FinalCTA />
       <Footer />
     </main>

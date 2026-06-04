@@ -25,6 +25,8 @@ AutonomIA funciona como un servicio de suscripción mensual.
 
 El cliente contrata el acceso a la plataforma, no adquiere propiedad sobre el software, código, diseños, modelos, documentación interna ni infraestructura.
 
+AutonomIA no aplica costes ocultos ni compromisos de permanencia general. Cualquier condición especial, módulo adicional, servicio personalizado o acuerdo Enterprise deberá indicarse antes de la contratación.
+
 ## 4. Facturación y pago
 
 La facturación prevista es mensual.
@@ -88,11 +90,17 @@ La cancelación mantendrá el acceso hasta el final del periodo ya pagado, salvo
 
 Al finalizar el periodo pagado, la cuenta perderá acceso operativo y la suscripción quedará cancelada.
 
+Para evitar la siguiente renovación, la cancelación deberá realizarse antes de la fecha de renovación mensual correspondiente.
+
 ## 10. Devoluciones
 
 No se realizarán devoluciones parciales por periodos ya iniciados, salvo obligación legal, error atribuible a AutonomIA o acuerdo específico.
 
 En planes Enterprise podrán aplicarse condiciones particulares.
+
+Si se detecta un cargo realizado por error atribuible a AutonomIA, se revisará el caso y, si corresponde, se devolverá el importe afectado.
+
+Si el problema se debe a una actuación, configuración, falta de cancelación o incidencia imputable al cliente, AutonomIA intentará ofrecer una solución razonable dentro de sus posibilidades, sin que ello implique obligación automática de devolución.
 
 ## 11. Módulos y funcionalidades
 
