@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 pt-36 text-center sm:px-6 lg:pt-24">
+    <section className="mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 pb-16 pt-44 text-center sm:px-6 sm:pt-48 lg:pb-20 lg:pt-36 xl:pt-40">
       <Image
         src="/autonomia-logo-hero.png"
         alt="AutonomIA"

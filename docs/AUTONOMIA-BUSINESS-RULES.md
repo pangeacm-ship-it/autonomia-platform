@@ -691,7 +691,10 @@ Creación del administrador inicial:
 - Si el perfil ya existe por email, se reutiliza.
 - Si no existe, se crea un perfil en estado `invited`.
 - Se crea relación en `company_users` con rol `company_admin`.
-- La creación del usuario real de Supabase Auth queda para la fase de invitaciones.
+- Si se define contraseña temporal, se crea usuario real de Supabase Auth desde servidor.
+- Si se marca enviar invitación, se intenta generar invitación con Supabase Auth.
+- Si no se configura email real todavía, el superadmin debe comunicar la contraseña temporal al cliente por un canal seguro.
+- El indicador de forzar cambio de contraseña queda registrado como metadato del usuario Auth para conectarlo en una fase posterior.
 
 Tablas afectadas:
 
@@ -701,6 +704,13 @@ Tablas afectadas:
 - `subscriptions`
 - `company_modules`
 - `superadmin_notes`
+
+Edición desde Superadmin:
+
+- Cada empresa puede abrirse desde `/superadmin/empresas/[id]`.
+- El superadmin puede editar datos básicos, sector, ciudad, contacto, plan, estado, módulos y acceso del administrador.
+- El teléfono de empresa se gestiona provisionalmente como teléfono del perfil administrador hasta añadir un campo específico de empresa.
+- Las acciones críticas deben generar nota interna en `superadmin_notes`.
 
 Reglas de seguridad:
 

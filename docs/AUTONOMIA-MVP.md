@@ -567,6 +567,7 @@ El alta manual crea:
 
 - Empresa.
 - Perfil del administrador inicial.
+- Usuario Auth si se define contraseña temporal.
 - Relación `company_admin`.
 - Suscripción interna en estado `trial`.
 - Módulos iniciales activos.
@@ -585,9 +586,27 @@ Las demos VIP y Partner se tratan comercialmente como demos sin límite. Mientra
 
 Pendiente para la siguiente fase:
 
-- Crear invitación real de Supabase Auth.
-- Enviar email transaccional al administrador.
+- Conectar plantilla de email transaccional definitiva.
 - Conectar el paso posterior de pago con Stripe.
+
+### Edición de empresa desde Superadmin
+
+El MVP incluye una página de detalle por empresa:
+
+- `/superadmin/empresas/[id]`
+
+Permite:
+
+- Editar datos básicos.
+- Cambiar sector.
+- Cambiar plan.
+- Cambiar estado de empresa.
+- Activar o desactivar módulos.
+- Resetear acceso del administrador con contraseña temporal.
+- Generar invitación si Supabase Auth/email está disponible.
+- Revisar notas internas.
+
+El teléfono de empresa queda provisionalmente asociado al perfil administrador hasta ampliar el esquema de datos.
 
 ### Bloqueo por plan y suscripción
 

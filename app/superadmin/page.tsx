@@ -54,6 +54,7 @@ const fallbackKpis = [
 
 const fallbackClients = [
   {
+    id: "demo-company-bar-la-plaza",
     name: "Bar La Plaza",
     plan: "Crecimiento",
     status: "Activo" as ClientStatus,
@@ -65,6 +66,7 @@ const fallbackClients = [
     modules: ["SocialIA", "Google Business", "InsightIA"],
   },
   {
+    id: "demo-company-clinica-nova",
     name: "Clínica Nova",
     plan: "Local IA 360",
     status: "Activo" as ClientStatus,
@@ -76,6 +78,7 @@ const fallbackClients = [
     modules: ["SocialIA", "ReviewIA", "WhatsAppIA", "LeadIA"],
   },
   {
+    id: "demo-company-beauty-studio",
     name: "Beauty Studio",
     plan: "Inicio",
     status: "Activo" as ClientStatus,
@@ -87,6 +90,7 @@ const fallbackClients = [
     modules: ["SocialIA"],
   },
   {
+    id: "demo-company-restaurante-alameda",
     name: "Restaurante Alameda",
     plan: "Crecimiento",
     status: "Renovación fallida" as ClientStatus,
@@ -98,6 +102,7 @@ const fallbackClients = [
     modules: ["SocialIA", "ReservaIA", "ReviewIA"],
   },
   {
+    id: "demo-company-dental-sur",
     name: "Dental Sur",
     plan: "Enterprise",
     status: "Demo" as ClientStatus,
@@ -420,6 +425,7 @@ function buildClients(
       .at(-1);
 
     return {
+      id: company.id,
       name: company.name,
       plan: subscription?.plan_id?.replace("plan-", "") ?? "Sin plan",
       status: clientStatus(company),
@@ -886,6 +892,16 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
               </label>
 
               <label className="grid gap-2 text-sm font-bold text-slate-200">
+                Contraseña temporal opcional
+                <input
+                  name="temporaryPassword"
+                  type="text"
+                  className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-3 text-white outline-none focus:border-cyan-300/50"
+                  placeholder="Ej. Autonomia2026!"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm font-bold text-slate-200">
                 Tipo demo
                 <select
                   name="demoType"
@@ -912,6 +928,30 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                   <option value="unlimited">Sin límite</option>
                 </select>
               </label>
+            </div>
+
+            <div className="grid gap-3 rounded-[2rem] border border-white/10 bg-[#0b1024] p-5 text-sm text-slate-300 md:grid-cols-2">
+              <label className="flex items-center gap-3 font-bold">
+                <input
+                  name="forcePasswordChange"
+                  type="checkbox"
+                  defaultChecked
+                  className="h-4 w-4 accent-cyan-400"
+                />
+                Forzar cambio de contraseña al entrar
+              </label>
+              <label className="flex items-center gap-3 font-bold">
+                <input
+                  name="sendInvitation"
+                  type="checkbox"
+                  className="h-4 w-4 accent-cyan-400"
+                />
+                Enviar invitación
+              </label>
+              <p className="md:col-span-2">
+                Si no se envía email real, muestra al finalizar: Empresa creada.
+                Crea o comunica la contraseña temporal al cliente.
+              </p>
             </div>
 
             <div className="rounded-[2rem] border border-white/10 bg-[#0b1024] p-5">
@@ -1047,16 +1087,20 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                     </div>
 
                     <div className="flex flex-wrap gap-2 2xl:justify-end">
-                      {["Ver empresa", "Ver usuarios", "Gestionar plan"].map(
-                        (action) => (
-                          <button
-                            key={`${client.name}-${action}`}
-                            className="rounded-xl border border-white/10 px-3 py-2 text-xs font-bold hover:bg-white/10"
-                          >
-                            {action}
-                          </button>
-                        ),
-                      )}
+                      <Link
+                        href={`/superadmin/empresas/${client.id}`}
+                        className="rounded-xl border border-white/10 px-3 py-2 text-xs font-bold hover:bg-white/10"
+                      >
+                        Editar empresa
+                      </Link>
+                      {["Ver usuarios", "Gestionar plan"].map((action) => (
+                        <button
+                          key={`${client.name}-${action}`}
+                          className="rounded-xl border border-white/10 px-3 py-2 text-xs font-bold hover:bg-white/10"
+                        >
+                          {action}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </article>
