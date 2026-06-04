@@ -6,6 +6,7 @@ import SensitiveValue, {
 } from "@/components/SensitiveValue";
 import SuperadminSidebar from "@/components/superadmin/SuperadminSidebar";
 import { isSuperadmin } from "@/lib/auth/roles";
+import { resolveCommercialAccess } from "@/lib/data/commercial-access";
 import { createCompanyWithAdminFormAction } from "@/lib/data/company-management";
 import {
   convertDemoToCustomerFormAction,
@@ -51,86 +52,36 @@ type SuperadminPageProps = {
 };
 
 const fallbackKpis = [
-  { label: "Clientes activos", value: "18", change: "+4 este mes", tone: "emerald" },
-  { label: "MRR", value: "1.840€", change: "+22%", tone: "violet" },
-  { label: "ARR estimado", value: "22.080€", change: "Anualizado", tone: "sky" },
-  { label: "Usuarios activos", value: "64", change: "12 online ahora", tone: "cyan" },
-  { label: "Empresas en límite", value: "4", change: "Usuarios por plan", tone: "amber" },
-  { label: "Churn", value: "3.2%", change: "Bajo control", tone: "emerald" },
-  { label: "Renovaciones fallidas", value: "240€", change: "2 tarjetas a revisar", tone: "amber" },
-  { label: "Demos solicitadas", value: "11", change: "5 sin gestionar", tone: "rose" },
-  { label: "Uso IA", value: "3.482 acciones", change: "+31% este mes", tone: "violet" },
+  { label: "Clientes activos", value: "0", change: "Sin empresas registradas", tone: "emerald" },
+  { label: "MRR", value: "0€", change: "Solo clientes facturables", tone: "violet" },
+  { label: "ARR estimado", value: "0€", change: "Anualizado", tone: "sky" },
+  { label: "Usuarios activos", value: "0", change: "Sin usuarios activos", tone: "cyan" },
+  { label: "Empresas en límite", value: "0", change: "Usuarios por plan", tone: "amber" },
+  { label: "Churn", value: "0%", change: "Sin histórico", tone: "emerald" },
+  { label: "Renovaciones fallidas", value: "0€", change: "Sin incidencias", tone: "amber" },
+  { label: "Demos solicitadas", value: "0", change: "Sin demos pendientes", tone: "rose" },
+  { label: "Uso IA", value: "0 acciones", change: "Sin actividad", tone: "violet" },
 ];
 
-const fallbackClients = [
-  {
-    id: "demo-company-bar-la-plaza",
-    name: "Bar La Plaza",
-    plan: "Crecimiento",
-    status: "Activo" as ClientStatus,
-    city: "Sevilla",
-    users: "2",
-    userLimit: "2",
-    mrr: "100€",
-    lastAccess: "Hoy 09:42",
-    modules: ["SocialIA", "Google Business", "InsightIA"],
-  },
-  {
-    id: "demo-company-clinica-nova",
-    name: "Clínica Nova",
-    plan: "Local IA 360",
-    status: "Activo" as ClientStatus,
-    city: "Málaga",
-    users: "4",
-    userLimit: "5",
-    mrr: "150€",
-    lastAccess: "Hoy 08:15",
-    modules: ["SocialIA", "ReviewIA", "WhatsAppIA", "LeadIA"],
-  },
-  {
-    id: "demo-company-beauty-studio",
-    name: "Beauty Studio",
-    plan: "Inicio",
-    status: "Activo" as ClientStatus,
-    city: "Córdoba",
-    users: "1",
-    userLimit: "1",
-    mrr: "79€",
-    lastAccess: "Ayer",
-    modules: ["SocialIA"],
-  },
-  {
-    id: "demo-company-restaurante-alameda",
-    name: "Restaurante Alameda",
-    plan: "Crecimiento",
-    status: "Renovación fallida" as ClientStatus,
-    city: "Sevilla",
-    users: "2",
-    userLimit: "2",
-    mrr: "100€",
-    lastAccess: "Hace 2 días",
-    modules: ["SocialIA", "ReservaIA", "ReviewIA"],
-  },
-  {
-    id: "demo-company-dental-sur",
-    name: "Dental Sur",
-    plan: "Enterprise",
-    status: "Demo" as ClientStatus,
-    city: "Granada",
-    users: "12",
-    userLimit: "Sin límite",
-    mrr: "Consultar",
-    lastAccess: "Hace 4 días",
-    modules: ["Multiubicación"],
-  },
-];
+const fallbackClients: {
+  id: string;
+  name: string;
+  plan: string;
+  status: ClientStatus;
+  city: string;
+  users: string;
+  userLimit: string;
+  mrr: string;
+  lastAccess: string;
+  modules: string[];
+}[] = [];
 
-const fallbackOnlineUsers = [
-  { name: "María López", company: "Bar La Plaza", module: "SocialIA", status: "Online ahora" as OnlineStatus },
-  { name: "Pedro Ruiz", company: "Clínica Nova", module: "WhatsAppIA", status: "Hace 3 min" as OnlineStatus },
-  { name: "Ana Gómez", company: "Beauty Studio", module: "Dashboard", status: "Hace 8 min" as OnlineStatus },
-  { name: "Juanma", company: "Superadmin", module: "Analítica", status: "Online ahora" as OnlineStatus },
-];
+const fallbackOnlineUsers: {
+  name: string;
+  company: string;
+  module: string;
+  status: OnlineStatus;
+}[] = [];
 
 const fallbackModuleUsage = [
   { name: "SocialIA", value: 78 },
@@ -143,39 +94,20 @@ const fallbackModuleUsage = [
 ];
 
 const fallbackPlanDistribution = [
-  { name: "Gratuito", clients: "2 demos", revenue: "0€/mes", users: "1 usuario" },
-  { name: "Inicio", clients: "6 clientes", revenue: "474€/mes", users: "1 usuario" },
-  { name: "Crecimiento", clients: "8 clientes", revenue: "800€/mes", users: "2 usuarios" },
-  { name: "Local IA 360", clients: "3 clientes", revenue: "450€/mes", users: "Hasta 5 usuarios" },
-  { name: "Enterprise", clients: "1 cliente", revenue: "Personalizado", users: "Usuarios personalizados" },
+  { name: "Gratuito", clients: "0 clientes", revenue: "0€/mes", users: "1 usuario" },
+  { name: "Inicio", clients: "0 clientes", revenue: "0€/mes", users: "1 usuario" },
+  { name: "Crecimiento", clients: "0 clientes", revenue: "0€/mes", users: "2 usuarios" },
+  { name: "Local IA", clients: "0 clientes", revenue: "0€/mes", users: "Hasta 5 usuarios" },
 ];
 
-const freePlanClients = [
-  {
-    company: "Peluquería Laura",
-    city: "Málaga",
-    weeklyStatus: "Pendiente",
-    supportPost: "No publicada",
-    nextUnlock: "Bloqueado hasta apoyo semanal",
-    exempt: false,
-  },
-  {
-    company: "Cafetería Sol",
-    city: "Granada",
-    weeklyStatus: "Desbloqueado",
-    supportPost: "Publicada",
-    nextUnlock: "2 publicaciones disponibles",
-    exempt: false,
-  },
-  {
-    company: "Asesoría Norte",
-    city: "Huelva",
-    weeklyStatus: "Exento",
-    supportPost: "Exención manual",
-    nextUnlock: "Sin obligación promocional",
-    exempt: true,
-  },
-];
+const freePlanClients: {
+  company: string;
+  city: string;
+  weeklyStatus: string;
+  supportPost: string;
+  nextUnlock: string;
+  exempt: boolean;
+}[] = [];
 
 const fallbackRevenueMetrics = [
   { label: "MRR total", value: "1.840€" },
@@ -185,114 +117,71 @@ const fallbackRevenueMetrics = [
   { label: "Próximos cobros", value: "9" },
 ];
 
-const fallbackLocations = [
-  { city: "Sevilla", clients: "8 clientes", plan: "Crecimiento", opportunity: "Alta demanda en restauración" },
-  { city: "Málaga", clients: "4 clientes", plan: "Local IA 360", opportunity: "Clínicas y estética" },
-  { city: "Córdoba", clients: "3 clientes", plan: "Inicio", opportunity: "Comercios locales" },
-  { city: "Granada", clients: "2 clientes", plan: "Enterprise", opportunity: "Multiubicación" },
-  { city: "Huelva", clients: "1 cliente", plan: "Inicio", opportunity: "Primeras demos" },
-];
+const fallbackLocations: {
+  city: string;
+  clients: string;
+  plan: string;
+  opportunity: string;
+}[] = [];
 
-const fallbackDemoRequests = [
-  { company: "Gimnasio CentroFit", city: "Sevilla", interest: "Interesado en LeadIA", status: "Pendiente" },
-  { company: "Peluquería Laura", city: "Málaga", interest: "Interesado en SocialIA", status: "Pendiente" },
-  { company: "Clínica Dental Norte", city: "Córdoba", interest: "Interesado en ReviewIA", status: "Contactado" },
-  { company: "Cafetería Sol", city: "Granada", interest: "Interesado en ReservaIA", status: "Nuevo" },
-];
+const fallbackDemoRequests: {
+  company: string;
+  city: string;
+  interest: string;
+  status: string;
+}[] = [];
 
 const fallbackDemoSummary = [
-  { label: "Demos activas", value: "4", detail: "Con seguimiento comercial", tone: "sky" },
-  { label: "Demos VIP", value: "1", detail: "Sin límite definido", tone: "violet" },
-  { label: "Caducan pronto", value: "2", detail: "Menos de 7 días", tone: "amber" },
-  { label: "Conversiones del mes", value: "3", detail: "+27% sobre mayo", tone: "emerald" },
+  { label: "Demos activas", value: "0", detail: "Sin demos activas", tone: "sky" },
+  { label: "Demos VIP", value: "0", detail: "Sin accesos VIP", tone: "violet" },
+  { label: "Caducan pronto", value: "0", detail: "Sin vencimientos", tone: "amber" },
+  { label: "Conversiones del mes", value: "0", detail: "Sin histórico", tone: "emerald" },
 ];
 
-const fallbackManagedDemos = [
-  {
-    companyId: "demo-company-bar-la-plaza",
-    planId: "plan-crecimiento",
-    company: "Bar La Plaza",
-    type: "Demo Comercial",
-    status: "Demo activa",
-    startDate: "20 mayo 2026",
-    endDate: "15 junio 2026",
-    remaining: "12 días restantes",
-    plan: "Crecimiento",
-    modules: ["SocialIA", "Google Business", "InsightIA", "ReviewIA"],
-  },
-  {
-    companyId: "demo-company-clinica-nova",
-    planId: "plan-local-ia-360",
-    company: "Clínica Nova",
-    type: "Demo VIP",
-    status: "Sin límite",
-    startDate: "08 mayo 2026",
-    endDate: "Sin límite",
-    remaining: "Sin límite",
-    plan: "Local IA 360",
-    modules: ["SocialIA", "ReviewIA", "WhatsAppIA", "LeadIA", "ReservaIA"],
-  },
-  {
-    companyId: "demo-company-beauty-studio",
-    planId: "plan-inicio",
-    company: "Beauty Studio",
-    type: "Demo Normal",
-    status: "Trial",
-    startDate: "28 mayo 2026",
-    endDate: "07 junio 2026",
-    remaining: "4 días restantes",
-    plan: "Inicio",
-    modules: ["SocialIA", "Calendario IA"],
-  },
-  {
-    companyId: "demo-company-dental-sur",
-    planId: "plan-enterprise",
-    company: "Dental Sur",
-    type: "Demo Enterprise",
-    status: "Sin límite",
-    startDate: "14 mayo 2026",
-    endDate: "Sin límite",
-    remaining: "Sin límite",
-    plan: "Enterprise",
-    modules: ["Multiubicación", "ReviewIA", "InsightIA", "Soporte prioritario"],
-  },
-];
+const fallbackManagedDemos: {
+  companyId: string;
+  planId: string;
+  company: string;
+  type: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+  remaining: string;
+  plan: string;
+  modules: string[];
+}[] = [];
 
 const alerts = [
-  { text: "2 renovaciones fallidas pendientes de regularizar", priority: "Alta" as Priority },
-  { text: "5 demos sin gestionar", priority: "Alta" as Priority },
-  { text: "1 cliente Enterprise pendiente de propuesta", priority: "Media" as Priority },
-  { text: "WhatsAppIA tiene alta demanda esta semana", priority: "Media" as Priority },
-  { text: "3 clientes en riesgo de suspensión por baja actividad", priority: "Baja" as Priority },
+  { text: "No hay alertas comerciales todavía", priority: "Baja" as Priority },
 ];
 
 const fallbackAiUsage = [
-  { label: "Publicaciones generadas", value: "1.248", width: "92%" },
-  { label: "Respuestas a reseñas", value: "438", width: "56%" },
-  { label: "Leads detectados", value: "312", width: "44%" },
-  { label: "Reservas gestionadas", value: "196", width: "36%" },
-  { label: "Informes generados", value: "87", width: "22%" },
-  { label: "Conversaciones WhatsApp", value: "1.201", width: "88%" },
+  { label: "Publicaciones generadas", value: "0", width: "0%" },
+  { label: "Respuestas a reseñas", value: "0", width: "0%" },
+  { label: "Leads detectados", value: "0", width: "0%" },
+  { label: "Reservas gestionadas", value: "0", width: "0%" },
+  { label: "Informes generados", value: "0", width: "0%" },
+  { label: "Conversaciones WhatsApp", value: "0", width: "0%" },
 ];
 
 const healthStats = [
-  { label: "Clientes en riesgo", value: "3", tone: "amber" },
-  { label: "Clientes muy activos", value: "9", tone: "emerald" },
-  { label: "Clientes nuevos", value: "4", tone: "sky" },
-  { label: "Sin actividad 7 días", value: "3", tone: "rose" },
+  { label: "Clientes en riesgo", value: "0", tone: "amber" },
+  { label: "Clientes muy activos", value: "0", tone: "emerald" },
+  { label: "Clientes nuevos", value: "0", tone: "sky" },
+  { label: "Sin actividad 7 días", value: "0", tone: "rose" },
 ];
 
-const customerHealth = [
-  { company: "Restaurante Alameda", risk: "Riesgo medio", reason: "Renovación fallida" },
-  { company: "Beauty Studio", risk: "Riesgo bajo", reason: "Poco uso semanal" },
-  { company: "Clínica Nova", risk: "Salud alta", reason: "Uso recurrente" },
-];
+const customerHealth: {
+  company: string;
+  risk: string;
+  reason: string;
+}[] = [];
 
-const tickets = [
-  { title: "Error al conectar Instagram", company: "Bar La Plaza", priority: "Alta" as Priority },
-  { title: "Duda sobre factura", company: "Beauty Studio", priority: "Media" as Priority },
-  { title: "Solicitud módulo Enterprise", company: "Dental Sur", priority: "Alta" as Priority },
-];
+const tickets: {
+  title: string;
+  company: string;
+  priority: Priority;
+}[] = [];
 
 const quickActions = [
   "Crear empresa",
@@ -606,29 +495,6 @@ function buildNotesByCompany(notes: SuperadminNote[]) {
   }, {});
 }
 
-function hasCommercialNote(notes: SuperadminNote[] | undefined, terms: string[]) {
-  return (notes ?? []).some((note) => {
-    const value = note.note.toLowerCase();
-    return terms.some((term) => value.includes(term));
-  });
-}
-
-function isVipCompany(notes: SuperadminNote[] | undefined) {
-  return hasCommercialNote(notes, ["company_created:vip", "demo vip", " vip"]);
-}
-
-function isPartnerCompany(notes: SuperadminNote[] | undefined) {
-  return hasCommercialNote(notes, ["company_created:partner", "demo partner", "partner"]);
-}
-
-function isBetaCompany(notes: SuperadminNote[] | undefined) {
-  return hasCommercialNote(notes, ["beta", "tester", "interna", "interno"]);
-}
-
-function isUnlimitedDemoCompany(notes: SuperadminNote[] | undefined) {
-  return hasCommercialNote(notes, ["demo_unlimited", "unlimited", "sin límite", "sin limite"]);
-}
-
 function isTrialOrDemoCompany(company: Company) {
   return company.status === "demo" || company.status === "trial";
 }
@@ -694,6 +560,24 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
   ]);
   const notesByCompany = buildNotesByCompany(realSuperadminNotes);
   const companyById = new Map(realCompanies.map((company) => [company.id, company]));
+  const planById = new Map(realPlans.map((plan) => [plan.id, plan]));
+  const subscriptionByCompanyId = new Map(
+    realSubscriptions.map((subscription) => [subscription.company_id, subscription]),
+  );
+  const commercialAccessByCompanyId = new Map(
+    realCompanies.map((company) => {
+      const subscription = subscriptionByCompanyId.get(company.id) ?? null;
+      return [
+        company.id,
+        resolveCommercialAccess({
+          company,
+          subscription,
+          plan: subscription ? planById.get(subscription.plan_id) : null,
+          notes: notesByCompany[company.id] ?? [],
+        }),
+      ];
+    }),
+  );
   const revenueEligibleCompanies = realCompanies.filter((company) =>
     isRevenueEligibleCompany(company, notesByCompany[company.id]),
   );
@@ -711,24 +595,23 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
       notesByCompany[subscription.company_id],
     ),
   );
-  const vipCompanies = realCompanies.filter((company) =>
-    isVipCompany(notesByCompany[company.id]),
+  const vipCompanies = realCompanies.filter(
+    (company) => commercialAccessByCompanyId.get(company.id)?.kind === "vip",
   );
-  const partnerCompanies = realCompanies.filter((company) =>
-    isPartnerCompany(notesByCompany[company.id]),
+  const partnerCompanies = realCompanies.filter(
+    (company) => commercialAccessByCompanyId.get(company.id)?.kind === "partner",
   );
-  const betaCompanies = realCompanies.filter((company) =>
-    isBetaCompany(notesByCompany[company.id]),
+  const betaCompanies = realCompanies.filter(
+    (company) => commercialAccessByCompanyId.get(company.id)?.kind === "beta",
   );
-  const unlimitedDemoCompanies = realCompanies.filter((company) =>
-    isUnlimitedDemoCompany(notesByCompany[company.id]),
+  const unlimitedDemoCompanies = realCompanies.filter(
+    (company) =>
+      commercialAccessByCompanyId.get(company.id)?.kind === "unlimited_demo",
   );
   const demoCompanies = realCompanies.filter(
     (company) =>
       isTrialOrDemoCompany(company) &&
-      !isVipCompany(notesByCompany[company.id]) &&
-      !isPartnerCompany(notesByCompany[company.id]) &&
-      !isBetaCompany(notesByCompany[company.id]),
+      !commercialAccessByCompanyId.get(company.id)?.isGifted,
   );
   const suspendedCompanies = realCompanies.filter(
     (company) => company.status === "suspended" || company.status === "canceled",
@@ -988,7 +871,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                   name="companyName"
                   required
                   className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-3 text-white outline-none focus:border-cyan-300/50"
-                  placeholder="Ej. Restaurante Alameda"
+                  placeholder="Ej. Nombre de empresa"
                 />
               </label>
 
@@ -1227,7 +1110,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
             </div>
 
             <div className="space-y-4">
-              {clients.map((client) => (
+              {clients.length ? clients.map((client) => (
                 <article
                   key={client.name}
                   className="rounded-3xl border border-white/10 bg-[#0b1024] p-5"
@@ -1305,7 +1188,21 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                     </div>
                   </div>
                 </article>
-              ))}
+              )) : (
+                <div className="rounded-3xl border border-white/10 bg-[#0b1024] p-6">
+                  <h3 className="text-xl font-black">No hay empresas registradas todavía.</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-400">
+                    Crea la primera empresa para empezar a operar AutonomIA con
+                    clientes reales.
+                  </p>
+                  <Link
+                    href="#clientes"
+                    className="mt-5 inline-flex rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-sm font-bold"
+                  >
+                    Crear primera empresa
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
 
@@ -1313,7 +1210,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
             <section id="usuarios" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
               <h2 className="text-2xl font-black">Usuarios online</h2>
               <div className="mt-5 space-y-3">
-                {onlineUsers.map((user) => (
+                {onlineUsers.length ? onlineUsers.map((user) => (
                   <article
                     key={`${user.name}-${user.company}`}
                     className="rounded-2xl border border-white/10 bg-[#0b1024] p-4"
@@ -1334,7 +1231,11 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                       </span>
                     </div>
                   </article>
-                ))}
+                )) : (
+                  <div className="rounded-2xl border border-white/10 bg-[#0b1024] p-4 text-sm text-slate-300">
+                    No hay usuarios online todavía.
+                  </div>
+                )}
               </div>
             </section>
 
@@ -1433,7 +1334,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
           <article className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
             <h2 className="text-2xl font-black">Localidades</h2>
             <div className="mt-5 space-y-3">
-              {locations.map((location) => (
+              {locations.length ? locations.map((location) => (
                 <div
                   key={location.city}
                   className="rounded-2xl border border-white/10 bg-[#0b1024] p-4"
@@ -1453,7 +1354,11 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                     {location.opportunity}
                   </p>
                 </div>
-              ))}
+              )) : (
+                <div className="rounded-2xl border border-white/10 bg-[#0b1024] p-4 text-sm text-slate-300">
+                  No hay localidades con clientes registrados.
+                </div>
+              )}
             </div>
           </article>
         </section>
@@ -1462,7 +1367,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
             <h2 className="text-2xl font-black">Solicitudes de demo</h2>
             <div className="mt-5 space-y-4">
-              {demoRequests.map((demo) => (
+              {demoRequests.length ? demoRequests.map((demo) => (
                 <article
                   key={demo.company}
                   className="rounded-3xl border border-white/10 bg-[#0b1024] p-5"
@@ -1493,7 +1398,11 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                     </div>
                   </div>
                 </article>
-              ))}
+              )) : (
+                <div className="rounded-3xl border border-white/10 bg-[#0b1024] p-5 text-sm text-slate-300">
+                  No hay solicitudes de demo pendientes.
+                </div>
+              )}
             </div>
           </div>
 
@@ -1566,7 +1475,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
           </div>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
-            {freePlanClients.map((client) => {
+            {freePlanClients.length ? freePlanClients.map((client) => {
               const matchedCompany = realCompanies.find(
                 (company) => company.name === client.company,
               );
@@ -1644,7 +1553,11 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                   </div>
                 </article>
               );
-            })}
+            }) : (
+              <div className="rounded-3xl border border-white/10 bg-[#0b1024] p-5 text-sm text-slate-300 lg:col-span-3">
+                No hay clientes en plan Gratuito.
+              </div>
+            )}
           </div>
         </section>
 
@@ -1689,7 +1602,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
           </div>
 
           <div className="mt-6 grid gap-5 xl:grid-cols-2">
-            {managedDemos.map((demo) => (
+            {managedDemos.length ? managedDemos.map((demo) => (
               <article
                 key={demo.company}
                 className="rounded-[2rem] border border-white/10 bg-[#0b1024] p-5"
@@ -1824,7 +1737,11 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                   </form>
                 </div>
               </article>
-            ))}
+            )) : (
+              <div className="rounded-[2rem] border border-white/10 bg-[#0b1024] p-5 text-sm text-slate-300 xl:col-span-2">
+                No hay demos activas ni accesos VIP pendientes de gestionar.
+              </div>
+            )}
           </div>
         </section>
 
@@ -1928,7 +1845,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
             </div>
 
             <div className="mt-5 space-y-3">
-              {customerHealth.map((item) => (
+              {customerHealth.length ? customerHealth.map((item) => (
                 <article
                   key={item.company}
                   className="rounded-2xl border border-white/10 bg-[#0b1024] p-4"
@@ -1945,7 +1862,11 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                     </span>
                   </div>
                 </article>
-              ))}
+              )) : (
+                <div className="rounded-2xl border border-white/10 bg-[#0b1024] p-4 text-sm text-slate-300">
+                  No hay datos de salud de clientes todavía.
+                </div>
+              )}
             </div>
           </div>
 
@@ -1954,13 +1875,13 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
               <div>
                 <h2 className="text-2xl font-black">Soporte y tickets</h2>
                 <p className="mt-2 text-sm text-slate-400">
-                  4 abiertos · 1 urgente · respuesta media 2h 15m
+                  0 abiertos · sin incidencias
                 </p>
               </div>
             </div>
 
             <div className="mt-5 space-y-3">
-              {tickets.map((ticket) => (
+              {tickets.length ? tickets.map((ticket) => (
                 <article
                   key={ticket.title}
                   className="rounded-2xl border border-white/10 bg-[#0b1024] p-4"
@@ -1981,7 +1902,11 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                     </span>
                   </div>
                 </article>
-              ))}
+              )) : (
+                <div className="rounded-2xl border border-white/10 bg-[#0b1024] p-4 text-sm text-slate-300">
+                  No hay tickets abiertos.
+                </div>
+              )}
             </div>
           </aside>
         </section>

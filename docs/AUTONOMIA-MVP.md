@@ -79,8 +79,8 @@ Límites de usuarios por plan:
 - Gratuito: 1 usuario.
 - Inicio: 1 usuario.
 - Crecimiento: 2 usuarios.
-- Local IA 360: hasta 5 usuarios.
-- Enterprise: personalizado o ilimitado según contrato.
+- Local IA: hasta 5 usuarios.
+- Enterprise queda oculto comercialmente y reservado para uso interno futuro.
 
 Reglas del plan Gratuito:
 
@@ -407,7 +407,14 @@ El bloqueo de acceso debe validarse en servidor, no solo en la interfaz.
 
 Plan recomendado para piloto:
 
-**Crecimiento fundador por 100 euros al mes.**
+**Crecimiento lanzamiento por 120 euros al mes.**
+
+Regla de lanzamiento:
+
+- El cliente mantiene el precio de lanzamiento mientras permanezca en el mismo
+  plan o suba a un plan superior.
+- Si baja de modalidad, pierde el precio de lanzamiento y se aplica el precio
+  normal vigente.
 
 Motivo:
 
@@ -624,8 +631,8 @@ Protección por plan:
 - Gratuito: dashboard, SocialIA limitado, empresa, suscripción y facturación.
 - Inicio: SocialIA completo y gestión básica.
 - Crecimiento: SocialIA, Google Business, ReviewIA básico, InsightIA básico y usuarios.
-- Local IA 360: módulos principales.
-- Enterprise: configurable.
+- Local IA: módulos principales.
+- Enterprise: oculto comercialmente y reservado para compatibilidad interna futura.
 
 Las páginas no incluidas en el plan deben mostrar una tarjeta de acceso limitado con enlace a planes y solicitud de ampliación.
 
@@ -677,3 +684,34 @@ Reglas para Superadmin:
 - Las empresas en prueba deben verse en métricas separadas.
 - Mientras no exista una columna específica de exención, las marcas se pueden leer desde `superadmin_notes`.
 - El panel debe mostrar claramente `Ingresos reales` y `Empresas en prueba`.
+
+### Acceso VIP y valor económico visible
+
+El MVP debe permitir que AutonomIA conceda acceso profesional sin coste a clientes estratégicos.
+
+Casos:
+
+- Acceso VIP.
+- Demo ilimitada.
+- Partner.
+- Beta tester.
+- Acceso promocional.
+
+Reglas:
+
+- No genera ingresos.
+- No genera facturación.
+- No suma MRR ni ARR.
+- El cliente debe ver el precio oficial real del plan.
+- No debe parecer una versión gratuita básica.
+
+Experiencia cliente:
+
+- En dashboard, suscripción y módulos debe mostrarse un distintivo de acceso VIP.
+- Para Crecimiento debe mostrarse precio oficial 150€/mes tachado.
+- Para Local IA debe mostrarse precio oficial 300€/mes tachado.
+- El texto debe transmitir privilegio, colaboración y confianza.
+
+Texto base:
+
+`Actualmente disfrutas de acceso VIP concedido por AutonomIA. Mantienes acceso completo sin coste mientras esta condición permanezca activa.`

@@ -2,9 +2,9 @@ const invoices = [
   {
     date: "15/05/2026",
     concept: "Plan Crecimiento",
-    base: "82,64€",
-    iva: "17,36€",
-    total: "100€",
+    base: "99,17€",
+    iva: "20,83€",
+    total: "120€",
     status: "Pagada",
     number: "AUT-2026-0002",
     fiscalStatus: "Archivo fiscal preparado",
@@ -12,9 +12,9 @@ const invoices = [
   {
     date: "15/04/2026",
     concept: "Plan Crecimiento",
-    base: "82,64€",
-    iva: "17,36€",
-    total: "100€",
+    base: "99,17€",
+    iva: "20,83€",
+    total: "120€",
     status: "Pagada",
     number: "AUT-2026-0001",
     fiscalStatus: "Archivo fiscal preparado",
@@ -45,11 +45,11 @@ export default function FacturacionPage() {
             <h2 className="text-2xl font-black">Datos fiscales</h2>
 
             <div className="mt-8 grid gap-5 md:grid-cols-2">
-              <input defaultValue="Bar La Plaza SL" className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4" />
-              <input defaultValue="B12345678" className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4" />
-              <input defaultValue="facturas@barlaplaza.com" className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4" />
-              <input defaultValue="+34 600 000 000" className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4" />
-              <input defaultValue="Calle Principal 1, Sevilla" className="md:col-span-2 rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4" />
+              <input placeholder="Razón social" className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4" />
+              <input placeholder="NIF/CIF" className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4" />
+              <input placeholder="Email de facturación" className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4" />
+              <input placeholder="Teléfono" className="rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4" />
+              <input placeholder="Domicilio fiscal" className="md:col-span-2 rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4" />
             </div>
 
             <button className="mt-8 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3 font-bold">
@@ -102,7 +102,7 @@ export default function FacturacionPage() {
           <div className="rounded-[2rem] border border-violet-400/30 bg-violet-500/10 p-6">
             <p className="text-sm text-violet-200">Plan actual</p>
             <h3 className="mt-2 text-3xl font-black">Crecimiento</h3>
-            <p className="mt-3 text-emerald-300">Precio fundador · 100€/mes</p>
+            <p className="mt-3 text-emerald-300">Precio lanzamiento · 120€/mes</p>
             <p className="mt-3 text-sm leading-6 text-slate-300">
               Suscripción activa con acceso completo hasta la próxima renovación.
             </p>
@@ -111,9 +111,9 @@ export default function FacturacionPage() {
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
             <p className="text-sm text-slate-400">Desglose mensual</p>
             <div className="mt-5 space-y-3 text-sm">
-              <p className="flex justify-between"><span>Base imponible</span><span>82,64€</span></p>
-              <p className="flex justify-between"><span>IVA 21%</span><span>17,36€</span></p>
-              <p className="flex justify-between border-t border-white/10 pt-3 text-lg font-black"><span>Total</span><span>100€</span></p>
+              <p className="flex justify-between"><span>Base imponible</span><span>99,17€</span></p>
+              <p className="flex justify-between"><span>IVA 21%</span><span>20,83€</span></p>
+              <p className="flex justify-between border-t border-white/10 pt-3 text-lg font-black"><span>Total</span><span>120€</span></p>
             </div>
           </div>
 
@@ -133,7 +133,7 @@ export default function FacturacionPage() {
             <p className="text-sm text-slate-400">Próxima renovación</p>
             <p className="mt-2 text-2xl font-black">15 Junio 2026</p>
             <p className="mt-3 text-emerald-300">
-              Renovación automática · Crecimiento · 100€/mes
+              Renovación automática · Crecimiento · 120€/mes
             </p>
           </div>
 

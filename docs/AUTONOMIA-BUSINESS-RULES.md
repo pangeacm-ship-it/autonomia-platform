@@ -138,8 +138,8 @@ Exención manual:
 
 Precio:
 
-- Oficial: 89 euros al mes.
-- Fundador: 79 euros al mes.
+- Normal: 100 euros al mes.
+- Lanzamiento: 90 euros al mes.
 
 Enfoque:
 
@@ -154,15 +154,14 @@ Incluye de forma recomendada:
 
 - Dashboard cliente.
 - Centro IA básico.
-- Calendario IA.
 - SocialIA completo.
 
 ### Crecimiento
 
 Precio:
 
-- Oficial: 120 euros al mes.
-- Fundador: 100 euros al mes.
+- Normal: 150 euros al mes.
+- Lanzamiento: 120 euros al mes.
 
 Enfoque:
 
@@ -177,15 +176,14 @@ Incluye de forma recomendada:
 - Todo lo incluido en Inicio.
 - Google Business.
 - ReviewIA básico.
-- Informes básicos.
-- Más volumen de publicaciones.
+- InsightIA básico.
 
-### Local IA 360
+### Local IA
 
 Precio:
 
-- Oficial: 180 euros al mes.
-- Fundador: 150 euros al mes.
+- Normal: 300 euros al mes.
+- Lanzamiento: 250 euros al mes.
 
 Enfoque:
 
@@ -207,11 +205,11 @@ Incluye de forma recomendada:
 - Mayor prioridad de soporte.
 - Más volumen de uso IA.
 
-### Enterprise
+### Enterprise interno futuro
 
 Precio:
 
-- Personalizado.
+- Oculto comercialmente.
 
 Enfoque:
 
@@ -228,6 +226,17 @@ Incluye según propuesta:
 - Multiubicación.
 - Integraciones personalizadas.
 - SLA o soporte prioritario.
+
+Enterprise no debe mostrarse como plan comercial visible en la landing ni en
+las pantallas de cliente. Se conserva solo como compatibilidad interna futura.
+
+### Regla de precio lanzamiento
+
+Los clientes que contraten durante el lanzamiento mantienen su precio
+promocional mientras permanezcan en el mismo plan o suban a un plan superior.
+
+Si bajan de modalidad, pierden el precio de lanzamiento y se aplica el precio
+normal vigente.
 - Configuración avanzada.
 
 ## 4. Módulos
@@ -760,16 +769,15 @@ Reglas por plan:
 - Gratuito: dashboard, SocialIA limitado, empresa, suscripción y facturación.
 - Inicio: SocialIA completo, calendario, empresa, suscripción, facturación y módulos.
 - Crecimiento: SocialIA, Google Business, ReviewIA básico, InsightIA básico y usuarios.
-- Local IA 360: módulos principales.
-- Enterprise: configurable según contrato.
+- Local IA: módulos principales.
+- Enterprise: oculto comercialmente y reservado para uso interno futuro.
 
 Límites de usuarios:
 
 - Gratuito: 1 usuario.
 - Inicio: 1 usuario.
 - Crecimiento: 2 usuarios.
-- Local IA 360: 5 usuarios.
-- Enterprise: personalizado.
+- Local IA: 5 usuarios.
 
 Reglas de experiencia:
 
@@ -862,3 +870,45 @@ Métricas comerciales separadas:
 - Porcentaje de clientes de pago.
 
 El Superadmin debe separar visualmente `Ingresos reales` de `Empresas en prueba` para no confundir tracción comercial con facturación real.
+
+## 25. Acceso VIP gratuito y valor percibido
+
+AutonomIA puede conceder acceso completo sin coste a determinados clientes por decisión comercial.
+
+Casos incluidos:
+
+- Demo ilimitada.
+- Acceso VIP.
+- Partner.
+- Beta tester.
+- Acceso promocional.
+- Empresa exenta de pago.
+
+Reglas económicas:
+
+- No computa ingresos.
+- No computa MRR.
+- No computa ARR.
+- No genera facturación mientras la condición permanezca activa.
+
+Reglas de experiencia cliente:
+
+- No debe mostrarse como plan gratuito básico.
+- No debe usarse el texto `cliente gratuito` ni `demo básica`.
+- El cliente debe ver el valor económico real del plan.
+- Debe mostrarse el precio oficial tachado y el distintivo `Acceso VIP`.
+
+Ejemplos visuales:
+
+- Plan Crecimiento · precio oficial 150€/mes tachado · Acceso VIP activo.
+- Plan Local IA · precio oficial 300€/mes tachado · Acceso VIP activo.
+
+Texto recomendado:
+
+`Actualmente disfrutas de acceso VIP concedido por AutonomIA. Mantienes acceso completo sin coste mientras esta condición permanezca activa.`
+
+Gestión desde Superadmin:
+
+- La ficha de empresa debe permitir marcar `Cliente de pago`, `Acceso VIP`, `Partner`, `Beta tester` o `Demo ilimitada`.
+- Mientras no exista una columna específica, el estado comercial puede registrarse en `superadmin_notes`.
+- La última marca comercial debe prevalecer sobre marcas anteriores.

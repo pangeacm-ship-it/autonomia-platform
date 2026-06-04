@@ -33,7 +33,7 @@ export const conversations = [
 export const initialMessages: Message[] = [
   {
     role: "assistant",
-    text: "Hola Juanma. Soy el Centro IA de AutonomIA. Puedo ayudarte a crear publicaciones, campañas, respuestas a reseñas, ideas para captar clientes, recordatorios y análisis del negocio.",
+    text: "Hola. Soy el Centro IA de AutonomIA. Puedo ayudarte a crear publicaciones, campañas, respuestas a reseñas, ideas para captar clientes, recordatorios y análisis del negocio.",
   },
   {
     role: "user",
@@ -41,7 +41,7 @@ export const initialMessages: Message[] = [
   },
   {
     role: "assistant",
-    text: "Perfecto. Para Bar La Plaza te propongo 3 acciones: publicar el menú del día, mostrar el ambiente de la terraza y lanzar una promoción de fin de semana. También prepararía una story rápida el viernes por la tarde.",
+    text: "Perfecto. Para tu negocio te propongo 3 acciones: publicar una novedad de la semana, mostrar el ambiente del local y lanzar una promoción de fin de semana. También prepararía una story rápida el viernes por la tarde.",
   },
 ];
 

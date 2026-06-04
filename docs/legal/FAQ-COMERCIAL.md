@@ -24,18 +24,26 @@ Algunos módulos pueden estar simulados, en demo o pendientes de integración re
 
 Los planes previstos son:
 
+- Gratuito
 - Inicio
 - Crecimiento
-- Local IA 360
-- Enterprise
+- Local IA
 
-El plan recomendado para piloto inicial es **Crecimiento fundador · 100€/mes**.
+Precios de lanzamiento:
 
-Los precios definitivos deberán confirmarse antes de producción.
+- Gratuito: 0€/mes.
+- Inicio: 90€/mes durante lanzamiento, precio normal 100€/mes.
+- Crecimiento: 120€/mes durante lanzamiento, precio normal 150€/mes.
+- Local IA: 250€/mes durante lanzamiento, precio normal 300€/mes.
+
+Los clientes que contraten durante el lanzamiento mantienen el precio
+promocional mientras permanezcan en el mismo plan o suban a un plan superior.
+Si bajan de modalidad, pierden el precio de lanzamiento y se aplica el precio
+normal vigente.
 
 ## Hay permanencia
 
-El modelo previsto es mensual, sin permanencia general, salvo condiciones específicas en planes Enterprise o acuerdos personalizados.
+El modelo previsto es mensual y sin permanencia general.
 
 En planes estándar, el cliente puede cancelar antes de la siguiente renovación mensual.
 
@@ -92,6 +100,14 @@ En futuras fases se utilizarán proveedores como Supabase, Stripe, OpenAI, Meta 
 Sí, el modelo previsto permite cambiar de plan cuando la plataforma tenga activada la gestión real de suscripciones.
 
 Los cambios de plan podrán afectar a módulos, precio, límites y periodo facturado.
+
+## Qué es el acceso VIP
+
+El acceso VIP es una condición especial concedida por AutonomIA a determinados clientes, partners, beta testers o pruebas estratégicas.
+
+Permite usar una versión profesional sin coste económico mientras la condición permanezca activa.
+
+No genera ingresos ni facturación para AutonomIA durante ese periodo, pero el cliente verá el valor real del plan profesional que está utilizando.
 
 ## AutonomIA publica automáticamente por mí
 

@@ -16,49 +16,14 @@ type User = {
   lastAccess: string;
 };
 
-type PendingInvitation = {
-  email: string;
-  role: string;
-  invitedAt: string;
-};
-
 const fallbackSummary = [
-  { label: "Usuarios activos", value: "2", detail: "Límite Crecimiento 2/2" },
-  { label: "Invitaciones pendientes", value: "2", detail: "Esperando aceptación" },
-  { label: "Administradores", value: "1", detail: "Acceso completo" },
+  { label: "Usuarios activos", value: "0", detail: "Sin usuarios registrados" },
+  { label: "Invitaciones pendientes", value: "0", detail: "Sin invitaciones" },
+  { label: "Administradores", value: "0", detail: "Pendiente de alta" },
   { label: "Roles configurados", value: "5", detail: "Permisos definidos" },
 ];
 
-const fallbackUsers: User[] = [
-  {
-    name: "Juanma Salado",
-    email: "juanma@barlaplaza.com",
-    role: "Admin",
-    status: "Activo",
-    lastAccess: "Hoy, 09:42",
-  },
-  {
-    name: "María López",
-    email: "marketing@barlaplaza.com",
-    role: "Marketing",
-    status: "Activo",
-    lastAccess: "Ayer, 18:15",
-  },
-  {
-    name: "Pedro Ruiz",
-    email: "ventas@barlaplaza.com",
-    role: "Comercial",
-    status: "Pendiente",
-    lastAccess: "Pendiente por límite del plan",
-  },
-  {
-    name: "Ana Gómez",
-    email: "soporte@barlaplaza.com",
-    role: "Soporte",
-    status: "Pendiente",
-    lastAccess: "Invitación enviada",
-  },
-];
+const fallbackUsers: User[] = [];
 
 const roles = [
   {
@@ -85,19 +50,6 @@ const roles = [
     name: "Solo lectura",
     access: "Informes y métricas",
     color: "text-slate-300",
-  },
-];
-
-const pendingInvitations: PendingInvitation[] = [
-  {
-    email: "operaciones@barlaplaza.com",
-    role: "Solo lectura",
-    invitedAt: "28 mayo 2026",
-  },
-  {
-    email: "eventos@barlaplaza.com",
-    role: "Marketing",
-    invitedAt: "31 mayo 2026",
   },
 ];
 
@@ -131,7 +83,6 @@ function getUserLimit(planKey: string | null | undefined) {
   if (planKey === "gratuito" || planKey === "inicio") return 1;
   if (planKey === "crecimiento") return 2;
   if (planKey === "local_ia_360") return 5;
-  if (planKey === "enterprise") return Number.POSITIVE_INFINITY;
   return 2;
 }
 
@@ -181,35 +132,33 @@ export default async function UsuariosPage() {
   const summary = [
     {
       label: "Usuarios activos",
-      value: String(activeUsers.length || fallbackUsers.filter((user) => user.status === "Activo").length),
-      detail: `Límite ${currentPlan?.name ?? "Crecimiento"} ${activeUsers.length || 2}/${getLimitLabel(userLimit)}`,
+      value: String(activeUsers.length),
+      detail: `Límite ${currentPlan?.name ?? "Crecimiento"} ${activeUsers.length}/${getLimitLabel(userLimit)}`,
     },
     {
       label: "Invitaciones pendientes",
-      value: String(invitedUsers.length || pendingInvitations.length),
+      value: String(invitedUsers.length),
       detail: "Esperando aceptación",
     },
     {
       label: "Administradores",
-      value: String(companyUsers.filter((user) => user.role?.key === "company_admin").length || 1),
+      value: String(companyUsers.filter((user) => user.role?.key === "company_admin").length),
       detail: "Acceso completo",
     },
     fallbackSummary[3],
   ];
   const planLimitText = `${currentPlan?.name ?? "Crecimiento"} · ${
-    activeUsers.length || 2
+    activeUsers.length
   }/${getLimitLabel(userLimit)} usuarios activos`;
   const limitWarning =
     Number.isFinite(userLimit) && activeUsers.length >= userLimit
       ? `El plan ${currentPlan?.name ?? "Crecimiento"} permite ${userLimit} usuarios activos. Las nuevas invitaciones quedan pendientes hasta ampliar plan o liberar un asiento.`
       : `El plan ${currentPlan?.name ?? "Crecimiento"} permite ${getLimitLabel(userLimit)} usuarios activos.`;
-  const displayedInvitations = invitedUsers.length
-    ? invitedUsers.map((user) => ({
+  const displayedInvitations = invitedUsers.map((user) => ({
         email: user.profile?.email ?? "email-pendiente@autonomia.app",
         role: getRoleLabel(user.role?.key),
         invitedAt: formatDate(user.invited_at),
-      }))
-    : pendingInvitations;
+      }));
 
   return (
     <section className="p-4 sm:p-6 lg:p-10">
@@ -271,7 +220,7 @@ export default async function UsuariosPage() {
             </div>
 
             <div className="space-y-4">
-              {users.map((user) => (
+              {users.length ? users.map((user) => (
                 <article
                   key={user.email}
                   className="rounded-3xl border border-white/10 bg-[#0b1024] p-5"
@@ -334,7 +283,11 @@ export default async function UsuariosPage() {
                     </div>
                   </div>
                 </article>
-              ))}
+              )) : (
+                <div className="rounded-3xl border border-white/10 bg-[#0b1024] p-6 text-sm leading-6 text-slate-300">
+                  No hay usuarios registrados todavía para esta empresa.
+                </div>
+              )}
             </div>
           </section>
 
@@ -354,7 +307,7 @@ export default async function UsuariosPage() {
             </div>
 
             <div className="space-y-4">
-              {displayedInvitations.map((invitation) => (
+              {displayedInvitations.length ? displayedInvitations.map((invitation) => (
                 <article
                   key={invitation.email}
                   className="rounded-3xl border border-white/10 bg-black/20 p-5"
@@ -374,7 +327,11 @@ export default async function UsuariosPage() {
                     </button>
                   </div>
                 </article>
-              ))}
+              )) : (
+                <div className="rounded-3xl border border-white/10 bg-black/20 p-5 text-sm leading-6 text-slate-300">
+                  No hay invitaciones pendientes.
+                </div>
+              )}
             </div>
           </section>
         </div>
@@ -431,8 +388,7 @@ export default async function UsuariosPage() {
                 "Gratuito · 1 usuario",
                 "Inicio · 1 usuario",
                 "Crecimiento · 2 usuarios",
-                "Local IA 360 · hasta 5 usuarios",
-                "Enterprise · personalizado",
+                "Local IA · hasta 5 usuarios",
               ].map((limit) => (
                 <p key={limit}>✓ {limit}</p>
               ))}

@@ -20,6 +20,12 @@ import type {
 } from "@/types/database";
 
 type DemoType = "normal" | "comercial" | "vip" | "partner";
+type CommercialStatus =
+  | "paying"
+  | "vip"
+  | "partner"
+  | "beta"
+  | "unlimited_demo";
 
 type CreateCompanyInput = {
   companyName: string;
@@ -729,6 +735,55 @@ export async function updateCompanyStatus(input: {
   return { ok: true, message: "Estado actualizado correctamente." };
 }
 
+export async function updateCompanyCommercialStatus(
+  companyId: string,
+  commercialStatus: CommercialStatus,
+): Promise<ActionResult> {
+  const auth = await getAuthorizedAdminClient();
+
+  if (!auth.ok) return { ok: false, message: auth.message };
+  if (!companyId || companyId.startsWith("demo-")) {
+    return { ok: false, message: "Empresa no válida para actualizar estado comercial." };
+  }
+
+  const labels: Record<CommercialStatus, string> = {
+    paying: "Cliente de pago",
+    vip: "Acceso VIP",
+    partner: "Partner",
+    beta: "Beta tester",
+    unlimited_demo: "Demo ilimitada",
+  };
+  const noteKeys: Record<CommercialStatus, string> = {
+    paying: "commercial_status:paying:Cliente marcado como facturable desde Superadmin.",
+    vip: "company_created:vip:Acceso VIP concedido por AutonomIA desde Superadmin.",
+    partner: "company_created:partner:Acceso Partner concedido por AutonomIA desde Superadmin.",
+    beta: "commercial_status:beta:Beta tester concedido por AutonomIA desde Superadmin.",
+    unlimited_demo: "demo_unlimited:true:Demo ilimitada concedida por AutonomIA desde Superadmin.",
+  };
+
+  await addNote(auth.supabase, companyId, auth.profileId, noteKeys[commercialStatus]);
+
+  if (commercialStatus !== "paying") {
+    await auth.supabase
+      .from("companies")
+      .update({ status: "demo", updated_at: new Date().toISOString() })
+      .eq("id", companyId);
+  } else {
+    await auth.supabase
+      .from("companies")
+      .update({ status: "active", updated_at: new Date().toISOString() })
+      .eq("id", companyId);
+  }
+
+  revalidatePath("/superadmin");
+  revalidatePath(`/superadmin/empresas/${companyId}`);
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/suscripcion");
+  revalidatePath("/dashboard/modulos");
+
+  return { ok: true, message: `Estado comercial actualizado: ${labels[commercialStatus]}.` };
+}
+
 async function hasProtectedBillingData(
   supabase: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
   companyId: string,
@@ -976,6 +1031,14 @@ export async function updateCompanyStatusFormAction(formData: FormData) {
     companyId,
     status: String(formData.get("status") ?? "trial") as Company["status"],
   });
+
+  redirectWithResultTo(`/superadmin/empresas/${companyId}`, result);
+}
+
+export async function updateCompanyCommercialStatusFormAction(formData: FormData) {
+  const companyId = String(formData.get("companyId") ?? "");
+  const commercialStatus = String(formData.get("commercialStatus") ?? "paying") as CommercialStatus;
+  const result = await updateCompanyCommercialStatus(companyId, commercialStatus);
 
   redirectWithResultTo(`/superadmin/empresas/${companyId}`, result);
 }

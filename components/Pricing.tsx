@@ -20,8 +20,8 @@ const plans = [
   {
     name: "Inicio",
     label: "PLAN BASE",
-    officialPrice: "89€",
-    launchPrice: "79€",
+    officialPrice: "100€",
+    launchPrice: "90€",
     description:
       "Para negocios que quieren publicar con constancia sin complicarse.",
     features: [
@@ -31,14 +31,14 @@ const plans = [
       "Calendario de publicaciones",
       "Aprobación antes de publicar",
       "Recordatorios básicos",
-      "12 publicaciones mensuales",
+      "SocialIA completo",
     ],
   },
   {
     name: "Crecimiento",
     label: "MÁS POPULAR",
-    officialPrice: "120€",
-    launchPrice: "100€",
+    officialPrice: "150€",
+    launchPrice: "120€",
     description:
       "Para negocios que quieren mejorar su presencia local y medir resultados.",
     features: [
@@ -46,44 +46,28 @@ const plans = [
       "Todo Inicio",
       "Google Business",
       "ReviewIA básico",
-      "Informes básicos",
+      "InsightIA básico",
       "Plan recomendado para negocios locales",
       "Seguimiento mensual",
     ],
     highlighted: true,
   },
   {
-    name: "Local IA 360",
+    name: "Local IA",
     label: "MÁS COMPLETO",
-    officialPrice: "180€",
-    launchPrice: "150€",
+    officialPrice: "300€",
+    launchPrice: "250€",
     description:
       "Para negocios que quieren delegar más marketing y reputación online.",
     features: [
       "Hasta 5 usuarios",
       "Todo Crecimiento",
       "Módulos principales",
-      "ReviewIA + LeadIA + ReservaIA",
+      "Módulos principales",
       "InsightIA avanzado",
       "Prioridad soporte",
       "Automatizaciones avanzadas",
     ],
-  },
-  {
-    name: "Enterprise",
-    label: "A MEDIDA",
-    officialPrice: null,
-    launchPrice: "Personalizado",
-    description:
-      "Para grupos, multiempresa o negocios con procesos e integraciones propias.",
-    features: [
-      "Usuarios personalizados",
-      "Multiempresa",
-      "Módulos a medida",
-      "Soporte prioritario",
-      "Propuesta personalizada",
-    ],
-    enterprise: true,
   },
 ];
 
@@ -102,8 +86,8 @@ export default function Pricing() {
         </h2>
 
         <p className="mt-5 text-lg leading-8 text-slate-400">
-          Contrata durante el lanzamiento y mantén tu tarifa fundador mientras
-          tu suscripción siga activa.
+          Contrata durante el lanzamiento y mantén tu precio promocional
+          mientras permanezcas en el mismo plan o subas a uno superior.
         </p>
       </div>
 
@@ -113,14 +97,14 @@ export default function Pricing() {
         </h3>
 
         <p className="mt-3 text-slate-300">
-          Sin permanencia. Sin sorpresas. Sin subidas de precio mientras
-          mantengas activa tu suscripción.
+          Sin permanencia. Sin sorpresas. Si bajas de modalidad, perderás el
+          precio de lanzamiento y se aplicará el precio normal vigente.
         </p>
       </div>
 
       <TrustGuarantee />
 
-      <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+      <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {plans.map((plan) => (
           <article
             key={plan.name}
@@ -164,31 +148,25 @@ export default function Pricing() {
                   plan.officialPrice ? "mt-5" : ""
                 } text-xs font-black uppercase tracking-[0.18em] text-emerald-300`}
               >
-                {plan.enterprise ? "Precio" : "Precio lanzamiento"}
+                Precio lanzamiento
               </p>
 
               <div className="mt-1 flex items-end gap-2">
                 <span
-                  className={`${
-                    plan.enterprise ? "text-4xl" : "text-6xl"
-                  } font-black text-emerald-300`}
+                  className="text-6xl font-black text-emerald-300"
                 >
                   {plan.launchPrice}
                 </span>
 
-                {!plan.enterprise ? (
-                  <span className="pb-3 text-lg font-bold text-slate-400">
-                    /mes
-                  </span>
-                ) : null}
+                <span className="pb-3 text-lg font-bold text-slate-400">
+                  /mes
+                </span>
               </div>
 
               <p className="mt-3 rounded-full bg-emerald-500/15 px-3 py-2 text-xs font-bold text-emerald-300">
-                {plan.enterprise
-                  ? "Multiempresa y personalizado"
-                  : plan.name === "Gratuito"
+                {plan.name === "Gratuito"
                     ? "Sin pago mensual"
-                    : "Tarifa fundador garantizada"}
+                    : "Precio lanzamiento garantizado"}
               </p>
             </div>
 

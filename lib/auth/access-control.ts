@@ -33,7 +33,6 @@ const allowedRoutesByPlan: Record<string, string[]> = {
   inicio: [
     "/dashboard",
     "/dashboard/socialia",
-    "/dashboard/calendario",
     "/dashboard/empresa",
     "/dashboard/suscripcion",
     "/dashboard/facturacion",
@@ -58,7 +57,7 @@ const allowedRoutesByPlan: Record<string, string[]> = {
 
 const allowedModulesByPlan: Record<string, string[]> = {
   gratuito: ["socialia"],
-  inicio: ["socialia", "calendario_ia"],
+  inicio: ["socialia"],
   crecimiento: ["socialia", "calendario_ia", "google_business", "reviewia", "insightia"],
   local_ia_360: [
     "socialia",

@@ -5,7 +5,7 @@ const actions = [
     type: "Contenido generado",
     status: "Pendiente de aprobación",
     preview:
-      "Hoy en Bar La Plaza te esperamos con nuestro menú casero del día, preparado con productos frescos y mucho sabor. Reserva tu mesa y disfruta de comida de verdad.",
+      "Hoy en nuestro negocio te esperamos con una propuesta especial, preparada con productos frescos y mucho sabor. Reserva tu visita y disfruta de una experiencia cercana.",
     date: "Sugerido para hoy · 13:30",
   },
   {

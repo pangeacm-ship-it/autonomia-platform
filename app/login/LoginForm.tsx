@@ -91,6 +91,13 @@ export default function LoginForm({ isSupabaseConfigured }: LoginFormProps) {
     let nextPath = "/dashboard";
 
     if (user) {
+      if (user.user_metadata?.force_password_change === true) {
+        setIsLoading(false);
+        router.push("/change-password");
+        router.refresh();
+        return;
+      }
+
       const { data: profileData } = await supabase
         .from("profiles")
         .select("*")

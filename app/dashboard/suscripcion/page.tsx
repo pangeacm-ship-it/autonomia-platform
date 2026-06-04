@@ -1,5 +1,7 @@
 import SubscriptionWarningBanner from "@/components/SubscriptionWarningBanner";
+import VipAccessBanner from "@/components/VipAccessBanner";
 import { shouldShowSubscriptionWarning } from "@/lib/auth/access-control";
+import { getCompanyCommercialAccess } from "@/lib/data/commercial-access";
 import { getCurrentCompany } from "@/lib/data/companies";
 import { getCompanyModules, getModules } from "@/lib/data/modules";
 import { getPlans } from "@/lib/data/plans";
@@ -26,25 +28,20 @@ const planCards = [
   {
     name: "Inicio",
     badge: "Entrada",
-    officialPrice: "89€",
-    launchPrice: "79€",
+    officialPrice: "100€",
+    launchPrice: "90€",
     description:
       "Para negocios que quieren mantener actividad constante en redes sin complicarse.",
     features: [
       "1 usuario",
-      "SocialIA",
-      "Instagram + Facebook",
-      "Calendario de publicaciones",
-      "Aprobación previa",
-      "Recordatorios básicos",
-      "12 publicaciones mensuales",
+      "SocialIA completo",
     ],
   },
   {
     name: "Crecimiento",
     badge: "Plan actual",
-    officialPrice: "120€",
-    launchPrice: "100€",
+    officialPrice: "150€",
+    launchPrice: "120€",
     description:
       "Para negocios que quieren más presencia local y mejores recomendaciones.",
     features: [
@@ -52,7 +49,7 @@ const planCards = [
       "Todo Inicio",
       "Google Business",
       "ReviewIA básico",
-      "Informes básicos",
+      "InsightIA básico",
       "Recomendaciones IA",
       "Mejor seguimiento mensual",
     ],
@@ -60,35 +57,21 @@ const planCards = [
     recommended: true,
   },
   {
-    name: "Local IA 360",
+    name: "Local IA",
     badge: "Premium",
-    officialPrice: "180€",
-    launchPrice: "150€",
+    officialPrice: "300€",
+    launchPrice: "250€",
     description:
       "Para negocios que quieren delegar más marketing y reputación online.",
     features: [
       "Hasta 5 usuarios",
       "Todo Crecimiento",
-      "ReviewIA",
-      "InsightIA",
+      "Módulos principales",
+      "InsightIA avanzado",
       "Prioridad soporte",
       "Automatizaciones avanzadas",
       "Mayor acompañamiento",
     ],
-  },
-  {
-    name: "Enterprise",
-    badge: "A medida",
-    description:
-      "Para franquicias, cadenas y empresas con varios centros que necesitan una solución personalizada.",
-    features: [
-      "Multiempresa",
-      "Multiubicación",
-      "Usuarios personalizados",
-      "Automatizaciones a medida",
-      "Soporte prioritario",
-    ],
-    enterprise: true,
   },
 ];
 
@@ -105,8 +88,7 @@ function getPlanKey(name: string) {
     Gratuito: "gratuito",
     Inicio: "inicio",
     Crecimiento: "crecimiento",
-    "Local IA 360": "local_ia_360",
-    Enterprise: "enterprise",
+    "Local IA": "local_ia_360",
   };
 
   return planKeys[name] ?? name.toLowerCase();
@@ -134,7 +116,6 @@ function getUserLimit(planKey: string | null | undefined) {
   if (planKey === "gratuito" || planKey === "inicio") return "1 usuario";
   if (planKey === "crecimiento") return "2 usuarios";
   if (planKey === "local_ia_360") return "Hasta 5 usuarios";
-  if (planKey === "enterprise") return "Personalizado";
   return "2 usuarios";
 }
 
@@ -175,6 +156,11 @@ export default async function SuscripcionPage() {
   const currentSupabasePlan = supabasePlans.find(
     (plan) => plan.id === subscription?.plan_id,
   );
+  const commercialAccess = await getCompanyCommercialAccess({
+    company,
+    subscription,
+    plan: currentSupabasePlan,
+  });
   const currentPlanName = currentSupabasePlan?.name ?? "Crecimiento";
   const currentPrice =
     subscription?.monthly_price_cents !== null &&
@@ -182,7 +168,7 @@ export default async function SuscripcionPage() {
       ? `${Math.round(subscription.monthly_price_cents / 100)}€/mes`
       : currentSupabasePlan
         ? `${formatMonthlyPrice(currentSupabasePlan)}/mes`
-        : "100€/mes";
+        : "120€/mes";
   const nextRenewal = subscription?.current_period_end
     ? new Intl.DateTimeFormat("es-ES", {
         day: "numeric",
@@ -206,7 +192,9 @@ export default async function SuscripcionPage() {
   const availableModuleNames = availableModulesFromSupabase.length
     ? availableModulesFromSupabase
     : fallbackAvailableModules;
-  const plans = planCards.map((plan) => {
+  const plans = planCards
+    .filter((plan) => !commercialAccess.isGifted || plan.name !== "Gratuito")
+    .map((plan) => {
     const supabasePlan = supabasePlans.find(
       (item) => item.key === getPlanKey(plan.name),
     );
@@ -251,8 +239,9 @@ export default async function SuscripcionPage() {
             </h2>
 
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-              {company.name} mantiene sus servicios preparados en modo demo o
-              con datos de Supabase cuando la sesión esté disponible.
+              {commercialAccess.isGifted
+                ? `${company.name} mantiene acceso profesional concedido por AutonomIA mientras esta condición permanezca activa.`
+                : `${company.name} mantiene sus servicios preparados en modo demo o con datos de Supabase cuando la sesión esté disponible.`}
             </p>
           </div>
 
@@ -262,6 +251,11 @@ export default async function SuscripcionPage() {
         </div>
       </div>
 
+      <div className="mb-8">
+        <VipAccessBanner access={commercialAccess} />
+      </div>
+
+      {!commercialAccess.isGifted ? (
       <div className="mb-8 rounded-[2rem] border border-violet-400/25 bg-violet-500/10 p-6">
         <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-center">
           <div>
@@ -284,17 +278,28 @@ export default async function SuscripcionPage() {
           </span>
         </div>
       </div>
+      ) : null}
 
-      <div className="grid items-stretch gap-6 xl:grid-cols-2 2xl:grid-cols-5">
+      <div className="mb-8 rounded-[2rem] border border-emerald-500/20 bg-emerald-500/10 p-6">
+        <h2 className="text-xl font-black text-emerald-300">
+          Regla de precio lanzamiento
+        </h2>
+        <p className="mt-3 text-sm leading-6 text-slate-300">
+          Si contratas durante el lanzamiento, mantienes el precio promocional
+          mientras sigas en el mismo plan o subas a uno superior. Si bajas de
+          modalidad, se pierde la tarifa de lanzamiento y se aplica el precio
+          normal vigente.
+        </p>
+      </div>
+
+      <div className="grid items-stretch gap-6 xl:grid-cols-2 2xl:grid-cols-4">
         {plans.map((plan) => (
           <article
             key={plan.name}
             className={`flex h-full flex-col rounded-[2rem] border p-6 ${
               plan.current
                 ? "border-emerald-400/40 bg-emerald-500/10 shadow-[0_0_35px_rgba(16,185,129,0.16)]"
-                : plan.enterprise
-                  ? "border-sky-400/30 bg-sky-500/10"
-                  : "border-white/10 bg-white/[0.04]"
+                : "border-white/10 bg-white/[0.04]"
             }`}
           >
             <div className="mb-5 flex min-h-[44px] items-start justify-between gap-4">
@@ -304,9 +309,7 @@ export default async function SuscripcionPage() {
                 className={`shrink-0 rounded-full px-3 py-2 text-xs font-black ${
                   plan.current
                     ? "bg-emerald-500/20 text-emerald-300"
-                    : plan.enterprise
-                      ? "bg-sky-500/20 text-sky-300"
-                      : "bg-violet-500/20 text-violet-300"
+                    : "bg-violet-500/20 text-violet-300"
                 }`}
               >
                 {plan.badge}
@@ -318,24 +321,7 @@ export default async function SuscripcionPage() {
             </p>
 
             <div className="mt-6 flex min-h-[245px] flex-col justify-between rounded-2xl border border-white/10 bg-black/20 p-5">
-              {plan.enterprise ? (
-                <>
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-300">
-                      Precio personalizado
-                    </p>
-
-                    <p className="mt-6 text-5xl font-black text-sky-300">
-                      Consultar
-                    </p>
-                  </div>
-
-                  <p className="mt-5 rounded-full bg-sky-500/15 px-3 py-2 text-xs font-bold text-sky-300">
-                    Solución adaptada a cada empresa
-                  </p>
-                </>
-              ) : (
-                <>
+              <>
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
                       Precio oficial
@@ -361,10 +347,9 @@ export default async function SuscripcionPage() {
                   </div>
 
                   <p className="mt-3 rounded-full bg-emerald-500/15 px-3 py-2 text-xs font-bold text-emerald-300">
-                    Tarifa fundador garantizada
+                    Precio lanzamiento garantizado
                   </p>
-                </>
-              )}
+              </>
             </div>
 
             <ul className="mt-6 min-h-[170px] space-y-3 text-sm text-slate-300">
@@ -376,17 +361,13 @@ export default async function SuscripcionPage() {
             <button
               className={`mt-auto w-full rounded-2xl px-6 py-4 font-bold ${
                 plan.current
-                  ? "border border-white/10 text-white hover:bg-white/10"
-                  : plan.enterprise
-                    ? "bg-white text-slate-950 hover:bg-slate-200"
-                    : "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-[0_0_35px_rgba(124,58,237,0.25)] hover:opacity-90"
+                ? "border border-white/10 text-white hover:bg-white/10"
+                  : "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-[0_0_35px_rgba(124,58,237,0.25)] hover:opacity-90"
               }`}
             >
               {plan.current
                 ? "Plan contratado"
-                : plan.enterprise
-                  ? "Solicitar propuesta"
-                  : "Cambiar a este plan"}
+                : "Cambiar a este plan"}
             </button>
           </article>
         ))}
@@ -444,8 +425,9 @@ export default async function SuscripcionPage() {
             </p>
 
             <p className="mt-3 text-sm leading-6 text-slate-300">
-              Tu tarifa fundador se mantendrá mientras la suscripción esté
-              activa. Plan actual: {currentPlanName} con límite de {userLimit}.
+              {commercialAccess.isGifted
+                ? `Estás utilizando una versión profesional con ${commercialAccess.label.toLowerCase()} especial. Plan actual: ${currentPlanName} con límite de ${userLimit}.`
+                : `Tu precio de lanzamiento se mantendrá mientras sigas en el mismo plan o subas a uno superior. Plan actual: ${currentPlanName} con límite de ${userLimit}.`}
             </p>
           </div>
 

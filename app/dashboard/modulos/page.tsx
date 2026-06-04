@@ -1,6 +1,8 @@
 import Link from "next/link";
 import SubscriptionWarningBanner from "@/components/SubscriptionWarningBanner";
+import VipAccessBanner from "@/components/VipAccessBanner";
 import { shouldShowSubscriptionWarning } from "@/lib/auth/access-control";
+import { getCompanyCommercialAccess } from "@/lib/data/commercial-access";
 import { getCurrentCompany } from "@/lib/data/companies";
 import {
   getCompanyModules,
@@ -10,7 +12,7 @@ import { getPlans } from "@/lib/data/plans";
 import { getCurrentSubscription } from "@/lib/data/subscriptions";
 import type { CompanyModule, Module } from "@/types/database";
 
-type ModuleStatus = "Activo" | "Recomendado" | "Disponible" | "Enterprise";
+type ModuleStatus = "Activo" | "Recomendado" | "Disponible";
 
 type ModuleCard = {
   name: string;
@@ -125,15 +127,6 @@ const availableModules: ModuleCard[] = [
     price: "+25€/mes",
     href: "/dashboard/tiktok-shorts",
   },
-  {
-    name: "Enterprise",
-    status: "Enterprise",
-    description:
-      "Solución a medida para empresas con varios centros, necesidades avanzadas o flujos propios.",
-    benefits: ["Multiubicación", "Soporte prioritario", "Automatizaciones a medida"],
-    price: "A medida",
-    href: "/dashboard/suscripcion",
-  },
 ];
 
 function normalize(value: string) {
@@ -187,7 +180,6 @@ function getModuleHref(module: Pick<Module, "key" | "name">) {
     whatsappia: "/dashboard/whatsappia",
     tiktok_shorts: "/dashboard/tiktok-shorts",
     youtube_shorts: "/dashboard/tiktok-shorts",
-    enterprise: "/dashboard/suscripcion",
   };
 
   return hrefs[module.key] ?? `/dashboard/${normalize(module.name)}`;
@@ -265,10 +257,6 @@ function getStatusClass(status: ModuleStatus) {
     return "bg-amber-500/20 text-amber-300";
   }
 
-  if (status === "Enterprise") {
-    return "bg-sky-500/20 text-sky-300";
-  }
-
   return "bg-violet-500/20 text-violet-300";
 }
 
@@ -279,10 +267,6 @@ function getActionLabel(status: ModuleStatus) {
 
   if (status === "Recomendado") {
     return "Activar módulo";
-  }
-
-  if (status === "Enterprise") {
-    return "Solicitar propuesta";
   }
 
   return "Ver detalles";
@@ -356,9 +340,7 @@ function ModuleGrid({
               className={`mt-6 block rounded-2xl px-5 py-3 text-center text-sm font-bold transition ${
                 module.status === "Activo"
                   ? "border border-white/10 text-white hover:bg-white/10"
-                  : module.status === "Enterprise"
-                    ? "bg-white text-slate-950 hover:bg-slate-200"
-                    : "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-[0_0_28px_rgba(124,58,237,0.24)] hover:opacity-90"
+                  : "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-[0_0_28px_rgba(124,58,237,0.24)] hover:opacity-90"
               }`}
             >
               {getActionLabel(module.status)}
@@ -388,6 +370,11 @@ export default async function ModulosPage() {
   ).length;
   const availableCount = Math.max(modules.length - activeCount - recommendedCount, 0);
   const currentPlan = plans.find((plan) => plan.id === subscription?.plan_id);
+  const commercialAccess = await getCompanyCommercialAccess({
+    company,
+    subscription,
+    plan: currentPlan,
+  });
   const summary = [
     {
       ...fallbackSummary[0],
@@ -521,9 +508,9 @@ export default async function ModulosPage() {
               Plan actual: {currentPlan?.name ?? "Crecimiento"}
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-400">
-              Incluye 2 usuarios, SocialIA, Google Business, ReviewIA básico e
-              informes básicos. Para más usuarios o módulos principales, Local
-              IA 360 amplía el límite hasta 5 usuarios.
+              {commercialAccess.isGifted
+                ? "Estás utilizando una versión profesional con acceso VIP especial. Los módulos activos mantienen el valor real del plan mientras esta condición permanezca activa."
+                : "Incluye 2 usuarios, SocialIA, Google Business, ReviewIA básico e InsightIA básico. Para más usuarios o módulos principales, Local IA amplía el límite hasta 5 usuarios."}
             </p>
           </div>
 
@@ -536,6 +523,11 @@ export default async function ModulosPage() {
         </div>
       </div>
 
+      <div className="mt-6">
+        <VipAccessBanner access={commercialAccess} />
+      </div>
+
+      {!commercialAccess.isGifted ? (
       <div className="mt-6 rounded-[2rem] border border-emerald-400/20 bg-emerald-500/10 p-6">
         <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-center">
           <div>
@@ -560,6 +552,7 @@ export default async function ModulosPage() {
           </Link>
         </div>
       </div>
+      ) : null}
 
       <ModuleGrid
         title="Módulos activos"

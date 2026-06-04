@@ -84,14 +84,17 @@ export default async function EmpresaPage() {
   const displayedRecommendedModules = recommendedModules.length
     ? recommendedModules
     : currentSector.compatibleModules;
-  const companyPhone = profileContext.profile.phone ?? "+34 600 000 000";
+  const companyPhone = profileContext.profile.phone ?? "";
+  const hasRegisteredCompany = company.name !== "Sin empresa registrada";
   const companyAddress = company.city
     ? `Dirección pendiente, ${company.city}`
-    : "Calle Principal, 1, Sevilla";
+    : "";
   const companyDescription =
     company.industry || company.city
       ? `${company.name} es un negocio de ${company.industry ?? "servicios"}${company.city ? ` en ${company.city}` : ""} que usa AutonomIA para organizar presencia digital, contenidos y recomendaciones.`
-      : `${company.name} usa AutonomIA para preparar contenido, revisar actividad y mantener su presencia digital organizada.`;
+      : hasRegisteredCompany
+        ? `${company.name} usa AutonomIA para preparar contenido, revisar actividad y mantener su presencia digital organizada.`
+        : "No hay empresa registrada todavía. Crea una empresa desde Superadmin para completar estos datos.";
 
   return (
     <section className="p-4 sm:p-6 lg:p-10">
@@ -156,7 +159,7 @@ export default async function EmpresaPage() {
                   Ciudad
                 </label>
                 <input
-                  defaultValue={company.city ?? "Sevilla"}
+                  defaultValue={company.city ?? ""}
                   className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 text-white outline-none focus:border-violet-400"
                 />
               </div>
@@ -176,7 +179,7 @@ export default async function EmpresaPage() {
                   Email
                 </label>
                 <input
-                  defaultValue={company.owner_email ?? "hola@barlaplaza.com"}
+                  defaultValue={company.owner_email ?? ""}
                   className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 text-white outline-none focus:border-violet-400"
                 />
               </div>

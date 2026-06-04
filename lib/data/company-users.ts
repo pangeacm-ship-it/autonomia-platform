@@ -31,65 +31,7 @@ function normalizeCompanyUser(row: CompanyUserRow): CompanyUserWithProfile {
   };
 }
 
-const fallbackCompanyUsers: CompanyUserWithProfile[] = [
-  {
-    id: "demo-company-user-juanma",
-    company_id: "demo-company-bar-la-plaza",
-    profile_id: "demo-profile-juanma",
-    role_id: "role-company-admin",
-    status: "active",
-    invited_at: "2026-01-15T09:00:00.000Z",
-    last_access_at: "2026-06-03T09:42:00.000Z",
-    created_at: "2026-01-15T09:00:00.000Z",
-    updated_at: "2026-06-03T09:42:00.000Z",
-    profile: {
-      full_name: "Juanma Salado",
-      email: "juanma@barlaplaza.com",
-    },
-    role: {
-      key: "company_admin",
-      name: "Admin",
-    },
-  },
-  {
-    id: "demo-company-user-marketing",
-    company_id: "demo-company-bar-la-plaza",
-    profile_id: "demo-profile-marketing",
-    role_id: "role-marketing",
-    status: "active",
-    invited_at: "2026-02-01T09:00:00.000Z",
-    last_access_at: "2026-06-02T18:15:00.000Z",
-    created_at: "2026-02-01T09:00:00.000Z",
-    updated_at: "2026-06-02T18:15:00.000Z",
-    profile: {
-      full_name: "María López",
-      email: "marketing@barlaplaza.com",
-    },
-    role: {
-      key: "marketing",
-      name: "Marketing",
-    },
-  },
-  {
-    id: "demo-company-user-sales",
-    company_id: "demo-company-bar-la-plaza",
-    profile_id: "demo-profile-sales",
-    role_id: "role-sales",
-    status: "invited",
-    invited_at: "2026-05-28T09:00:00.000Z",
-    last_access_at: null,
-    created_at: "2026-05-28T09:00:00.000Z",
-    updated_at: "2026-05-28T09:00:00.000Z",
-    profile: {
-      full_name: "Pedro Ruiz",
-      email: "ventas@barlaplaza.com",
-    },
-    role: {
-      key: "sales",
-      name: "Comercial",
-    },
-  },
-];
+const fallbackCompanyUsers: CompanyUserWithProfile[] = [];
 
 export async function getCompanyUsers(
   companyId: string,
@@ -108,7 +50,7 @@ export async function getCompanyUsers(
     .order("created_at");
 
   if (error || !data?.length) {
-    return fallback.length ? fallback : fallbackCompanyUsers;
+    return fallback;
   }
 
   return ((data ?? []) as CompanyUserRow[]).map(normalizeCompanyUser);

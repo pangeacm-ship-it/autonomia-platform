@@ -50,7 +50,7 @@ export default function SavingsCalculator() {
           </div>
 
           <div className="p-5 text-right text-2xl font-black text-emerald-300">
-            79€
+            90€
           </div>
         </div>
       </div>

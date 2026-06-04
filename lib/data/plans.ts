@@ -2,11 +2,15 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Plan } from "@/types/database";
 import { mockPlans } from "./mock";
 
+function visiblePlans(plans: Plan[]) {
+  return plans.filter((plan) => plan.status !== "hidden");
+}
+
 export async function getPlans(): Promise<Plan[]> {
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return mockPlans;
+    return visiblePlans(mockPlans);
   }
 
   const { data, error } = await supabase
@@ -15,8 +19,8 @@ export async function getPlans(): Promise<Plan[]> {
     .order("monthly_price_cents");
 
   if (error || !data?.length) {
-    return mockPlans;
+    return visiblePlans(mockPlans);
   }
 
-  return data;
+  return visiblePlans(data);
 }

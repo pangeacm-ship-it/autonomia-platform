@@ -9,8 +9,10 @@ import {
   updateCompanyFormAction,
   updateCompanyModulesFormAction,
   updateCompanyPlanFormAction,
+  updateCompanyCommercialStatusFormAction,
   updateCompanyStatusFormAction,
 } from "@/lib/data/company-management";
+import { resolveCommercialAccess } from "@/lib/data/commercial-access";
 import {
   convertDemoToCustomerFormAction,
   extendCompanyDemoFormAction,
@@ -31,6 +33,14 @@ const companyStatuses: Array<{ value: Company["status"]; label: string }> = [
   { value: "past_due", label: "Renovación fallida" },
   { value: "suspended", label: "Suspendida" },
   { value: "canceled", label: "Cancelada" },
+];
+
+const commercialStatuses = [
+  { value: "paying", label: "Cliente de pago" },
+  { value: "vip", label: "Acceso VIP" },
+  { value: "partner", label: "Partner" },
+  { value: "beta", label: "Beta tester" },
+  { value: "unlimited_demo", label: "Demo ilimitada" },
 ];
 
 function statusClass(status: string) {
@@ -91,6 +101,13 @@ export default async function CompanyDetailPage({
       .map((companyModule) => companyModule.module_id),
   );
   const currentPlanId = detail.subscription?.plan_id ?? "";
+  const currentPlan = detail.plans.find((plan) => plan.id === currentPlanId);
+  const commercialAccess = resolveCommercialAccess({
+    company: detail.company,
+    subscription: detail.subscription,
+    plan: currentPlan,
+    notes: detail.notes,
+  });
 
   return (
     <main className="min-h-screen bg-[#050816] text-white">
@@ -245,6 +262,38 @@ export default async function CompanyDetailPage({
                     <input name="companyId" type="hidden" value={detail.company.id} />
                     <input name="status" type="hidden" value={status.value} />
                     <button className="rounded-xl border border-white/10 px-3 py-2 text-xs font-bold hover:bg-white/10">
+                      {status.label}
+                    </button>
+                  </form>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] border border-violet-400/20 bg-violet-500/10 p-6">
+              <h2 className="text-2xl font-black">Estado comercial</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                Estado actual: {commercialAccess.label}. Los accesos VIP,
+                partner, beta y demo ilimitada no computan ingresos.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {commercialStatuses.map((status) => (
+                  <form
+                    key={status.value}
+                    action={updateCompanyCommercialStatusFormAction}
+                  >
+                    <input name="companyId" type="hidden" value={detail.company.id} />
+                    <input
+                      name="commercialStatus"
+                      type="hidden"
+                      value={status.value}
+                    />
+                    <button
+                      className={`rounded-xl border px-3 py-2 text-xs font-bold hover:bg-white/10 ${
+                        commercialAccess.kind === status.value
+                          ? "border-violet-300/40 bg-violet-400/20 text-violet-100"
+                          : "border-white/10"
+                      }`}
+                    >
                       {status.label}
                     </button>
                   </form>

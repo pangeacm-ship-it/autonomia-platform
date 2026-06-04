@@ -10,10 +10,10 @@ AutonomIA se ofrece como servicio digital alojado en la nube.
 
 Los planes comerciales previstos son:
 
+- **Gratuito**
 - **Inicio**
 - **Crecimiento**
-- **Local IA 360**
-- **Enterprise**
+- **Local IA**
 
 Cada plan podrá incluir distintos módulos, límites, funcionalidades, soporte, configuración y precios.
 
@@ -25,7 +25,22 @@ AutonomIA funciona como un servicio de suscripción mensual.
 
 El cliente contrata el acceso a la plataforma, no adquiere propiedad sobre el software, código, diseños, modelos, documentación interna ni infraestructura.
 
-AutonomIA no aplica costes ocultos ni compromisos de permanencia general. Cualquier condición especial, módulo adicional, servicio personalizado o acuerdo Enterprise deberá indicarse antes de la contratación.
+AutonomIA no aplica costes ocultos ni compromisos de permanencia general. Cualquier condición especial, módulo adicional o servicio personalizado deberá indicarse antes de la contratación.
+
+## 3.1. Precios de lanzamiento
+
+Los precios comerciales de lanzamiento son:
+
+- Gratuito: 0 euros al mes.
+- Inicio: 90 euros al mes durante lanzamiento, precio normal 100 euros al mes.
+- Crecimiento: 120 euros al mes durante lanzamiento, precio normal 150 euros al mes.
+- Local IA: 250 euros al mes durante lanzamiento, precio normal 300 euros al mes.
+
+Los clientes que contraten durante el lanzamiento mantienen su precio
+promocional mientras permanezcan en el mismo plan o suban a un plan superior.
+
+Si bajan de modalidad, pierden el precio de lanzamiento y se aplica el precio
+normal vigente.
 
 ## 4. Facturación y pago
 
@@ -96,7 +111,7 @@ Para evitar la siguiente renovación, la cancelación deberá realizarse antes d
 
 No se realizarán devoluciones parciales por periodos ya iniciados, salvo obligación legal, error atribuible a AutonomIA o acuerdo específico.
 
-En planes Enterprise podrán aplicarse condiciones particulares.
+En acuerdos personalizados futuros podrán aplicarse condiciones particulares.
 
 Si se detecta un cargo realizado por error atribuible a AutonomIA, se revisará el caso y, si corresponde, se devolverá el importe afectado.
 
@@ -135,9 +150,12 @@ El cliente no podrá:
 - Revender el servicio sin autorización.
 - Automatizar usos abusivos o contrarios a las políticas de proveedores externos.
 
-## 15. Plan Enterprise
+## 15. Acuerdos personalizados futuros
 
-El plan Enterprise podrá tener condiciones personalizadas, incluyendo precio, soporte, módulos, límites, facturación, permanencia, onboarding y contrato específico.
+AutonomIA podrá preparar acuerdos personalizados futuros para clientes con
+necesidades especiales, varias sedes, integraciones a medida, mayores volúmenes
+o soporte avanzado. Estos acuerdos no forman parte de los planes comerciales
+visibles iniciales y requerirán condiciones específicas.
 
 ## 16. Revisión legal
 

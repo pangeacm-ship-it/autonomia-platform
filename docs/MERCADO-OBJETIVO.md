@@ -126,7 +126,7 @@ Para los primeros 2 o 3 clientes reales:
 
 - Elegir negocios cercanos y accesibles.
 - Priorizar quien pueda dar feedback rápido.
-- Vender el plan Crecimiento fundador.
+- Vender el plan Crecimiento de lanzamiento.
 - Limitar la promesa a SocialIA básico, Centro IA, dashboard, tareas y configuración de empresa.
 - Presentar ReviewIA, WhatsAppIA, LeadIA y ReservaIA como roadmap, no como automatización real completa.
 

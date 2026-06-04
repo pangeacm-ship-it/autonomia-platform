@@ -50,7 +50,7 @@ Antes de producción faltan:
 - Conservación documental.
 - VERI*FACTU y proveedor fiscal.
 - Datos fiscales obligatorios del emisor y receptor.
-- Tratamiento de planes Enterprise y descuentos.
+- Tratamiento de precios de lanzamiento y acuerdos personalizados futuros.
 
 ## Qué debe revisarse antes de lanzar
 

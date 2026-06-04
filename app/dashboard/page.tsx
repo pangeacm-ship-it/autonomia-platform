@@ -1,9 +1,14 @@
 import Link from "next/link";
 import SubscriptionWarningBanner from "@/components/SubscriptionWarningBanner";
+import VipAccessBanner from "@/components/VipAccessBanner";
 import {
   getCurrentDashboardAccess,
   shouldShowSubscriptionWarning,
 } from "@/lib/auth/access-control";
+import { getCompanyCommercialAccess } from "@/lib/data/commercial-access";
+import { getCurrentCompany } from "@/lib/data/companies";
+import { getPlans } from "@/lib/data/plans";
+import { getCurrentSubscription } from "@/lib/data/subscriptions";
 
 const quickAccess = [
   {
@@ -62,6 +67,15 @@ const activeModules = ["SocialIA", "Google Business", "ReviewIA", "LeadIA"];
 
 export default async function DashboardPage() {
   const access = await getCurrentDashboardAccess();
+  const company = await getCurrentCompany();
+  const subscription = await getCurrentSubscription(company.id);
+  const plans = await getPlans();
+  const currentPlan = plans.find((plan) => plan.id === subscription?.plan_id);
+  const commercialAccess = await getCompanyCommercialAccess({
+    company,
+    subscription,
+    plan: currentPlan,
+  });
 
   return (
     <section className="p-4 sm:p-6 lg:p-10">
@@ -106,6 +120,12 @@ export default async function DashboardPage() {
           </Link>
         ))}
       </div>
+
+      {commercialAccess.isGifted ? (
+        <div className="mb-8">
+          <VipAccessBanner access={commercialAccess} compact />
+        </div>
+      ) : null}
 
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
@@ -172,9 +192,13 @@ export default async function DashboardPage() {
         <aside className="space-y-6">
           <div className="rounded-[2rem] border border-violet-400/30 bg-violet-500/10 p-6">
             <p className="text-sm text-violet-200">Plan actual</p>
-            <h3 className="mt-2 text-3xl font-black">Crecimiento</h3>
+            <h3 className="mt-2 text-3xl font-black">
+              {commercialAccess.planDisplayName}
+            </h3>
             <p className="mt-3 text-sm text-emerald-300">
-              Precio fundador · 100€/mes
+              {commercialAccess.isGifted
+                ? `${commercialAccess.label} · precio oficial ${commercialAccess.officialPrice}`
+                : "Precio lanzamiento · 120€/mes"}
             </p>
           </div>
 

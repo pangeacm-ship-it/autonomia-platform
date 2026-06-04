@@ -143,7 +143,7 @@ export default async function WhatsAppIAPage() {
 
                     <p className="mt-3 text-sm leading-6 text-slate-300">
                       Hola {chat.name.split(" ")[0]}, gracias por contactar con
-                      Bar La Plaza. Podemos ayudarte con disponibilidad,
+                      nuestro negocio. Podemos ayudarte con disponibilidad,
                       horarios o reservas. ¿Para qué día y cuántas personas
                       necesitas?
                     </p>

@@ -111,7 +111,8 @@ export default function OnboardingPage() {
                     Nombre comercial
                   </label>
                   <input
-                    defaultValue="Bar La Plaza"
+                    defaultValue=""
+                    placeholder="Nombre de tu empresa"
                     className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 outline-none focus:border-violet-400"
                   />
                 </div>
@@ -121,7 +122,8 @@ export default function OnboardingPage() {
                     Ciudad
                   </label>
                   <input
-                    defaultValue="Sevilla"
+                    defaultValue=""
+                    placeholder="Ciudad"
                     className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 outline-none focus:border-violet-400"
                   />
                 </div>
@@ -131,7 +133,8 @@ export default function OnboardingPage() {
                     Teléfono
                   </label>
                   <input
-                    defaultValue="+34 600 000 000"
+                    defaultValue=""
+                    placeholder="+34"
                     className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 outline-none focus:border-violet-400"
                   />
                 </div>
@@ -141,7 +144,8 @@ export default function OnboardingPage() {
                     Email
                   </label>
                   <input
-                    defaultValue="hola@barlaplaza.com"
+                    defaultValue=""
+                    placeholder="email@empresa.com"
                     className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 outline-none focus:border-violet-400"
                   />
                 </div>
@@ -280,7 +284,7 @@ export default function OnboardingPage() {
               <div className="mt-5 space-y-4 text-sm">
                 <p className="flex justify-between gap-4">
                   <span className="text-slate-400">Empresa</span>
-                  <span className="font-bold">Bar La Plaza</span>
+                  <span className="font-bold">Tu empresa</span>
                 </p>
                 <p className="flex justify-between gap-4">
                   <span className="text-slate-400">Sector</span>

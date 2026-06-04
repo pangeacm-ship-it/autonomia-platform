@@ -135,11 +135,11 @@ export default function CentroIAPage() {
         <div className="mt-5 flex flex-col justify-between gap-6 xl:flex-row xl:items-end">
           <div>
             <h1 className="text-3xl font-black sm:text-4xl">
-              Buenos días, Juanma 👋
+              Buenos días 👋
             </h1>
 
             <p className="mt-4 max-w-3xl text-slate-300">
-              He analizado la actividad de Bar La Plaza y tengo varias acciones
+              He analizado la actividad de tu empresa y tengo varias acciones
               recomendadas para mejorar publicaciones, reseñas, leads y
               reservas.
             </p>

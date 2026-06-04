@@ -13,150 +13,21 @@ import type {
 } from "@/types/database";
 import {
   mockPlans,
-  mockCompany,
-  mockCompanyModules,
   mockModules,
-  mockProfile,
-  mockSubscription,
 } from "./mock";
 import { getCurrentProfileContext } from "./profiles";
 
-const fallbackCompanies: Company[] = [
-  mockCompany,
-  {
-    ...mockCompany,
-    id: "demo-company-clinica-nova",
-    name: "Clínica Nova",
-    legal_name: "Clínica Nova S.L.",
-    slug: "clinica-nova",
-    city: "Málaga",
-    industry: "Salud",
-    owner_name: "María Nova",
-    owner_email: "admin@clinicanova.com",
-  },
-  {
-    ...mockCompany,
-    id: "demo-company-beauty-studio",
-    name: "Beauty Studio",
-    legal_name: "Beauty Studio S.L.",
-    slug: "beauty-studio",
-    city: "Córdoba",
-    industry: "Belleza",
-    owner_name: "Laura Gómez",
-    owner_email: "hola@beautystudio.com",
-  },
-];
+const fallbackCompanies: Company[] = [];
 
-const fallbackCompanyUsers: CompanyUser[] = [
-  {
-    id: "demo-company-user-juanma",
-    company_id: mockCompany.id,
-    profile_id: mockProfile.id,
-    role_id: "role-company-admin",
-    status: "active",
-    invited_at: "2026-01-15T09:00:00.000Z",
-    last_access_at: "2026-06-03T09:42:00.000Z",
-    created_at: "2026-01-15T09:00:00.000Z",
-    updated_at: "2026-06-03T09:42:00.000Z",
-  },
-  {
-    id: "demo-company-user-marketing",
-    company_id: mockCompany.id,
-    profile_id: "demo-profile-marketing",
-    role_id: "role-marketing",
-    status: "active",
-    invited_at: "2026-02-01T09:00:00.000Z",
-    last_access_at: "2026-06-03T09:12:00.000Z",
-    created_at: "2026-02-01T09:00:00.000Z",
-    updated_at: "2026-06-03T09:12:00.000Z",
-  },
-];
+const fallbackCompanyUsers: CompanyUser[] = [];
 
-const fallbackSubscriptions: Subscription[] = [
-  mockSubscription,
-  {
-    ...mockSubscription,
-    id: "subscription-demo-clinica-nova",
-    company_id: "demo-company-clinica-nova",
-    plan_id: "plan-local-ia-360",
-    monthly_price_cents: 15000,
-  },
-  {
-    ...mockSubscription,
-    id: "subscription-demo-beauty-studio",
-    company_id: "demo-company-beauty-studio",
-    plan_id: "plan-inicio",
-    monthly_price_cents: 7900,
-  },
-];
+const fallbackSubscriptions: Subscription[] = [];
 
-const fallbackDemoRequests: DemoRequest[] = [
-  {
-    id: "demo-request-centrofit",
-    company_name: "Gimnasio CentroFit",
-    contact_name: "Carlos",
-    email: "hola@centrofit.com",
-    phone: null,
-    city: "Sevilla",
-    industry: "Deporte",
-    interested_module: "LeadIA",
-    requested_plan_key: "crecimiento",
-    status: "pending",
-    notes: null,
-    created_at: "2026-06-01T09:00:00.000Z",
-    updated_at: "2026-06-01T09:00:00.000Z",
-  },
-  {
-    id: "demo-request-peluqueria-laura",
-    company_name: "Peluquería Laura",
-    contact_name: "Laura",
-    email: "hola@peluquerialaura.com",
-    phone: null,
-    city: "Málaga",
-    industry: "Belleza",
-    interested_module: "SocialIA",
-    requested_plan_key: "inicio",
-    status: "new",
-    notes: null,
-    created_at: "2026-06-02T09:00:00.000Z",
-    updated_at: "2026-06-02T09:00:00.000Z",
-  },
-];
+const fallbackDemoRequests: DemoRequest[] = [];
 
-const fallbackUsageEvents: UsageEvent[] = [
-  {
-    id: "usage-socialia",
-    company_id: mockCompany.id,
-    profile_id: mockProfile.id,
-    module_key: "socialia",
-    event_type: "post_generated",
-    quantity: 42,
-    metadata: {},
-    created_at: "2026-06-03T09:00:00.000Z",
-  },
-  {
-    id: "usage-reviewia",
-    company_id: mockCompany.id,
-    profile_id: mockProfile.id,
-    module_key: "reviewia",
-    event_type: "review_reply_generated",
-    quantity: 16,
-    metadata: {},
-    created_at: "2026-06-03T09:00:00.000Z",
-  },
-];
+const fallbackUsageEvents: UsageEvent[] = [];
 
-const fallbackSuperadminNotes: SuperadminNote[] = [
-  {
-    id: "demo-note-bar-la-plaza",
-    company_id: mockCompany.id,
-    profile_id: mockProfile.id,
-    note: "company_created:normal:Empresa demo facturable para panel de ejemplo.",
-    visibility: "internal",
-    created_at: "2026-01-15T09:00:00.000Z",
-    updated_at: "2026-01-15T09:00:00.000Z",
-  },
-];
+const fallbackSuperadminNotes: SuperadminNote[] = [];
 
 const fallbackBusinessSectors: BusinessSectorRow[] = [
   {
@@ -265,7 +136,7 @@ export async function getSuperadminPlans(): Promise<Plan[]> {
   const supabase = await getSuperadminClient();
 
   if (!supabase) {
-    return mockPlans;
+    return mockPlans.filter((plan) => plan.status !== "hidden");
   }
 
   const { data, error } = await supabase
@@ -273,7 +144,9 @@ export async function getSuperadminPlans(): Promise<Plan[]> {
     .select("*")
     .order("monthly_price_cents");
 
-  return error || !data?.length ? mockPlans : data;
+  return error || !data?.length
+    ? mockPlans.filter((plan) => plan.status !== "hidden")
+    : data.filter((plan) => plan.status !== "hidden");
 }
 
 export async function getSuperadminBusinessSectors(): Promise<BusinessSectorRow[]> {
@@ -342,7 +215,7 @@ export async function getSuperadminCompanyModules() {
   const supabase = await getSuperadminClient();
 
   if (!supabase) {
-    return mockCompanyModules;
+    return [];
   }
 
   const { data, error } = await supabase
@@ -350,14 +223,18 @@ export async function getSuperadminCompanyModules() {
     .select("*")
     .order("created_at", { ascending: false });
 
-  return error || !data?.length ? mockCompanyModules : data;
+  return error || !data?.length ? [] : data;
 }
 
 function hasRevenueExclusionNote(notes: SuperadminNote[] = []) {
-  return notes.some((note) => {
+  for (const note of notes) {
     const value = note.note.toLowerCase();
 
-    return [
+    if (value.includes("commercial_status:paying")) {
+      return false;
+    }
+
+    if ([
       "demo_unlimited",
       "sin límite",
       "sin limite",
@@ -375,8 +252,12 @@ function hasRevenueExclusionNote(notes: SuperadminNote[] = []) {
       "exenta de pago",
       "exento de pago",
       "payment_exempt",
-    ].some((term) => value.includes(term));
-  });
+    ].some((term) => value.includes(term))) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function isRevenueEligibleCompany(

@@ -26,7 +26,7 @@ const aiIdeas = [
 
 const aiResults = [
   {
-    title: "Hoy toca arroz meloso en Bar La Plaza",
+    title: "Nueva propuesta destacada de la semana",
     channel: "Instagram + Facebook",
     text: "Si buscas un plato con sabor de verdad, hoy tenemos arroz meloso con carrillada preparado con mimo y producto de calidad.",
   },
@@ -38,7 +38,7 @@ const aiResults = [
   {
     title: "Reserva tu mesa para hoy",
     channel: "Facebook",
-    text: "Hoy tenemos menú especial en Bar La Plaza. Ven con quien quieras y disfruta de comida casera en un ambiente cercano.",
+    text: "Hoy tenemos una propuesta especial. Ven con quien quieras y disfruta de una experiencia cercana.",
   },
 ];
 

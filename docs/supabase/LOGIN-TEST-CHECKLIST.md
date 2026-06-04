@@ -5,7 +5,7 @@ Objetivo: comprobar localmente que AutonomIA resuelve sesión, perfil, empresa y
 ## Usuarios esperados
 
 - `superadmin@autonomia.app` debe entrar en `/superadmin`.
-- `cliente@barlaplaza.com` debe entrar en `/dashboard`.
+- El email del cliente real debe entrar en `/dashboard`.
 
 ## 1. Variables locales
 
@@ -26,7 +26,7 @@ Después de cambiar `.env.local`, reinicia el servidor local.
 En Supabase, revisa en Authentication -> Users:
 
 - Existe `superadmin@autonomia.app`.
-- Existe `cliente@barlaplaza.com`.
+- Existe el usuario cliente real.
 - Ambos usuarios tienen email confirmado si el proyecto lo exige.
 - Ambos usuarios tienen contraseña válida.
 - Copia el `User UID` de cada usuario para comprobar `profiles.auth_user_id`.
@@ -38,7 +38,7 @@ En `public.profiles`, cada usuario real debe tener una fila:
 | email | auth_user_id | status |
 | --- | --- | --- |
 | `superadmin@autonomia.app` | UID real de Auth | `active` |
-| `cliente@barlaplaza.com` | UID real de Auth | `active` |
+| email del cliente real | UID real de Auth | `active` |
 
 Errores comunes:
 
@@ -71,7 +71,7 @@ Para el cliente:
 
 | profile_id | company_id | role_id | status |
 | --- | --- | --- | --- |
-| perfil de `cliente@barlaplaza.com` | empresa Bar La Plaza | rol `company_admin` | `active` |
+| perfil del cliente real | empresa creada desde Superadmin | rol `company_admin` | `active` |
 
 Errores comunes:
 
@@ -82,17 +82,17 @@ Errores comunes:
 
 ## 6. Tabla `companies`
 
-Para `cliente@barlaplaza.com`, debe existir una empresa asociada:
+Para el usuario cliente, debe existir una empresa asociada:
 
-- Nombre: `Bar La Plaza`.
+- Nombre: empresa real creada desde Superadmin.
 - Estado recomendado para la prueba: `active`.
 - El `id` debe coincidir con `company_users.company_id`.
 
 ## 7. Tabla `subscriptions`
 
-Para Bar La Plaza debe existir una suscripción:
+Para la empresa real debe existir una suscripción:
 
-- `company_id`: empresa Bar La Plaza.
+- `company_id`: empresa real creada desde Superadmin.
 - `status`: `active` o `trial`.
 - `plan_id`: plan existente.
 
@@ -105,7 +105,7 @@ La app todavía no bloquea el dashboard por suscripción, pero ya puede leerla e
 3. Entra con `superadmin@autonomia.app`.
 4. Resultado esperado: redirección a `/superadmin`.
 5. Cierra sesión.
-6. Entra con `cliente@barlaplaza.com`.
+6. Entra con el email del cliente real.
 7. Resultado esperado: redirección a `/dashboard`.
 8. Revisa `/dashboard/empresa`, `/dashboard/modulos` y `/dashboard/suscripcion`.
 
@@ -166,8 +166,8 @@ set
   status = 'active',
   updated_at = now()
 from auth.users u
-where lower(u.email) = 'cliente@barlaplaza.com'
-  and lower(p.email) in ('cliente@barlaplaza.com', 'juanma@barlaplaza.com');
+where lower(u.email) = '<email_cliente_real>'
+  and lower(p.email) = '<email_cliente_real>';
 
 -- 2. Asegurar perfil superadmin si no existía.
 insert into public.profiles (auth_user_id, full_name, email, status)
@@ -181,9 +181,9 @@ on conflict (email) do update set
 
 -- 3. Asegurar perfil cliente si no existía.
 insert into public.profiles (auth_user_id, full_name, email, status)
-select u.id, 'Cliente Bar La Plaza', lower(u.email), 'active'
+select u.id, 'Cliente AutonomIA', lower(u.email), 'active'
 from auth.users u
-where lower(u.email) = 'cliente@barlaplaza.com'
+where lower(u.email) = '<email_cliente_real>'
 on conflict (email) do update set
   auth_user_id = excluded.auth_user_id,
   status = 'active',
@@ -212,13 +212,13 @@ where cu.company_id is null
   and lower(p.email) = 'superadmin@autonomia.app'
   and r.key = 'superadmin';
 
--- 5. Dar rol company_admin al cliente de Bar La Plaza.
+-- 5. Dar rol company_admin al cliente real.
 insert into public.company_users (company_id, profile_id, role_id, status, invited_at, last_access_at)
 select c.id, p.id, r.id, 'active', now(), now()
 from public.companies c
-join public.profiles p on lower(p.email) = 'cliente@barlaplaza.com'
+join public.profiles p on lower(p.email) = '<email_cliente_real>'
 join public.roles r on r.key = 'company_admin'
-where c.slug = 'bar-la-plaza'
+where c.slug = '<slug_empresa_real>'
 on conflict (company_id, profile_id, role_id) do update set
   status = 'active',
   updated_at = now();

@@ -36,14 +36,14 @@ Ejecutar `supabase/seed.sql` después de las migraciones.
 
 El seed crea:
 
-- Planes: Inicio, Crecimiento, Local IA 360, Enterprise.
+- Planes visibles: Gratuito, Inicio, Crecimiento y Local IA.
+- Enterprise queda oculto para compatibilidad interna futura.
 - Módulos principales de AutonomIA.
 - Sectores empresariales prioritarios.
-- Empresas demo: Bar La Plaza, Clínica Nova y Beauty Studio.
-- Perfiles demo documentados sin crear usuarios de Auth.
-- Suscripciones demo.
-- Módulos activos y recomendados.
-- Solicitudes demo, tickets y eventos de uso.
+
+El seed no crea empresas, usuarios, suscripciones, tickets ni eventos ficticios.
+La plataforma debe empezar sin clientes hasta que el superadmin cree la primera
+empresa real.
 
 ## Activar y probar RLS
 
@@ -63,18 +63,11 @@ Pruebas mínimas antes de producción:
 
 1. Crear usuarios reales en Supabase Auth.
 2. Copiar cada `auth.users.id`.
-3. Actualizar `public.profiles.auth_user_id` para enlazarlo con el perfil demo.
+3. Crear o actualizar `public.profiles.auth_user_id` para enlazarlo con el perfil real.
 4. Iniciar sesión con cada usuario y probar consultas desde la app o desde políticas simuladas en Supabase.
 
-Perfiles demo preparados:
-
-- `superadmin@autonomia.local`
-- `juanma@barlaplaza.com`
-- `marketing@barlaplaza.com`
-- `ventas@barlaplaza.com`
-- `soporte@barlaplaza.com`
-- `admin@clinicanova.com`
-- `hola@beautystudio.com`
+El seed no crea perfiles demo. Los perfiles reales se crean desde el alta de
+empresa en Superadmin o mediante SQL controlado en staging.
 
 ## Qué falta antes de producción
 
