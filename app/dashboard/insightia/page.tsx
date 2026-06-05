@@ -1,4 +1,5 @@
 import AccessDeniedCard from "@/components/AccessDeniedCard";
+import ModuleStatusPanel from "@/components/ModuleStatusPanel";
 import { getDashboardRouteAccess } from "@/lib/auth/access-control";
 
 const stats = [
@@ -63,6 +64,27 @@ export default async function InsightIAPage() {
           detectar oportunidades, riesgos y próximas acciones recomendadas.
         </p>
       </div>
+
+      <ModuleStatusPanel
+        moduleName="InsightIA"
+        status="Disponible según plan"
+        description="InsightIA resume el rendimiento de los módulos conectados. Las métricas reales se alimentarán de datos operativos y excluirán demos, archivados y eliminados."
+        capabilities={[
+          "Detectar oportunidades y riesgos.",
+          "Unificar señales de módulos activos.",
+          "Preparar recomendaciones accionables.",
+        ]}
+        requirements={[
+          "Módulos con actividad suficiente.",
+          "Datos reales separados de pruebas internas.",
+          "Plan con analítica incluida.",
+        ]}
+        nextSteps={[
+          "Usar las recomendaciones como guía inicial.",
+          "Conectar módulos reales por fases.",
+          "Revisar métricas con datos limpios.",
+        ]}
+      />
 
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (

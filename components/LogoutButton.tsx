@@ -10,7 +10,7 @@ type LogoutButtonProps = {
 };
 
 export default function LogoutButton({
-  className = "rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-slate-300 hover:bg-white/10",
+  className = "rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-bold text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60",
   label = "Cerrar sesión",
 }: LogoutButtonProps) {
   const router = useRouter();

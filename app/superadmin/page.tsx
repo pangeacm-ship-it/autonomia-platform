@@ -834,7 +834,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                 Superadmin AutonomIA
               </h1>
 
-              <p className="mt-4 max-w-4xl text-slate-300">
+              <p className="mt-4 max-w-4xl text-slate-600">
                 Control global de clientes, ingresos, uso de módulos y actividad
                 de la plataforma.
               </p>
@@ -842,13 +842,13 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <SensitiveValuesToggle />
-              <button className="rounded-2xl border border-white/10 px-5 py-3 text-sm font-bold hover:bg-white/10">
+              <button className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 hover:bg-blue-50">
                 Exportar informe
               </button>
-              <LogoutButton className="rounded-2xl border border-red-400/20 px-5 py-3 text-sm font-bold text-red-200 hover:bg-red-500/10" />
+              <LogoutButton className="rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-700 hover:bg-red-100" />
               <Link
                 href="/onboarding"
-                className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-center text-sm font-bold shadow-[0_0_35px_rgba(124,58,237,0.28)] hover:opacity-90"
+                className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-center text-sm font-bold text-white shadow-[0_18px_45px_rgba(79,70,229,0.24)] hover:opacity-90"
               >
                 Nueva empresa
               </Link>

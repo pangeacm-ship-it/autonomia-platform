@@ -85,6 +85,43 @@ button {
   color: #64748b !important;
 }
 
+.autonomia-light-shell [class*="text-emerald-300"],
+.autonomia-light-shell [class*="text-emerald-200"],
+.autonomia-light-shell [class*="text-green-300"],
+.autonomia-light-shell [class*="text-green-200"] {
+  color: #047857 !important;
+}
+
+.autonomia-light-shell [class*="text-amber-300"],
+.autonomia-light-shell [class*="text-amber-200"],
+.autonomia-light-shell [class*="text-yellow-300"],
+.autonomia-light-shell [class*="text-yellow-200"] {
+  color: #b45309 !important;
+}
+
+.autonomia-light-shell [class*="text-violet-300"],
+.autonomia-light-shell [class*="text-violet-200"],
+.autonomia-light-shell [class*="text-purple-300"],
+.autonomia-light-shell [class*="text-purple-200"] {
+  color: #6d28d9 !important;
+}
+
+.autonomia-light-shell [class*="text-sky-300"],
+.autonomia-light-shell [class*="text-sky-200"],
+.autonomia-light-shell [class*="text-cyan-300"],
+.autonomia-light-shell [class*="text-cyan-200"] {
+  color: #0369a1 !important;
+}
+
+.autonomia-light-shell [class*="text-pink-300"],
+.autonomia-light-shell [class*="text-pink-200"],
+.autonomia-light-shell [class*="text-red-300"],
+.autonomia-light-shell [class*="text-red-200"],
+.autonomia-light-shell [class*="text-rose-300"],
+.autonomia-light-shell [class*="text-rose-200"] {
+  color: #be123c !important;
+}
+
 .autonomia-light-shell input,
 .autonomia-light-shell select,
 .autonomia-light-shell textarea {
@@ -106,4 +143,37 @@ button {
 .autonomia-light-shell [class*="bg-gradient-to-r"] [class*="text-slate-300"],
 .autonomia-light-shell [class*="bg-gradient-to-r"] [class*="text-slate-400"] {
   color: #475569 !important;
+}
+
+.autonomia-light-shell h1,
+.autonomia-light-shell h2,
+.autonomia-light-shell h3,
+.autonomia-light-shell h4 {
+  color: #111827;
+}
+
+.autonomia-light-shell button[class*="border-white/10"],
+.autonomia-light-shell a[class*="border-white/10"] {
+  background: #ffffff;
+  color: #334155;
+}
+
+.autonomia-light-shell button[class*="border-white/10"]:hover,
+.autonomia-light-shell a[class*="border-white/10"]:hover {
+  background: #eff6ff;
+}
+
+.autonomia-light-shell [class*="bg-amber-500/10"] {
+  background: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+
+.autonomia-light-shell [class*="bg-emerald-500/10"] {
+  background: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+}
+
+.autonomia-light-shell [class*="bg-violet-500/10"] {
+  background: #f5f3ff !important;
+  border-color: #ddd6fe !important;
 }

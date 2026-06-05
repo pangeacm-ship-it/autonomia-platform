@@ -1,4 +1,5 @@
 import AccessDeniedCard from "@/components/AccessDeniedCard";
+import ModuleStatusPanel from "@/components/ModuleStatusPanel";
 import { getDashboardRouteAccess } from "@/lib/auth/access-control";
 
 const stats = [
@@ -75,6 +76,27 @@ export default async function WhatsAppIAPage() {
           y convierte consultas en oportunidades comerciales.
         </p>
       </div>
+
+      <ModuleStatusPanel
+        moduleName="WhatsAppIA"
+        status="Requiere conexión"
+        description="WhatsAppIA está preparado como módulo profesional, pero las respuestas reales necesitan conectar WhatsApp Business API antes de activar automatizaciones externas."
+        capabilities={[
+          "Centralizar conversaciones de clientes.",
+          "Preparar respuestas con IA antes de enviarlas.",
+          "Detectar reservas, leads y consultas habituales.",
+        ]}
+        requirements={[
+          "Cuenta de WhatsApp Business API.",
+          "Plantillas y permisos de mensajería aprobados.",
+          "Revisión humana antes de activar automatizaciones reales.",
+        ]}
+        nextSteps={[
+          "Revisar el plan y módulos contratados.",
+          "Conectar WhatsApp cuando la integración esté activa.",
+          "Mantener por ahora la bandeja como vista simulada interna.",
+        ]}
+      />
 
       <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (

@@ -1,4 +1,5 @@
 import AccessDeniedCard from "@/components/AccessDeniedCard";
+import ModuleStatusPanel from "@/components/ModuleStatusPanel";
 import { getDashboardRouteAccess } from "@/lib/auth/access-control";
 
 const reviews = [
@@ -58,6 +59,27 @@ export default async function GoogleBusinessPage() {
           en búsquedas locales.
         </p>
       </div>
+
+      <ModuleStatusPanel
+        moduleName="Google Business"
+        status="Requiere conexión"
+        description="El módulo está preparado para reputación y visibilidad local. La sincronización real con Google Business se activará cuando la cuenta esté conectada."
+        capabilities={[
+          "Supervisar reseñas y reputación.",
+          "Preparar respuestas y sugerencias de mejora.",
+          "Centralizar acciones de visibilidad local.",
+        ]}
+        requirements={[
+          "Ficha de Google Business verificada.",
+          "Permisos de acceso concedidos a AutonomIA.",
+          "Revisión antes de publicar cambios reales.",
+        ]}
+        nextSteps={[
+          "Mantener la vista como panel de preparación.",
+          "Revisar reseñas y mejoras sugeridas.",
+          "Conectar Google Business en fase de integración.",
+        ]}
+      />
 
       <div className="grid gap-5 md:grid-cols-4">
         <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">

@@ -1,4 +1,5 @@
 import AccessDeniedCard from "@/components/AccessDeniedCard";
+import ModuleStatusPanel from "@/components/ModuleStatusPanel";
 import { getDashboardRouteAccess } from "@/lib/auth/access-control";
 
 const trends = [
@@ -78,6 +79,27 @@ export default async function TikTokShortsPage() {
           aumentar alcance y visibilidad.
         </p>
       </div>
+
+      <ModuleStatusPanel
+        moduleName="TikTok & Shorts"
+        status="En preparación"
+        description="Este módulo queda presentado como extensión futura de SocialIA para vídeo corto. De momento no publica ni conecta cuentas externas."
+        capabilities={[
+          "Organizar ideas para vídeos cortos.",
+          "Preparar calendarios de tendencias.",
+          "Alinear contenido con campañas del negocio.",
+        ]}
+        requirements={[
+          "Canales externos conectados en una fase posterior.",
+          "Guía de marca y tono definidos.",
+          "Aprobación del cliente antes de publicar.",
+        ]}
+        nextSteps={[
+          "Usar SocialIA para contenido base.",
+          "Guardar ideas visuales para futuras campañas.",
+          "Activar conexión cuando el módulo esté listo.",
+        ]}
+      />
 
       <div className="grid gap-5 md:grid-cols-4">
         <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">

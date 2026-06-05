@@ -1,4 +1,5 @@
 import AccessDeniedCard from "@/components/AccessDeniedCard";
+import ModuleStatusPanel from "@/components/ModuleStatusPanel";
 import { getDashboardRouteAccess } from "@/lib/auth/access-control";
 
 const stats = [
@@ -96,6 +97,27 @@ export default async function ReservaIAPage() {
           Business y formularios para evitar pérdidas y aumentar ocupación.
         </p>
       </div>
+
+      <ModuleStatusPanel
+        moduleName="ReservaIA"
+        status="Requiere configuración"
+        description="ReservaIA está diseñado para negocios con citas, mesas, visitas o reservas. Antes de automatizar necesita definir disponibilidad, reglas y canales de entrada."
+        capabilities={[
+          "Organizar reservas y citas por estado.",
+          "Preparar recordatorios y confirmaciones.",
+          "Adaptar el lenguaje al sector de la empresa.",
+        ]}
+        requirements={[
+          "Horario de negocio configurado.",
+          "Tipo de reserva definido por sector.",
+          "Canal de recepción conectado en una fase posterior.",
+        ]}
+        nextSteps={[
+          "Revisar ejemplos por sector.",
+          "Configurar empresa y horario.",
+          "Activar conexión real cuando esté lista.",
+        ]}
+      />
 
       <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (

@@ -21,7 +21,7 @@ export default function PasswordInput({
         type="button"
         aria-label={isVisible ? "Ocultar contraseña" : "Mostrar contraseña"}
         onClick={() => setIsVisible((current) => !current)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl px-2 py-1 text-sm text-slate-300 hover:bg-white/10 hover:text-white"
+        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-950"
       >
         👁
       </button>

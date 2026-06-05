@@ -114,7 +114,7 @@ function ProductMockup() {
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden px-4 pb-20 pt-36 sm:px-6 lg:pt-32">
+    <section className="relative overflow-hidden px-4 pb-20 pt-44 sm:px-6 sm:pt-36 lg:pt-32">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_10%,rgba(96,165,250,0.24),transparent_32%),radial-gradient(circle_at_85%_20%,rgba(167,139,250,0.24),transparent_30%)]" />
 
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">

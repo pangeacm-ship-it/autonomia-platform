@@ -1,4 +1,5 @@
 import AccessDeniedCard from "@/components/AccessDeniedCard";
+import ModuleStatusPanel from "@/components/ModuleStatusPanel";
 import { getDashboardRouteAccess } from "@/lib/auth/access-control";
 
 const reviewStats = [
@@ -92,6 +93,27 @@ export default async function ReviewIAPage() {
           </span>
         </div>
       </div>
+
+      <ModuleStatusPanel
+        moduleName="ReviewIA"
+        status="Disponible según plan"
+        description="ReviewIA prepara la gestión profesional de reseñas. Las respuestas reales en Google se publicarán solo cuando la conexión esté configurada y aprobada."
+        capabilities={[
+          "Analizar reseñas y tono del cliente.",
+          "Preparar respuestas profesionales.",
+          "Detectar riesgos reputacionales.",
+        ]}
+        requirements={[
+          "Plan con ReviewIA incluido o módulo recomendado.",
+          "Conexión futura con Google Business.",
+          "Aprobación humana antes de publicar respuestas reales.",
+        ]}
+        nextSteps={[
+          "Revisar respuestas sugeridas.",
+          "Conectar Google Business cuando proceda.",
+          "Definir tono de marca en Configuración IA.",
+        ]}
+      />
 
       <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {reviewStats.map((stat) => (

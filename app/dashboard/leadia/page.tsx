@@ -1,4 +1,5 @@
 import AccessDeniedCard from "@/components/AccessDeniedCard";
+import ModuleStatusPanel from "@/components/ModuleStatusPanel";
 import { getDashboardRouteAccess } from "@/lib/auth/access-control";
 
 const stats = [
@@ -84,6 +85,27 @@ export default async function LeadIAPage() {
           convierte conversaciones en reservas o clientes.
         </p>
       </div>
+
+      <ModuleStatusPanel
+        moduleName="LeadIA"
+        status="Disponible según plan"
+        description="LeadIA organiza oportunidades comerciales dentro de AutonomIA. Las captaciones automáticas desde canales externos se activarán cuando estén conectadas las integraciones."
+        capabilities={[
+          "Clasificar oportunidades por estado y prioridad.",
+          "Preparar seguimientos comerciales.",
+          "Relacionar conversaciones con posibles clientes.",
+        ]}
+        requirements={[
+          "Plan con LeadIA incluido o módulo activado.",
+          "Canales de entrada conectados en una fase posterior.",
+          "Criterios comerciales definidos por la empresa.",
+        ]}
+        nextSteps={[
+          "Usar el pipeline como vista de trabajo interna.",
+          "Revisar oportunidades antes de automatizar seguimientos.",
+          "Conectar fuentes reales cuando estén disponibles.",
+        ]}
+      />
 
       <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (

@@ -207,15 +207,15 @@ export default function LoginForm({ isSupabaseConfigured }: LoginFormProps) {
       <div
         className={`rounded-2xl border px-4 py-3 text-center text-xs font-bold ${
           isDemoMode
-            ? "border-amber-400/20 bg-amber-500/10 text-amber-100"
-            : "border-emerald-400/20 bg-emerald-500/10 text-emerald-100"
+            ? "border-amber-200 bg-amber-50 text-amber-800"
+            : "border-emerald-200 bg-emerald-50 text-emerald-800"
         }`}
       >
         {isDemoMode ? "Modo demo activo" : "Modo real Supabase activo"}
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-bold text-slate-300">
+        <label className="mb-2 block text-sm font-bold text-slate-700">
           Email
         </label>
 
@@ -225,12 +225,12 @@ export default function LoginForm({ isSupabaseConfigured }: LoginFormProps) {
           onChange={(event) => setEmail(event.target.value)}
           placeholder="tu@email.com"
           required={!isDemoMode}
-          className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-slate-500 focus:border-violet-400"
+          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
         />
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-bold text-slate-300">
+        <label className="mb-2 block text-sm font-bold text-slate-700">
           Contraseña
         </label>
 
@@ -239,12 +239,12 @@ export default function LoginForm({ isSupabaseConfigured }: LoginFormProps) {
           onChange={(event) => setPassword(event.target.value)}
           placeholder="••••••••"
           required={!isDemoMode}
-          className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-slate-500 focus:border-violet-400"
+          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
         />
       </div>
 
       {error ? (
-        <div className="rounded-2xl border border-red-400/20 bg-red-500/10 p-4 text-sm leading-6 text-red-100">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-800">
           {error}
         </div>
       ) : null}
@@ -252,13 +252,13 @@ export default function LoginForm({ isSupabaseConfigured }: LoginFormProps) {
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-4 text-center font-bold shadow-[0_0_35px_rgba(124,58,237,0.35)] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-4 text-center font-bold text-white shadow-[0_18px_45px_rgba(79,70,229,0.24)] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isLoading ? "Entrando..." : isDemoMode ? "Entrar en modo demo" : "Entrar"}
       </button>
 
       {isDemoMode ? (
-        <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-sm leading-6 text-amber-100">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
           Modo demo activo: faltan las variables públicas de Supabase en el
           entorno local o el servidor no se reinició después de configurarlas.
         </div>
@@ -267,7 +267,7 @@ export default function LoginForm({ isSupabaseConfigured }: LoginFormProps) {
       {isDemoMode ? (
         <Link
           href="/dashboard"
-          className="block rounded-2xl border border-white/10 px-5 py-3 text-center text-sm font-bold text-slate-200 hover:bg-white/10"
+          className="block rounded-2xl border border-slate-200 bg-white px-5 py-3 text-center text-sm font-bold text-slate-700 hover:bg-blue-50"
         >
           Abrir dashboard demo
         </Link>
