@@ -198,6 +198,34 @@ export type SuperadminNote = {
   updated_at: string;
 };
 
+export type SocialConnectionStatus =
+  | "connected"
+  | "disconnected"
+  | "expired"
+  | "needs_review";
+
+export type SocialConnection = {
+  id: string;
+  company_id: string;
+  provider: "meta";
+  platform: "facebook" | "instagram";
+  account_name: string | null;
+  account_id: string | null;
+  page_id: string | null;
+  instagram_business_account_id: string | null;
+  access_token_encrypted: string | null;
+  refresh_token_encrypted: string | null;
+  token_expires_at: string | null;
+  scopes: string[];
+  status: SocialConnectionStatus;
+  last_sync_at: string | null;
+  is_demo: boolean;
+  archived_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type BillingProtectedRow = {
   id: string;
   company_id: string | null;
@@ -282,6 +310,12 @@ export type Database = {
         Row: SuperadminNote;
         Insert: Partial<SuperadminNote>;
         Update: Partial<SuperadminNote>;
+        Relationships: [];
+      };
+      social_connections: {
+        Row: SocialConnection;
+        Insert: Partial<SocialConnection>;
+        Update: Partial<SocialConnection>;
         Relationships: [];
       };
       invoices: {

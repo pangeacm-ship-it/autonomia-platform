@@ -1,20 +1,8 @@
-const connections = [
-  {
-    name: "Instagram",
-    status: "Conectado",
-    description: "Publicación automática y aprobación previa desde SocialIA.",
-    lastSync: "Hace 8 minutos",
-    permissions: ["Publicar contenido", "Leer métricas", "Gestionar stories"],
-    action: "Revisar conexión",
-  },
-  {
-    name: "Facebook",
-    status: "Conectado",
-    description: "Publicación en la página del negocio y campañas locales.",
-    lastSync: "Hace 8 minutos",
-    permissions: ["Publicar en página", "Leer interacción", "Gestionar contenido"],
-    action: "Revisar conexión",
-  },
+import { getCurrentCompany } from "@/lib/data/companies";
+import { getCompanySocialConnections } from "@/lib/data/social-connections";
+import type { SocialConnectionStatus } from "@/types/database";
+
+const staticConnections = [
   {
     name: "Google Business",
     status: "Conectado",
@@ -51,7 +39,70 @@ const connections = [
   },
 ];
 
-export default function ConexionesPage() {
+function statusLabel(status: SocialConnectionStatus | string) {
+  const labels: Record<string, string> = {
+    connected: "Conectado",
+    disconnected: "No conectado",
+    expired: "Caducado",
+    needs_review: "Requiere revisión",
+  };
+
+  return labels[status] ?? status;
+}
+
+function formatLastSync(value: string | null) {
+  if (!value) return "Sin sincronizar";
+
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+export default async function ConexionesPage() {
+  const company = await getCurrentCompany();
+  const socialConnections = await getCompanySocialConnections(company.id);
+  const facebookConnection = socialConnections.find(
+    (connection) => connection.platform === "facebook",
+  );
+  const instagramConnection = socialConnections.find(
+    (connection) => connection.platform === "instagram",
+  );
+  const metaConnections = [
+    {
+      name: "Facebook",
+      status: statusLabel(facebookConnection?.status ?? "disconnected"),
+      description:
+        "Página de Facebook preparada para futuras publicaciones aprobadas desde SocialIA.",
+      lastSync: formatLastSync(facebookConnection?.last_sync_at ?? null),
+      permissions: ["Página de Facebook", "Publicaciones aprobadas", "Métricas futuras"],
+      action: facebookConnection?.status === "connected" ? "Revisar conexión" : "Conectar Facebook",
+      notice: "Conexión real Meta pendiente de activar.",
+    },
+    {
+      name: "Instagram",
+      status: statusLabel(instagramConnection?.status ?? "disconnected"),
+      description:
+        "Instagram Business preparado para futuras publicaciones SocialIA.",
+      lastSync: formatLastSync(instagramConnection?.last_sync_at ?? null),
+      permissions: ["Instagram Business", "Publicaciones aprobadas", "Métricas futuras"],
+      action: instagramConnection?.status === "connected" ? "Revisar conexión" : "Conectar Instagram",
+      notice: "Conexión real Meta pendiente de activar.",
+    },
+  ];
+  const connections = [...metaConnections, ...staticConnections];
+  const connectedCount = connections.filter(
+    (connection) => connection.status === "Conectado" || connection.status === "Activo",
+  ).length;
+  const pendingCount = connections.filter(
+    (connection) => connection.status === "Pendiente" || connection.status === "Requiere revisión",
+  ).length;
+  const disconnectedCount = connections.filter(
+    (connection) => connection.status === "No conectado" || connection.status === "Caducado",
+  ).length;
+
   return (
     <section className="p-6 lg:p-10">
       <div className="mb-8 rounded-[2rem] border border-white/10 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-sky-500/10 p-8">
@@ -72,17 +123,17 @@ export default function ConexionesPage() {
       <div className="mb-8 grid gap-5 md:grid-cols-3">
         <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-6">
           <p className="text-sm text-emerald-200">Conectadas</p>
-          <h3 className="mt-2 text-4xl font-black">4</h3>
+          <h3 className="mt-2 text-4xl font-black">{connectedCount}</h3>
         </div>
 
         <div className="rounded-3xl border border-amber-500/20 bg-amber-500/10 p-6">
           <p className="text-sm text-amber-200">Pendientes</p>
-          <h3 className="mt-2 text-4xl font-black">1</h3>
+          <h3 className="mt-2 text-4xl font-black">{pendingCount}</h3>
         </div>
 
         <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-6">
           <p className="text-sm text-red-200">Sin conectar</p>
-          <h3 className="mt-2 text-4xl font-black">1</h3>
+          <h3 className="mt-2 text-4xl font-black">{disconnectedCount}</h3>
         </div>
       </div>
 
@@ -131,14 +182,22 @@ export default function ConexionesPage() {
               </ul>
             </div>
 
-            {connection.warning && (
+            {"warning" in connection && connection.warning ? (
               <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4">
                 <p className="text-sm leading-6 text-amber-100">
                   <span className="font-black">Aviso:</span>{" "}
                   {connection.warning}
                 </p>
               </div>
-            )}
+            ) : null}
+
+            {"notice" in connection && connection.notice ? (
+              <div className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-4">
+                <p className="text-sm leading-6 text-blue-900">
+                  {connection.notice}
+                </p>
+              </div>
+            ) : null}
 
             <div className="mt-6 flex flex-wrap gap-3">
               <button className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3 text-sm font-bold hover:opacity-90">

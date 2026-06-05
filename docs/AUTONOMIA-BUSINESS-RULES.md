@@ -1024,3 +1024,36 @@ Reglas de exclusión:
 - No mostrar publicaciones con `archived_at`.
 - Las publicaciones demo se identifican con badge `Demo`.
 - Los datos demo no computan métricas reales.
+
+## 27. SocialIA Fase 2 y conexión Meta
+
+SocialIA Fase 2 solo prepara la conexión futura con Meta.
+
+Reglas:
+
+- No se publica todavía en redes reales.
+- No se conecta OpenAI.
+- No se guardan tokens en cliente.
+- No se añaden claves Meta al código.
+- Los tokens futuros deberán guardarse cifrados en servidor.
+- Cada empresa tendrá sus propias conexiones en `social_connections`.
+
+Estados de conexión:
+
+- `connected`: cuenta conectada.
+- `disconnected`: cuenta no conectada.
+- `expired`: token caducado.
+- `needs_review`: requiere revisión o permisos incompletos.
+
+Pantallas afectadas:
+
+- SocialIA muestra estado Facebook e Instagram.
+- Conexiones muestra tarjetas Facebook e Instagram.
+
+Pendiente:
+
+- OAuth real con Meta.
+- Revisión de permisos de Meta.
+- Selección de Facebook Page.
+- Selección de Instagram Business.
+- Publicación real desde servidor con aprobación previa.

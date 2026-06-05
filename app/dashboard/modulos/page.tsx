@@ -2,6 +2,7 @@ import Link from "next/link";
 import SubscriptionWarningBanner from "@/components/SubscriptionWarningBanner";
 import VipAccessBanner from "@/components/VipAccessBanner";
 import { shouldShowSubscriptionWarning } from "@/lib/auth/access-control";
+import { getCommercialPrice } from "@/lib/commercial-plans";
 import { getCompanyCommercialAccess } from "@/lib/data/commercial-access";
 import { getCurrentCompany } from "@/lib/data/companies";
 import {
@@ -370,6 +371,7 @@ export default async function ModulosPage() {
   ).length;
   const availableCount = Math.max(modules.length - activeCount - recommendedCount, 0);
   const currentPlan = plans.find((plan) => plan.id === subscription?.plan_id);
+  const currentCommercialPrice = getCommercialPrice(currentPlan?.key ?? "crecimiento");
   const commercialAccess = await getCompanyCommercialAccess({
     company,
     subscription,
@@ -507,6 +509,11 @@ export default async function ModulosPage() {
             <h2 className="text-xl font-black">
               Plan actual: {currentPlan?.name ?? "Crecimiento"}
             </h2>
+            <p className="mt-2 text-sm font-bold text-emerald-300">
+              {commercialAccess.isGifted
+                ? `Precio oficial ${commercialAccess.officialPrice} · Acceso VIP activo`
+                : `${currentCommercialPrice.priceTypeLabel} · ${currentCommercialPrice.monthlyLabel}`}
+            </p>
             <p className="mt-2 text-sm leading-6 text-slate-400">
               {commercialAccess.isGifted
                 ? "Estás utilizando una versión profesional con acceso VIP especial. Los módulos activos mantienen el valor real del plan mientras esta condición permanezca activa."

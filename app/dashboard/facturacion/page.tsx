@@ -1,27 +1,37 @@
-const invoices = [
-  {
-    date: "15/05/2026",
-    concept: "Plan Crecimiento",
-    base: "99,17€",
-    iva: "20,83€",
-    total: "120€",
-    status: "Pagada",
-    number: "AUT-2026-0002",
-    fiscalStatus: "Archivo fiscal preparado",
-  },
-  {
-    date: "15/04/2026",
-    concept: "Plan Crecimiento",
-    base: "99,17€",
-    iva: "20,83€",
-    total: "120€",
-    status: "Pagada",
-    number: "AUT-2026-0001",
-    fiscalStatus: "Archivo fiscal preparado",
-  },
-];
+import { getCommercialPrice } from "@/lib/commercial-plans";
+
+function formatEuros(value: number) {
+  return `${value.toFixed(2).replace(".", ",")}€`;
+}
 
 export default function FacturacionPage() {
+  const currentPrice = getCommercialPrice("crecimiento");
+  const totalAmount = Number(currentPrice.visiblePrice.replace("€", ""));
+  const baseAmount = totalAmount / 1.21;
+  const ivaAmount = totalAmount - baseAmount;
+  const invoices = [
+    {
+      date: "15/05/2026",
+      concept: "Plan Crecimiento",
+      base: formatEuros(baseAmount),
+      iva: formatEuros(ivaAmount),
+      total: currentPrice.visiblePrice,
+      status: "Pagada",
+      number: "AUT-2026-0002",
+      fiscalStatus: "Archivo fiscal preparado",
+    },
+    {
+      date: "15/04/2026",
+      concept: "Plan Crecimiento",
+      base: formatEuros(baseAmount),
+      iva: formatEuros(ivaAmount),
+      total: currentPrice.visiblePrice,
+      status: "Pagada",
+      number: "AUT-2026-0001",
+      fiscalStatus: "Archivo fiscal preparado",
+    },
+  ];
+
   return (
     <section className="p-4 sm:p-6 lg:p-10">
       <div className="mb-8 rounded-[2rem] border border-white/10 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-sky-500/10 p-6 lg:p-8">
@@ -102,7 +112,9 @@ export default function FacturacionPage() {
           <div className="rounded-[2rem] border border-violet-400/30 bg-violet-500/10 p-6">
             <p className="text-sm text-violet-200">Plan actual</p>
             <h3 className="mt-2 text-3xl font-black">Crecimiento</h3>
-            <p className="mt-3 text-emerald-300">Precio lanzamiento · 120€/mes</p>
+            <p className="mt-3 text-emerald-300">
+              {currentPrice.priceTypeLabel} · {currentPrice.monthlyLabel}
+            </p>
             <p className="mt-3 text-sm leading-6 text-slate-300">
               Suscripción activa con acceso completo hasta la próxima renovación.
             </p>
@@ -111,9 +123,9 @@ export default function FacturacionPage() {
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
             <p className="text-sm text-slate-400">Desglose mensual</p>
             <div className="mt-5 space-y-3 text-sm">
-              <p className="flex justify-between"><span>Base imponible</span><span>99,17€</span></p>
-              <p className="flex justify-between"><span>IVA 21%</span><span>20,83€</span></p>
-              <p className="flex justify-between border-t border-white/10 pt-3 text-lg font-black"><span>Total</span><span>120€</span></p>
+              <p className="flex justify-between"><span>Base imponible</span><span>{formatEuros(baseAmount)}</span></p>
+              <p className="flex justify-between"><span>IVA 21%</span><span>{formatEuros(ivaAmount)}</span></p>
+              <p className="flex justify-between border-t border-white/10 pt-3 text-lg font-black"><span>Total</span><span>{currentPrice.visiblePrice}</span></p>
             </div>
           </div>
 
@@ -133,7 +145,7 @@ export default function FacturacionPage() {
             <p className="text-sm text-slate-400">Próxima renovación</p>
             <p className="mt-2 text-2xl font-black">15 Junio 2026</p>
             <p className="mt-3 text-emerald-300">
-              Renovación automática · Crecimiento · 120€/mes
+              Renovación automática · Crecimiento · {currentPrice.monthlyLabel}
             </p>
           </div>
 

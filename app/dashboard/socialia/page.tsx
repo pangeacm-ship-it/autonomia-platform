@@ -12,6 +12,7 @@ import {
   updatePostFormAction,
 } from "@/lib/data/posts";
 import { getCurrentProfileContext } from "@/lib/data/profiles";
+import { getConnectionStatus } from "@/lib/data/social-connections";
 import type { Post, PostStatus } from "@/types/database";
 import { EditorialCalendar } from "./components/EditorialCalendar";
 import { SocialIAComposer } from "./SocialIAComposer";
@@ -230,6 +231,101 @@ function UpcomingPostsPanel({ posts }: { posts: Post[] }) {
   );
 }
 
+function connectionLabel(status: string) {
+  const labels: Record<string, string> = {
+    connected: "Conectado",
+    disconnected: "No conectado",
+    expired: "Caducado",
+    needs_review: "Requiere revisión",
+  };
+
+  return labels[status] ?? "No conectado";
+}
+
+function connectionClass(status: string) {
+  if (status === "connected") return "border-emerald-200 bg-emerald-50 text-emerald-800";
+  if (status === "needs_review") return "border-amber-200 bg-amber-50 text-amber-800";
+  if (status === "expired") return "border-rose-200 bg-rose-50 text-rose-800";
+  return "border-slate-200 bg-slate-50 text-slate-600";
+}
+
+function SocialConnectionsPanel({
+  status,
+}: {
+  status: { facebook: string; instagram: string };
+}) {
+  const items = [
+    {
+      name: "Facebook",
+      platform: "facebook",
+      status: status.facebook,
+      description: "Página de Facebook para futuras publicaciones aprobadas.",
+    },
+    {
+      name: "Instagram",
+      platform: "instagram",
+      status: status.instagram,
+      description: "Cuenta Instagram Business para futuras publicaciones SocialIA.",
+    },
+  ];
+
+  return (
+    <section className="mb-8 rounded-[2rem] border border-blue-100 bg-white p-6 shadow-[0_18px_55px_rgba(15,23,42,0.06)]">
+      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+        <div>
+          <p className="text-sm font-black uppercase tracking-[0.22em] text-blue-700">
+            Conexiones sociales
+          </p>
+          <h2 className="mt-3 text-2xl font-black text-slate-950">
+            Meta preparado para Facebook e Instagram
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+            Conexión real Meta pendiente de activar. Los tokens se guardarán
+            solo en servidor y cifrados cuando se implemente OAuth real.
+          </p>
+        </div>
+        <span className="w-fit rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-violet-800">
+          Fase 2 preparada
+        </span>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        {items.map((item) => (
+          <article
+            key={item.platform}
+            className="rounded-3xl border border-slate-200 bg-[#F8FAFF] p-5"
+          >
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+              <div>
+                <h3 className="text-xl font-black text-slate-950">{item.name}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {item.description}
+                </p>
+              </div>
+              <span
+                className={`w-fit rounded-full border px-3 py-2 text-xs font-black ${connectionClass(
+                  item.status,
+                )}`}
+              >
+                {connectionLabel(item.status)}
+              </span>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-3 text-sm font-black text-white shadow-[0_12px_35px_rgba(79,70,229,0.22)]">
+                Conectar {item.name}
+              </button>
+              <button className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700 hover:bg-blue-50">
+                Desconectar
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function PostCard({ post, canMarkDemo }: { post: Post; canMarkDemo: boolean }) {
   return (
     <article className="rounded-3xl border border-white/10 bg-[#0b1024] p-5">
@@ -391,7 +487,10 @@ export default async function SocialIAPage() {
     getCurrentDashboardAccess(),
     getCurrentProfileContext(),
   ]);
-  const posts = await getCompanyPosts(company.id);
+  const [posts, connectionStatus] = await Promise.all([
+    getCompanyPosts(company.id),
+    getConnectionStatus(company.id),
+  ]);
   const realPosts = filterRealOperationalRecords(posts);
   const weekStart = startOfWeek(new Date());
   const weeklyRealPosts = realPosts.filter(
@@ -456,6 +555,8 @@ export default async function SocialIAPage() {
       </div>
 
       <UpcomingPostsPanel posts={calendarPosts} />
+
+      <SocialConnectionsPanel status={connectionStatus} />
 
       <div className="mb-8">
         <EditorialCalendar posts={calendarPosts} />

@@ -28,7 +28,7 @@ export default function VipAccessBanner({ access, compact = false }: VipAccessBa
               {access.officialPrice}
             </span>
             <span className="rounded-full bg-violet-400 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-slate-950">
-              {access.label}
+              Acceso VIP activo
             </span>
           </div>
         </div>

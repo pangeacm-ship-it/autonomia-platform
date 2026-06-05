@@ -69,7 +69,7 @@ export default function PlanComparison() {
                     {plan.label}
                     {plan.featured ? (
                       <span className="ml-2 rounded-full bg-violet-100 px-2 py-1 text-[10px] text-violet-700">
-                        Completo
+                        🏆 Completa
                       </span>
                     ) : null}
                   </th>
@@ -108,7 +108,7 @@ export default function PlanComparison() {
               </h3>
               {plan.featured ? (
                 <p className="mt-2 text-sm font-bold text-violet-700">
-                  Plan más completo
+                  🏆 Experiencia AutonomIA Completa
                 </p>
               ) : null}
               <div className="mt-5 space-y-3">

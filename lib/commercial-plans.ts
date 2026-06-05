@@ -65,7 +65,7 @@ export const commercialPlans = [
   {
     key: "local-ia",
     name: "Local IA",
-    label: "MÁS COMPLETO",
+    label: "🏆 Experiencia AutonomIA Completa",
     officialPrice: "300€",
     launchPrice: founderOffer.launchPrices.localIa,
     normalPrice: "300€",
@@ -81,6 +81,43 @@ export const commercialPlans = [
     ],
   },
 ];
+
+export type CommercialPlanKey = (typeof commercialPlans)[number]["key"];
+
+export function normalizeCommercialPlanKey(value: string | null | undefined) {
+  const key = (value ?? "").toLowerCase().replace(/_/g, "-");
+
+  if (key.includes("local") || key.includes("enterprise")) return "local-ia";
+  if (key.includes("crecimiento")) return "crecimiento";
+  if (key.includes("inicio")) return "inicio";
+  if (key.includes("gratuito") || key.includes("free")) return "gratuito";
+
+  return "crecimiento";
+}
+
+export function getCommercialPlan(value: string | null | undefined) {
+  const key = normalizeCommercialPlanKey(value);
+
+  return commercialPlans.find((plan) => plan.key === key) ?? commercialPlans[2];
+}
+
+export function getCommercialPrice(value: string | null | undefined) {
+  const plan = getCommercialPlan(value);
+  const hasLaunchPrice = founderOffer.isActive && Boolean(plan.officialPrice);
+
+  return {
+    plan,
+    isFounderOfferActive: founderOffer.isActive,
+    hasLaunchPrice,
+    officialPrice: plan.officialPrice,
+    normalPrice: plan.normalPrice,
+    launchPrice: plan.launchPrice,
+    visiblePrice: hasLaunchPrice ? plan.launchPrice : plan.normalPrice,
+    monthlyLabel: `${hasLaunchPrice ? plan.launchPrice : plan.normalPrice}/mes`,
+    officialMonthlyLabel: plan.officialPrice ? `${plan.officialPrice}/mes` : null,
+    priceTypeLabel: hasLaunchPrice ? "Precio lanzamiento" : "Precio mensual",
+  };
+}
 
 export const planComparisonRows = [
   { feature: "Facebook", gratuito: true, inicio: true, crecimiento: true, localIa: true },

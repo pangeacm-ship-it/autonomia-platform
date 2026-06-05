@@ -5,6 +5,7 @@ import {
   getCurrentDashboardAccess,
   shouldShowSubscriptionWarning,
 } from "@/lib/auth/access-control";
+import { getCommercialPrice } from "@/lib/commercial-plans";
 import { getCompanyCommercialAccess } from "@/lib/data/commercial-access";
 import { getCurrentCompany } from "@/lib/data/companies";
 import { getPlans } from "@/lib/data/plans";
@@ -71,6 +72,7 @@ export default async function DashboardPage() {
   const subscription = await getCurrentSubscription(company.id);
   const plans = await getPlans();
   const currentPlan = plans.find((plan) => plan.id === subscription?.plan_id);
+  const currentCommercialPrice = getCommercialPrice(currentPlan?.key ?? "crecimiento");
   const commercialAccess = await getCompanyCommercialAccess({
     company,
     subscription,
@@ -198,7 +200,7 @@ export default async function DashboardPage() {
             <p className="mt-3 text-sm text-emerald-300">
               {commercialAccess.isGifted
                 ? `${commercialAccess.label} · precio oficial ${commercialAccess.officialPrice}`
-                : "Precio lanzamiento · 120€/mes"}
+                : `${currentCommercialPrice.priceTypeLabel} · ${currentCommercialPrice.monthlyLabel}`}
             </p>
           </div>
 

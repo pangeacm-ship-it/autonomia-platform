@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getCommercialPrice } from "@/lib/commercial-plans";
 import type { Company, Plan, Subscription, SuperadminNote } from "@/types/database";
 
 export type CommercialAccessKind =
@@ -59,27 +60,11 @@ function getLatestCommercialKind(notes: SuperadminNote[]): CommercialAccessKind 
 }
 
 function getPlanDisplayName(plan: Plan | null | undefined, subscription: Subscription | null | undefined) {
-  const key = plan?.key ?? subscription?.plan_id?.replace("plan-", "") ?? "crecimiento";
-
-  if (key.includes("local")) return "Local IA";
-  if (key.includes("crecimiento")) return "Crecimiento";
-  if (key.includes("inicio")) return "Inicio";
-  if (key.includes("enterprise")) return "Local IA";
-  if (key.includes("gratuito")) return "Gratuito";
-
-  return plan?.name ?? "Crecimiento";
+  return getCommercialPrice(plan?.key ?? subscription?.plan_id).plan.name;
 }
 
 function getOfficialPrice(plan: Plan | null | undefined, subscription: Subscription | null | undefined) {
-  const key = plan?.key ?? subscription?.plan_id?.replace("plan-", "") ?? "crecimiento";
-
-  if (key.includes("local")) return "300€/mes";
-  if (key.includes("crecimiento")) return "150€/mes";
-  if (key.includes("inicio")) return "100€/mes";
-  if (key.includes("enterprise")) return "300€/mes";
-  if (key.includes("gratuito")) return "0€/mes";
-
-  return "150€/mes";
+  return getCommercialPrice(plan?.key ?? subscription?.plan_id).officialMonthlyLabel ?? "0€/mes";
 }
 
 export function resolveCommercialAccess({
