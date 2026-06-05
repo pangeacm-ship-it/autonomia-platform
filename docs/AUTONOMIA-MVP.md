@@ -855,29 +855,32 @@ Estado actual:
 - No publica en redes reales.
 - Las recomendaciones de Elena IA son sugerencias visuales hasta conectar IA real.
 
-### SocialIA Fase 2: preparación Meta
+### SocialIA Fase 3A: OAuth Meta preparado
 
-SocialIA Fase 2 prepara la arquitectura para conectar Facebook e Instagram en una fase posterior.
+SocialIA Fase 3A prepara la base OAuth real para conectar Facebook e Instagram Business con Meta, sin publicar todavía fuera de AutonomIA.
 
 Incluye:
 
 - Tabla `social_connections` por empresa.
 - Estado visual de Facebook e Instagram en SocialIA.
 - Estado visual de Facebook e Instagram en Conexiones.
-- Variables futuras `META_APP_ID`, `META_APP_SECRET` y `META_REDIRECT_URI`.
+- Variables `NEXT_PUBLIC_META_APP_ID`, `META_APP_ID`, `META_APP_SECRET` y `META_REDIRECT_URI`.
+- Ruta `/api/integrations/meta/start` para iniciar OAuth desde servidor.
+- Ruta `/api/integrations/meta/callback` para validar `state` e intercambiar `code`.
+- Registro de conexión como `needs_review`.
 - Documentación técnica de OAuth Meta.
 
 No incluye todavía:
 
-- OAuth real.
 - Publicación en Facebook.
 - Publicación en Instagram.
 - Conexión OpenAI.
-- Tokens reales.
+- Guardado de tokens reales cifrados.
+- Selección de Facebook Page.
+- Detección completa de Instagram Business.
 
 Siguiente fase:
 
-- Implementar OAuth real desde servidor.
 - Cifrar tokens.
 - Seleccionar Facebook Page e Instagram Business.
 - Publicar únicamente contenido aprobado.

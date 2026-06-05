@@ -41,8 +41,10 @@ const staticConnections = [
 
 function statusLabel(status: SocialConnectionStatus | string) {
   const labels: Record<string, string> = {
+    connecting: "Conectando",
     connected: "Conectado",
     disconnected: "No conectado",
+    error: "Error",
     expired: "Caducado",
     needs_review: "Requiere revisión",
   };
@@ -70,6 +72,7 @@ export default async function ConexionesPage() {
   const instagramConnection = socialConnections.find(
     (connection) => connection.platform === "instagram",
   );
+  const metaOAuthHref = `/api/integrations/meta/start?companyId=${company.id}`;
   const metaConnections = [
     {
       name: "Facebook",
@@ -78,8 +81,12 @@ export default async function ConexionesPage() {
         "Página de Facebook preparada para futuras publicaciones aprobadas desde SocialIA.",
       lastSync: formatLastSync(facebookConnection?.last_sync_at ?? null),
       permissions: ["Página de Facebook", "Publicaciones aprobadas", "Métricas futuras"],
-      action: facebookConnection?.status === "connected" ? "Revisar conexión" : "Conectar Facebook",
-      notice: "Conexión real Meta pendiente de activar.",
+      action:
+        facebookConnection?.status === "connected"
+          ? "Revisar conexión"
+          : "Conectar Facebook e Instagram",
+      oauthHref: metaOAuthHref,
+      notice: "OAuth real preparado. La conexión quedará en revisión antes de publicar.",
     },
     {
       name: "Instagram",
@@ -88,8 +95,12 @@ export default async function ConexionesPage() {
         "Instagram Business preparado para futuras publicaciones SocialIA.",
       lastSync: formatLastSync(instagramConnection?.last_sync_at ?? null),
       permissions: ["Instagram Business", "Publicaciones aprobadas", "Métricas futuras"],
-      action: instagramConnection?.status === "connected" ? "Revisar conexión" : "Conectar Instagram",
-      notice: "Conexión real Meta pendiente de activar.",
+      action:
+        instagramConnection?.status === "connected"
+          ? "Revisar conexión"
+          : "Conectar Facebook e Instagram",
+      oauthHref: metaOAuthHref,
+      notice: "OAuth real preparado. La conexión quedará en revisión antes de publicar.",
     },
   ];
   const connections = [...metaConnections, ...staticConnections];
@@ -161,7 +172,9 @@ export default async function ConexionesPage() {
                   connection.status === "Conectado" ||
                   connection.status === "Activo"
                     ? "bg-emerald-500/20 text-emerald-300"
-                    : connection.status === "Pendiente"
+                    : connection.status === "Pendiente" ||
+                        connection.status === "Conectando" ||
+                        connection.status === "Requiere revisión"
                       ? "bg-amber-500/20 text-amber-300"
                       : "bg-red-500/20 text-red-300"
                 }`}
@@ -200,9 +213,18 @@ export default async function ConexionesPage() {
             ) : null}
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <button className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3 text-sm font-bold hover:opacity-90">
-                {connection.action}
-              </button>
+              {"oauthHref" in connection && connection.oauthHref ? (
+                <a
+                  href={connection.oauthHref}
+                  className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3 text-sm font-bold text-white hover:opacity-90"
+                >
+                  {connection.action}
+                </a>
+              ) : (
+                <button className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3 text-sm font-bold hover:opacity-90">
+                  {connection.action}
+                </button>
+              )}
 
               <button className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-bold hover:bg-white/10">
                 Ver detalles

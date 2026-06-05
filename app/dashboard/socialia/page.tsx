@@ -233,8 +233,10 @@ function UpcomingPostsPanel({ posts }: { posts: Post[] }) {
 
 function connectionLabel(status: string) {
   const labels: Record<string, string> = {
+    connecting: "Conectando",
     connected: "Conectado",
     disconnected: "No conectado",
+    error: "Error",
     expired: "Caducado",
     needs_review: "Requiere revisión",
   };
@@ -244,16 +246,21 @@ function connectionLabel(status: string) {
 
 function connectionClass(status: string) {
   if (status === "connected") return "border-emerald-200 bg-emerald-50 text-emerald-800";
+  if (status === "connecting") return "border-blue-200 bg-blue-50 text-blue-800";
   if (status === "needs_review") return "border-amber-200 bg-amber-50 text-amber-800";
   if (status === "expired") return "border-rose-200 bg-rose-50 text-rose-800";
+  if (status === "error") return "border-rose-200 bg-rose-50 text-rose-800";
   return "border-slate-200 bg-slate-50 text-slate-600";
 }
 
 function SocialConnectionsPanel({
+  companyId,
   status,
 }: {
+  companyId: string;
   status: { facebook: string; instagram: string };
 }) {
+  const metaOAuthHref = `/api/integrations/meta/start?companyId=${companyId}`;
   const items = [
     {
       name: "Facebook",
@@ -280,12 +287,12 @@ function SocialConnectionsPanel({
             Meta preparado para Facebook e Instagram
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-            Conexión real Meta pendiente de activar. Los tokens se guardarán
-            solo en servidor y cifrados cuando se implemente OAuth real.
+            OAuth real preparado. Los tokens nunca se exponen al cliente y la
+            conexión queda en revisión antes de activar publicación real.
           </p>
         </div>
         <span className="w-fit rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-violet-800">
-          Fase 2 preparada
+          Fase 3A OAuth
         </span>
       </div>
 
@@ -312,9 +319,12 @@ function SocialConnectionsPanel({
             </div>
 
             <div className="mt-5 flex flex-wrap gap-3">
-              <button className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-3 text-sm font-black text-white shadow-[0_12px_35px_rgba(79,70,229,0.22)]">
-                Conectar {item.name}
-              </button>
+              <a
+                href={metaOAuthHref}
+                className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-3 text-sm font-black text-white shadow-[0_12px_35px_rgba(79,70,229,0.22)]"
+              >
+                Conectar Facebook e Instagram
+              </a>
               <button className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700 hover:bg-blue-50">
                 Desconectar
               </button>
@@ -556,7 +566,7 @@ export default async function SocialIAPage() {
 
       <UpcomingPostsPanel posts={calendarPosts} />
 
-      <SocialConnectionsPanel status={connectionStatus} />
+      <SocialConnectionsPanel companyId={company.id} status={connectionStatus} />
 
       <div className="mb-8">
         <EditorialCalendar posts={calendarPosts} />

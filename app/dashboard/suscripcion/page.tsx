@@ -233,7 +233,9 @@ export default async function SuscripcionPage() {
             }`}
           >
             <div className="mb-5 flex min-h-[78px] flex-col justify-between gap-3">
-              <h2 className="text-3xl font-black">{plan.name}</h2>
+              <h2 className={`text-3xl font-black ${isLocalIa ? "text-slate-950" : ""}`}>
+                {plan.name}
+              </h2>
 
               <span
                 className={`w-fit shrink-0 rounded-full px-3 py-2 text-xs font-black ${
@@ -248,15 +250,21 @@ export default async function SuscripcionPage() {
               </span>
             </div>
 
-            <p className="min-h-[118px] text-sm leading-6 text-slate-300">
+            <p className={`min-h-[118px] text-sm leading-6 ${isLocalIa ? "text-slate-600" : "text-slate-300"}`}>
               {plan.description}
             </p>
 
-            <div className="mt-6 flex h-[298px] flex-col justify-between rounded-2xl border border-white/10 bg-black/20 p-5">
+            <div
+              className={`mt-6 flex h-[298px] flex-col justify-between rounded-2xl border p-5 ${
+                isLocalIa
+                  ? "border-blue-100 bg-white/80"
+                  : "border-white/10 bg-black/20"
+              }`}
+            >
               <CommercialPrice planKey={plan.key} size="lg" />
             </div>
 
-            <ul className="mt-6 min-h-[170px] space-y-3 text-sm text-slate-300">
+            <ul className={`mt-6 min-h-[170px] space-y-3 text-sm ${isLocalIa ? "text-slate-700" : "text-slate-300"}`}>
               {plan.features.map((feature) => (
                 <li key={feature}>✓ {feature}</li>
               ))}

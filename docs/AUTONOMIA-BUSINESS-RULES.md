@@ -1025,9 +1025,9 @@ Reglas de exclusión:
 - Las publicaciones demo se identifican con badge `Demo`.
 - Los datos demo no computan métricas reales.
 
-## 27. SocialIA Fase 2 y conexión Meta
+## 27. SocialIA Fase 3A y OAuth Meta
 
-SocialIA Fase 2 solo prepara la conexión futura con Meta.
+SocialIA Fase 3A prepara la base OAuth real con Meta para Facebook e Instagram Business.
 
 Reglas:
 
@@ -1035,8 +1035,12 @@ Reglas:
 - No se conecta OpenAI.
 - No se guardan tokens en cliente.
 - No se añaden claves Meta al código.
+- `META_APP_SECRET` solo puede usarse en servidor.
+- El flujo OAuth debe usar `state` obligatorio.
+- El `state` se guarda en cookie `httpOnly` con expiración corta.
 - Los tokens futuros deberán guardarse cifrados en servidor.
 - Cada empresa tendrá sus propias conexiones en `social_connections`.
+- La Fase 3A registra la conexión como `needs_review` hasta completar selección de página y cifrado de tokens.
 
 Estados de conexión:
 
@@ -1049,11 +1053,12 @@ Pantallas afectadas:
 
 - SocialIA muestra estado Facebook e Instagram.
 - Conexiones muestra tarjetas Facebook e Instagram.
+- Ambas pantallas enlazan a `/api/integrations/meta/start`.
 
 Pendiente:
 
-- OAuth real con Meta.
 - Revisión de permisos de Meta.
 - Selección de Facebook Page.
 - Selección de Instagram Business.
+- Cifrado y conservación segura de tokens.
 - Publicación real desde servidor con aprobación previa.
