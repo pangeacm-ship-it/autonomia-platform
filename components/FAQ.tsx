@@ -55,13 +55,13 @@ export default function FAQ() {
   return (
     <section id="faq" className="mx-auto max-w-7xl px-6 py-24">
       <div className="mx-auto max-w-3xl text-center">
-        <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-cyan-300">
+        <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-blue-600">
           Dudas habituales
         </p>
-        <h2 className="text-4xl font-black md:text-5xl">
+        <h2 className="text-4xl font-black text-slate-950 md:text-5xl">
           Preguntas frecuentes
         </h2>
-        <p className="mt-5 text-lg leading-8 text-slate-400">
+        <p className="mt-5 text-lg leading-8 text-slate-600">
           Resolvemos las dudas más habituales antes de empezar con AutonomIA.
         </p>
       </div>
@@ -70,15 +70,15 @@ export default function FAQ() {
         {faqs.map((faq) => (
           <details
             key={faq.question}
-            className="group rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 open:border-cyan-400/30 open:bg-cyan-500/10"
+            className="group rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(30,41,59,0.05)] open:border-blue-200 open:bg-blue-50"
           >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-lg font-black text-white">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-lg font-black text-slate-950">
               {faq.question}
-              <span className="rounded-full border border-white/10 px-3 py-1 text-sm text-cyan-200 transition group-open:rotate-45">
+              <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-blue-700 transition group-open:rotate-45">
                 +
               </span>
             </summary>
-            <p className="mt-4 text-sm leading-7 text-slate-300">
+            <p className="mt-4 text-sm leading-7 text-slate-600">
               {faq.answer}
             </p>
           </details>

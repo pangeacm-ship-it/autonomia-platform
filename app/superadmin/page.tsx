@@ -4,6 +4,7 @@ import PasswordInput from "@/components/PasswordInput";
 import SensitiveValue, {
   SensitiveValuesToggle,
 } from "@/components/SensitiveValue";
+import CommercialSettingsCard from "@/components/superadmin/CommercialSettingsCard";
 import SuperadminSidebar from "@/components/superadmin/SuperadminSidebar";
 import { isSuperadmin } from "@/lib/auth/roles";
 import { resolveCommercialAccess } from "@/lib/data/commercial-access";
@@ -523,7 +524,7 @@ function isTrialOrDemoCompany(company: Company) {
 
 function UnauthorizedSuperadmin() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#050816] px-6 text-white">
+    <main className="autonomia-light-shell flex min-h-screen items-center justify-center px-6 text-slate-950">
       <section className="max-w-lg rounded-[2rem] border border-rose-400/20 bg-rose-500/10 p-8 text-center">
         <p className="text-sm font-black uppercase tracking-[0.22em] text-rose-200">
           Acceso restringido
@@ -815,7 +816,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
   const hasCreationOptions = Boolean(realPlans.length && creationModules.length);
 
   return (
-    <main className="min-h-screen bg-[#050816] text-white">
+    <main className="autonomia-light-shell min-h-screen text-slate-950">
       <section className="mx-auto max-w-[1600px] px-5 py-6 sm:px-6 lg:px-10">
         <header id="resumen" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-sky-500/10 p-6 lg:p-8">
           <div className="flex flex-col justify-between gap-6 xl:flex-row xl:items-end">
@@ -1509,6 +1510,9 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
             </section>
 
             <section id="configuracion" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
+              <CommercialSettingsCard />
+
+              <div className="mt-6">
               <h2 className="text-2xl font-black">Acciones rápidas</h2>
               <div className="mt-5 grid gap-3">
                 {quickActions.map((action) =>
@@ -1529,6 +1533,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                     </button>
                   ),
                 )}
+              </div>
               </div>
             </section>
           </aside>

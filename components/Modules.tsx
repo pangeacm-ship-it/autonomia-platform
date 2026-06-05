@@ -8,7 +8,7 @@ const modules = [
     features: [
       "Instagram + Facebook",
       "Gestión desde el panel",
-      "Generación de publicaciones",
+      "Calendario editorial",
       "Aprobación previa",
     ],
     highlighted: true,
@@ -75,17 +75,17 @@ export default function Modules() {
   return (
     <section id="modulos" className="mx-auto max-w-7xl px-6 py-24">
       <div className="mx-auto mb-14 max-w-3xl text-center">
-        <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-violet-300">
+        <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-violet-600">
           Plataforma modular
         </p>
 
-        <h2 className="text-4xl font-black md:text-5xl">
+        <h2 className="text-4xl font-black text-slate-950 md:text-5xl">
           Empieza con SocialIA.
           <br />
           Añade solo lo que necesites.
         </h2>
 
-        <p className="mt-5 text-lg leading-8 text-slate-400">
+        <p className="mt-5 text-lg leading-8 text-slate-600">
           Todos los clientes empiezan con el módulo base de publicaciones y
           calendario editorial. Después pueden activar módulos extra según las
           necesidades reales de su negocio.
@@ -96,38 +96,38 @@ export default function Modules() {
         {modules.map((module) => (
           <div
             key={module.name}
-            className={`rounded-3xl border p-6 backdrop-blur transition hover:-translate-y-1 ${
+            className={`rounded-[2rem] border p-6 transition hover:-translate-y-1 ${
               module.highlighted
-                ? "border-violet-400/60 bg-gradient-to-b from-violet-500/20 to-white/[0.04] shadow-[0_0_45px_rgba(124,58,237,0.22)]"
-                : "border-white/10 bg-white/[0.04] hover:bg-white/[0.07]"
+                ? "border-violet-200 bg-gradient-to-b from-violet-50 to-white shadow-[0_24px_70px_rgba(109,40,217,0.13)]"
+                : "border-slate-200 bg-white shadow-[0_18px_50px_rgba(30,41,59,0.06)] hover:border-blue-200"
             }`}
           >
-            <div className="mb-5 flex items-center justify-between">
+            <div className="mb-5 flex items-center justify-between gap-3">
               <span
                 className={`rounded-full px-3 py-1 text-xs font-bold ${
                   module.highlighted
-                    ? "bg-violet-400 text-slate-950"
-                    : "bg-white/10 text-slate-300"
+                    ? "bg-violet-600 text-white"
+                    : "bg-slate-100 text-slate-600"
                 }`}
               >
                 {module.type}
               </span>
 
-              <span className="text-sm font-bold text-slate-300">
+              <span className="text-sm font-bold text-slate-500">
                 {module.price}
               </span>
             </div>
 
-            <h3 className="text-2xl font-black">{module.name}</h3>
+            <h3 className="text-2xl font-black text-slate-950">{module.name}</h3>
 
-            <p className="mt-3 min-h-24 leading-7 text-slate-400">
+            <p className="mt-3 min-h-24 leading-7 text-slate-600">
               {module.description}
             </p>
 
-            <ul className="mt-6 space-y-3 text-sm text-slate-300">
+            <ul className="mt-6 space-y-3 text-sm text-slate-600">
               {module.features.map((feature) => (
                 <li key={feature} className="flex gap-2">
-                  <span className="text-violet-300">✓</span>
+                  <span className="font-black text-violet-600">✓</span>
                   <span>{feature}</span>
                 </li>
               ))}

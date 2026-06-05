@@ -49,3 +49,61 @@ a {
 button {
   cursor: pointer;
 }
+
+.autonomia-light-shell {
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.2), transparent 32%),
+    radial-gradient(circle at top right, rgba(167, 139, 250, 0.2), transparent 30%),
+    #f8faff;
+  color: #0f172a;
+}
+
+.autonomia-light-shell [class*="bg-[#050816]"],
+.autonomia-light-shell [class*="bg-[#070b1c]"],
+.autonomia-light-shell [class*="bg-[#0b1024]"],
+.autonomia-light-shell [class*="bg-[#080d20]"],
+.autonomia-light-shell [class*="bg-white/[0.04]"],
+.autonomia-light-shell [class*="bg-white/[0.07]"],
+.autonomia-light-shell [class*="bg-black/20"] {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 18px 50px rgba(30, 41, 59, 0.06);
+}
+
+.autonomia-light-shell [class*="border-white/10"],
+.autonomia-light-shell [class*="border-white/15"] {
+  border-color: #e2e8f0 !important;
+}
+
+.autonomia-light-shell [class*="text-slate-200"],
+.autonomia-light-shell [class*="text-slate-300"] {
+  color: #475569 !important;
+}
+
+.autonomia-light-shell [class*="text-slate-400"],
+.autonomia-light-shell [class*="text-slate-500"] {
+  color: #64748b !important;
+}
+
+.autonomia-light-shell input,
+.autonomia-light-shell select,
+.autonomia-light-shell textarea {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.autonomia-light-shell input::placeholder,
+.autonomia-light-shell textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.autonomia-light-shell [class*="bg-gradient-to-r"],
+.autonomia-light-shell [class*="bg-gradient-to-b"] {
+  box-shadow: 0 24px 70px rgba(79, 70, 229, 0.1);
+}
+
+.autonomia-light-shell [class*="bg-gradient-to-r"] [class*="text-slate-300"],
+.autonomia-light-shell [class*="bg-gradient-to-r"] [class*="text-slate-400"] {
+  color: #475569 !important;
+}

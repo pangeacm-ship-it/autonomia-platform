@@ -74,7 +74,7 @@ export default async function CompanyDetailPage({
 
   if (!detail) {
     return (
-      <main className="min-h-screen bg-[#050816] px-6 py-12 text-white">
+      <main className="autonomia-light-shell min-h-screen px-6 py-12 text-slate-950">
         <section className="mx-auto max-w-2xl rounded-[2rem] border border-rose-400/20 bg-rose-500/10 p-8">
           <p className="text-sm font-black uppercase tracking-[0.22em] text-rose-200">
             Acceso denegado
@@ -110,7 +110,7 @@ export default async function CompanyDetailPage({
   });
 
   return (
-    <main className="min-h-screen bg-[#050816] text-white">
+    <main className="autonomia-light-shell min-h-screen text-slate-950">
       <section className="mx-auto max-w-[1500px] px-5 py-6 sm:px-6 lg:px-10">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <Link

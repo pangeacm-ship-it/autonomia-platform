@@ -25,7 +25,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <main className="h-dvh overflow-hidden bg-[#050816] text-white">
+    <main className="autonomia-light-shell h-dvh overflow-hidden text-slate-950">
       <div className="flex h-dvh min-w-0 flex-col lg:flex-row">
         <DashboardSidebar />
 
