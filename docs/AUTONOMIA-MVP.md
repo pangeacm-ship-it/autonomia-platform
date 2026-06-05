@@ -829,3 +829,28 @@ Experiencia cliente:
 Texto base:
 
 `Actualmente disfrutas de acceso VIP concedido por AutonomIA. Mantienes acceso completo sin coste mientras esta condición permanezca activa.`
+
+### Calendario Inteligente central
+
+El MVP debe evitar calendarios duplicados entre módulos.
+
+Regla funcional:
+
+- SocialIA crea, guarda, aprueba y programa publicaciones internas.
+- Calendario Inteligente centraliza la planificación completa del negocio.
+- Las publicaciones programadas desde SocialIA aparecen en Calendario Inteligente.
+- El calendario central también muestra recomendaciones Elena IA simuladas, tareas, reservas/citas y eventos importantes.
+
+Reglas de datos:
+
+- Solo se muestran publicaciones con `scheduled_at`.
+- Se incluyen estados `scheduled`, `approved` y `pending_approval` si tienen fecha.
+- Se excluyen registros con `deleted_at` o `archived_at`.
+- Las publicaciones `is_demo = true` se muestran con distintivo Demo y no cuentan como métricas reales.
+
+Estado actual:
+
+- No conecta Meta.
+- No conecta OpenAI.
+- No publica en redes reales.
+- Las recomendaciones de Elena IA son sugerencias visuales hasta conectar IA real.

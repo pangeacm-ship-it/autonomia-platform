@@ -992,3 +992,35 @@ Gestión desde Superadmin:
 - La ficha de empresa debe permitir marcar `Cliente de pago`, `Acceso VIP`, `Partner`, `Beta tester` o `Demo ilimitada`.
 - Mientras no exista una columna específica, el estado comercial puede registrarse en `superadmin_notes`.
 - La última marca comercial debe prevalecer sobre marcas anteriores.
+
+## 26. Calendario Inteligente como planificación central
+
+AutonomIA debe usar un calendario central para evitar duplicidad entre módulos.
+
+Reglas:
+
+- SocialIA es el lugar donde se crean, editan, aprueban y programan publicaciones.
+- Calendario Inteligente es el lugar donde se consulta la planificación global.
+- El calendario central debe mostrar publicaciones SocialIA, recomendaciones Elena IA, tareas, reservas/citas y eventos importantes.
+- Las recomendaciones Elena IA son sugerencias hasta conectar OpenAI.
+- Las reservas/citas y eventos no conectados todavía pueden mostrarse como simulación visual.
+
+Filtros previstos:
+
+- Todo.
+- Instagram.
+- Facebook.
+- Google Business.
+- WhatsApp.
+- TikTok.
+- Reservas/Citas.
+- Elena IA.
+- Tareas.
+- Demo.
+
+Reglas de exclusión:
+
+- No mostrar publicaciones con `deleted_at`.
+- No mostrar publicaciones con `archived_at`.
+- Las publicaciones demo se identifican con badge `Demo`.
+- Los datos demo no computan métricas reales.

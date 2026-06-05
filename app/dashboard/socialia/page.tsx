@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { defaultBusinessSector } from "@/lib/business-sectors";
 import { getCurrentDashboardAccess } from "@/lib/auth/access-control";
 import { getCurrentCompany } from "@/lib/data/companies";
@@ -458,6 +459,31 @@ export default async function SocialIAPage() {
 
       <div className="mb-8">
         <EditorialCalendar posts={calendarPosts} />
+      </div>
+
+      <div className="mb-8 rounded-[2rem] border border-blue-100 bg-white p-6 shadow-[0_18px_55px_rgba(15,23,42,0.06)]">
+        <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-blue-700">
+              Calendario Inteligente
+            </p>
+            <h2 className="mt-3 text-2xl font-black text-slate-950">
+              SocialIA crea contenido, Calendario organiza todo
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+              Usa esta pantalla para crear y aprobar publicaciones. Para ver la
+              planificación completa del negocio, revisa publicaciones,
+              recomendaciones, tareas y reservas en el calendario central.
+            </p>
+          </div>
+
+          <Link
+            href="/dashboard/calendario"
+            className="w-fit rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-sm font-black text-white shadow-[0_12px_35px_rgba(79,70,229,0.22)] hover:opacity-90"
+          >
+            Ver planificación completa
+          </Link>
+        </div>
       </div>
 
       <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
