@@ -9,6 +9,10 @@ import { isSuperadmin } from "@/lib/auth/roles";
 import { resolveCommercialAccess } from "@/lib/data/commercial-access";
 import { createCompanyWithAdminFormAction } from "@/lib/data/company-management";
 import {
+  filterDemoRecords,
+  filterRealOperationalRecords,
+} from "@/lib/data/demo-data";
+import {
   convertDemoToCustomerFormAction,
   exemptCompanyFromPromoRequirementFormAction,
   extendCompanyDemoFormAction,
@@ -648,11 +652,18 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
   const demoRequests = realDemoRequestCards.length
     ? realDemoRequestCards
     : fallbackDemoRequests;
-  const realModuleUsage = buildUsage(realUsageEvents);
+  const realOperationalUsageEvents = filterRealOperationalRecords(realUsageEvents);
+  const demoUsageEvents = filterDemoRecords(realUsageEvents);
+  const archivedUsageEvents = realUsageEvents.filter(
+    (event) => Boolean(event.archived_at) && !event.deleted_at,
+  );
+  const deletableUsageEventsCount =
+    demoUsageEvents.length + archivedUsageEvents.length;
+  const realModuleUsage = buildUsage(realOperationalUsageEvents);
   const moduleUsage = realModuleUsage.length
     ? realModuleUsage
     : fallbackModuleUsage;
-  const realAiUsage = buildAiUsage(realUsageEvents);
+  const realAiUsage = buildAiUsage(realOperationalUsageEvents);
   const aiUsage = realAiUsage.length ? realAiUsage : fallbackAiUsage;
   const activeCompanies = realCompanies.filter((company) => company.status === "active");
   const totalMrr = revenueSubscriptions.reduce(
@@ -688,7 +699,7 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
     { label: "Churn", value: "3.2%", change: "Pendiente de cálculo real", tone: "emerald" },
     { label: "Renovaciones fallidas", value: String(pastDueRevenueSubscriptions.length), change: "Solo clientes facturables", tone: "amber" },
     { label: "Demos solicitadas", value: String(realDemoRequests.length), change: "Solicitudes registradas", tone: "rose" },
-    { label: "Uso IA", value: `${realUsageEvents.reduce((sum, event) => sum + event.quantity, 0)} acciones`, change: "Eventos usage_events", tone: "violet" },
+    { label: "Uso IA", value: `${realOperationalUsageEvents.reduce((sum, event) => sum + event.quantity, 0)} acciones`, change: "Solo datos reales operativos", tone: "violet" },
   ] : fallbackKpis;
   const realOnlineUsers = realCompanyUsers
     .filter((user) => user.last_access_at)
@@ -1428,6 +1439,10 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
           <aside className="space-y-6">
             <section id="analitica" className="scroll-mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
               <h2 className="text-2xl font-black">Analítica de uso IA</h2>
+              <p className="mt-2 text-xs leading-5 text-slate-400">
+                Las métricas excluyen datos demo, archivados o eliminados
+                lógicamente.
+              </p>
               <div className="mt-5 space-y-4">
                 {aiUsage.map((item) => (
                   <div key={item.label}>
@@ -1442,6 +1457,53 @@ export default async function SuperadminPage({ searchParams }: SuperadminPagePro
                       />
                     </div>
                   </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] border border-amber-400/20 bg-amber-500/10 p-6">
+              <p className="text-sm font-black uppercase tracking-[0.22em] text-amber-300">
+                Mantenimiento de datos
+              </p>
+              <h2 className="mt-3 text-2xl font-black">
+                Datos demo y pruebas
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                Preparado para archivar o limpiar actividad de prueba sin tocar
+                facturas, pagos, eventos de facturación ni registros fiscales.
+              </p>
+
+              <div className="mt-5 grid gap-3">
+                {[
+                  { label: "Datos demo detectados", value: demoUsageEvents.length },
+                  { label: "Datos archivados", value: archivedUsageEvents.length },
+                  { label: "Datos eliminables", value: deletableUsageEventsCount },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#0b1024] p-4"
+                  >
+                    <span className="text-sm text-slate-300">{item.label}</span>
+                    <span className="text-xl font-black text-amber-200">
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 grid gap-3">
+                {[
+                  "Archivar datos demo",
+                  "Eliminar datos demo",
+                  "Limpiar actividad de prueba",
+                ].map((action) => (
+                  <button
+                    key={action}
+                    type="button"
+                    className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-left text-sm font-bold text-slate-300 hover:bg-white/10"
+                  >
+                    {action}
+                  </button>
                 ))}
               </div>
             </section>

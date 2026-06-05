@@ -255,6 +255,68 @@ Reglas:
 - El origen se registra como `landing` en `demo_requests` y `superadmin_notes`.
 - El superadmin puede revisar después la actividad, cambiar plan, activar Acceso
   VIP, conceder demo ilimitada, suspender o archivar.
+
+### Seguridad de datos demo y prueba
+
+Los registros operativos de prueba deben poder distinguirse de los datos reales
+antes de activar módulos reales.
+
+Reglas:
+
+- Los datos con `is_demo = true` no computan métricas reales.
+- Los datos con `archived_at` informado no computan métricas reales.
+- Los datos con `deleted_at` informado no computan métricas reales.
+- Las métricas reales solo cuentan registros con `is_demo = false`,
+  `archived_at is null` y `deleted_at is null`.
+- Los datos archivados deben conservarse para revisión interna.
+- Los datos eliminados lógicamente no deben mostrarse como actividad operativa.
+- Está prohibido borrar de forma insegura facturas, pagos, `billing_events` o
+  `fiscal_records`.
+
+### SocialIA Fase 1A
+
+SocialIA Fase 1A trabaja solo con publicaciones internas reales de AutonomIA.
+
+Reglas:
+
+- No conecta Meta.
+- No conecta Facebook.
+- No conecta Instagram.
+- No conecta OpenAI.
+- No publica fuera de AutonomIA.
+- Permite crear, guardar, editar, aprobar, programar, cancelar y archivar
+  publicaciones internas.
+- El modo "Generar ejemplo" solo rellena el formulario y no guarda registros.
+- Las publicaciones demo o archivadas no computan como métricas reales.
+- Las métricas reales solo cuentan publicaciones con `is_demo = false`,
+  `archived_at is null` y `deleted_at is null`.
+- El plan Gratuito permite 2 publicaciones reales por semana; al alcanzar el
+  límite se bloquea la creación de nuevas publicaciones reales, pero no la
+  visualización de publicaciones existentes.
+
+La publicación real en redes deberá implementarse en una fase posterior con
+permisos explícitos, auditoría y control de errores.
+
+### SocialIA Fase 1B
+
+SocialIA Fase 1B añade un calendario editorial real para que el cliente organice
+su contenido antes de conectar redes.
+
+Reglas:
+
+- Vista mensual y semanal de publicaciones internas.
+- Panel de próximas publicaciones: hoy, mañana y esta semana.
+- Las publicaciones demo se muestran con distintivo `Demo`.
+- Las publicaciones demo no cuentan en estadísticas reales.
+- Las publicaciones archivadas o eliminadas lógicamente no aparecen en el
+  calendario operativo.
+- Se permite reprogramar editando la fecha desde la tarjeta.
+- No hay drag & drop todavía.
+- No conecta Meta, Facebook, Instagram ni OpenAI.
+- No publica fuera de AutonomIA.
+
+El calendario sigue visible aunque el plan Gratuito alcance el límite semanal de
+2 publicaciones reales.
 - Configuración avanzada.
 
 ## 4. Módulos

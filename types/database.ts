@@ -142,7 +142,39 @@ export type UsageEvent = {
   event_type: string;
   quantity: number;
   metadata: Record<string, unknown>;
+  is_demo?: boolean | null;
+  archived_at?: string | null;
+  deleted_at?: string | null;
   created_at: string;
+};
+
+export type PostStatus =
+  | "draft"
+  | "pending_approval"
+  | "approved"
+  | "scheduled"
+  | "published_simulated"
+  | "canceled"
+  | "archived";
+
+export type Post = {
+  id: string;
+  company_id: string;
+  created_by: string | null;
+  module_key: string;
+  channel: string;
+  channels?: string[] | null;
+  title: string;
+  content: string;
+  media_urls: string[] | null;
+  status: PostStatus;
+  scheduled_at: string | null;
+  published_at: string | null;
+  is_demo?: boolean | null;
+  archived_at?: string | null;
+  deleted_at?: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type CompanyModule = {
@@ -220,6 +252,12 @@ export type Database = {
         Row: CompanyModule;
         Insert: Partial<CompanyModule>;
         Update: Partial<CompanyModule>;
+        Relationships: [];
+      };
+      posts: {
+        Row: Post;
+        Insert: Partial<Post>;
+        Update: Partial<Post>;
         Relationships: [];
       };
       business_sectors: {

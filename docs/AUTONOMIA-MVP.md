@@ -452,6 +452,84 @@ El superadmin no aprueba la entrada inicial. Puede intervenir después para
 cambiar plan, activar Acceso VIP, conceder demo ilimitada, suspender, archivar o
 convertir a pago.
 
+## Política de datos demo
+
+Antes de activar módulos reales, AutonomIA debe separar los datos de prueba de
+la actividad real.
+
+Las tablas operativas deben contemplar:
+
+- `is_demo`
+- `archived_at`
+- `deleted_at`
+
+Las métricas del MVP solo deben contar datos reales operativos:
+
+- `is_demo = false`
+- `archived_at is null`
+- `deleted_at is null`
+
+Los datos demo, archivados o eliminados lógicamente no deben afectar a métricas
+de uso IA, publicaciones, leads, reservas, reseñas, actividad ni módulos usados.
+
+No se deben borrar registros fiscales, facturas, pagos ni eventos de facturación
+desde herramientas de limpieza demo.
+
+## SocialIA Fase 1A
+
+SocialIA Fase 1A permite gestionar publicaciones internas reales dentro de
+AutonomIA sin conectar Meta, Facebook, Instagram ni OpenAI.
+
+Incluye:
+
+- Crear publicaciones internas.
+- Guardar borradores.
+- Enviar a aprobación.
+- Editar publicaciones.
+- Aprobar publicaciones.
+- Programar fecha dentro de AutonomIA.
+- Cancelar publicaciones.
+- Archivar publicaciones.
+- Marcar publicaciones como demo/prueba cuando proceda.
+- Generar un ejemplo temporal que solo rellena el formulario y no se guarda.
+- Contador del plan Gratuito con 2 publicaciones reales semanales.
+
+Estados previstos:
+
+- `draft`
+- `pending_approval`
+- `approved`
+- `scheduled`
+- `published_simulated`
+- `canceled`
+- `archived`
+
+Las publicaciones programadas no se publican en redes reales todavía. La futura
+integración con Meta deberá respetar aprobación, permisos y límites del plan.
+Las métricas solo cuentan publicaciones reales operativas: `is_demo = false`,
+`archived_at is null` y `deleted_at is null`.
+
+## SocialIA Fase 1B
+
+SocialIA Fase 1B añade calendario editorial completo para organizar contenido
+antes de conectar redes reales.
+
+Incluye:
+
+- Vista mensual del calendario editorial.
+- Vista semanal de lunes a domingo.
+- Navegación por mes o semana con Anterior y Siguiente.
+- Panel de próximas publicaciones: hoy, mañana y esta semana.
+- Visualización de publicaciones `draft`, `pending_approval`, `scheduled` y
+  `published_simulated`.
+- Distintivo `Demo` para publicaciones de prueba.
+- Reprogramación manual editando la fecha programada desde la tarjeta.
+- Calendario visible aunque el plan Gratuito alcance el límite semanal.
+
+Las publicaciones demo se muestran para revisión, pero no cuentan en
+estadísticas reales. Esta fase todavía no publica en Instagram, Facebook, Meta
+ni otras redes.
+
 Motivo:
 
 - Precio suficiente para validar disposición de pago.
