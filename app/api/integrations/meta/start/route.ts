@@ -12,6 +12,11 @@ const metaOAuthDialogUrl = "https://www.facebook.com/v20.0/dialog/oauth";
 
 export async function GET(request: NextRequest) {
   const companyId = request.nextUrl.searchParams.get("companyId");
+  const platformParam = request.nextUrl.searchParams.get("platform");
+  const platform =
+    platformParam === "facebook" || platformParam === "instagram"
+      ? platformParam
+      : null;
 
   if (!companyId) {
     return NextResponse.json(
@@ -38,7 +43,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const state = createMetaOAuthState(companyId);
+  const state = createMetaOAuthState(companyId, platform);
   const encodedState = encodeMetaOAuthState(state);
   const url = new URL(metaOAuthDialogUrl);
 
@@ -60,4 +65,3 @@ export async function GET(request: NextRequest) {
 
   return response;
 }
-

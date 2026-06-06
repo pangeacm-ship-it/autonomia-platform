@@ -6,7 +6,15 @@ No modifica la aplicación, no conecta servicios externos y no sustituye una rev
 
 ## 1. Visión general
 
-AutonomIA es un SaaS modular para negocios locales que centraliza automatización, contenido, reseñas, leads, reservas, métricas y atención asistida por IA.
+AutonomIA es un SaaS por planes para negocios locales que centraliza automatización, contenido, reseñas, leads, reservas, métricas y atención asistida por IA.
+
+Regla comercial maestra:
+
+- AutonomIA vende planes, no módulos individuales.
+- Los módulos representan capacidades del producto.
+- Cada plan desbloquea un conjunto definido de módulos y niveles de servicio.
+- El cliente actualiza su plan cuando necesita más funcionalidades.
+- No existe contratación individual ni precio independiente por módulo.
 
 El producto se organiza en dos grandes áreas:
 
@@ -42,7 +50,7 @@ Permisos:
 
 - Gestionar usuarios de su empresa.
 - Consultar facturación y suscripción.
-- Activar o revisar módulos contratados.
+- Revisar las herramientas incluidas en el plan.
 - Configurar datos de empresa, horarios, marca, conexiones e IA.
 - Acceder a todos los módulos incluidos en su plan.
 
@@ -389,7 +397,7 @@ No deben existir:
 
 ### `active`
 
-Acceso completo según plan, módulos contratados y rol del usuario.
+Acceso completo según plan, herramientas desbloqueadas y rol del usuario.
 
 ### `trial`
 
@@ -617,7 +625,7 @@ Flujo recomendado:
 7. Configuración de empresa.
 8. Conexión de canales.
 9. Configuración IA.
-10. Activación de módulos.
+10. Confirmación de herramientas incluidas en el plan.
 
 El acceso operativo solo debe activarse cuando el cobro inicial se haya completado correctamente, salvo campañas `trial` explícitas.
 
@@ -846,10 +854,10 @@ Rutas permitidas con `suspended` o `canceled`:
 
 Reglas por plan:
 
-- Gratuito: dashboard, SocialIA limitado, empresa, suscripción y facturación.
-- Inicio: SocialIA completo, calendario, empresa, suscripción, facturación y módulos.
-- Crecimiento: SocialIA, Google Business, ReviewIA básico, InsightIA básico y usuarios.
-- Local IA: módulos principales.
+- Gratuito: SocialIA limitado, Calendario Inteligente básico y Elena IA básica limitada.
+- Inicio: SocialIA completo, Calendario Inteligente y Elena IA básica.
+- Crecimiento: todo Inicio, Google Business, ReviewIA básico e InsightIA básico.
+- Local IA: todo Crecimiento, WhatsApp Business, TikTok, ReviewIA completo, InsightIA completo y Elena IA avanzada.
 - Enterprise: oculto comercialmente y reservado para uso interno futuro.
 
 Límites de usuarios:

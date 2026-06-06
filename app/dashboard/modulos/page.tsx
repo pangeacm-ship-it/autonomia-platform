@@ -20,14 +20,14 @@ type ModuleCard = {
   status: ModuleStatus;
   description: string;
   benefits: string[];
-  price: string;
+  availability: string;
   href: string;
 };
 
 const fallbackSummary = [
   { label: "Módulos activos", value: "4", detail: "Operativos ahora" },
   { label: "Módulos recomendados", value: "3", detail: "Prioridad IA" },
-  { label: "Disponibles", value: "5", detail: "Listos para activar" },
+  { label: "Disponibles", value: "5", detail: "En planes superiores" },
   { label: "Ahorro estimado", value: "12h/mes", detail: "Tiempo recuperado" },
 ];
 
@@ -38,7 +38,7 @@ const activeModules: ModuleCard[] = [
     description:
       "Crea publicaciones para Instagram y Facebook desde ideas, fotos o mensajes enviados por WhatsApp.",
     benefits: ["Contenido recurrente", "Aprobación previa", "Calendario social"],
-    price: "Incluido",
+    availability: "✅ Incluido en tu plan",
     href: "/dashboard/socialia",
   },
   {
@@ -47,7 +47,7 @@ const activeModules: ModuleCard[] = [
     description:
       "Mantiene la presencia local del negocio en Google con publicaciones, ficha y visibilidad básica.",
     benefits: ["Visibilidad local", "Publicaciones Google", "Mejor presencia en Maps"],
-    price: "Incluido en plan actual",
+    availability: "✅ Incluido en tu plan",
     href: "/dashboard/google-business",
   },
   {
@@ -56,7 +56,7 @@ const activeModules: ModuleCard[] = [
     description:
       "Resume métricas, actividad y oportunidades para entender qué acciones están funcionando mejor.",
     benefits: ["Informes claros", "Recomendaciones IA", "Seguimiento mensual"],
-    price: "Incluido en plan actual",
+    availability: "✅ Incluido en tu plan",
     href: "/dashboard/insightia",
   },
   {
@@ -65,7 +65,7 @@ const activeModules: ModuleCard[] = [
     description:
       "Organiza publicaciones, campañas, reservas y tareas importantes desde una vista centralizada.",
     benefits: ["Planificación visual", "Fechas clave", "Control operativo"],
-    price: "Incluido",
+    availability: "✅ Incluido en tu plan",
     href: "/dashboard/calendario",
   },
 ];
@@ -77,7 +77,7 @@ const recommendedModules: ModuleCard[] = [
     description:
       "Prepara respuestas profesionales a reseñas para proteger la reputación y acelerar la atención.",
     benefits: ["Respuestas rápidas", "Mejor reputación", "Aprobación manual"],
-    price: "+19€/mes",
+    availability: "🔒 Disponible en Crecimiento o superior",
     href: "/dashboard/reviewia",
   },
   {
@@ -86,7 +86,7 @@ const recommendedModules: ModuleCard[] = [
     description:
       "Detecta oportunidades comerciales y ayuda a hacer seguimiento de contactos interesados.",
     benefits: ["Más oportunidades", "Seguimiento comercial", "Prioridad por lead"],
-    price: "+29€/mes",
+    availability: "🔒 Disponible en Local IA",
     href: "/dashboard/leadia",
   },
   {
@@ -95,19 +95,19 @@ const recommendedModules: ModuleCard[] = [
     description:
       "Ayuda a gestionar consultas de reserva, confirmaciones y recordatorios para reducir olvidos.",
     benefits: ["Más reservas", "Recordatorios", "Menos tareas manuales"],
-    price: "+19€/mes",
+    availability: "🔒 Disponible en Local IA",
     href: "/dashboard/reservaia",
   },
 ];
 
 const availableModules: ModuleCard[] = [
   {
-    name: "WhatsAppIA",
+    name: "WhatsApp Business",
     status: "Disponible",
     description:
       "Automatiza respuestas frecuentes por WhatsApp para horarios, servicios y dudas habituales.",
     benefits: ["Atención 24/7", "Menos mensajes repetidos", "Respuestas consistentes"],
-    price: "+29€/mes",
+    availability: "🔒 Disponible en Local IA",
     href: "/dashboard/whatsappia",
   },
   {
@@ -116,7 +116,7 @@ const availableModules: ModuleCard[] = [
     description:
       "Genera ideas y guiones para vídeos cortos pensados para captar atención en redes.",
     benefits: ["Ideas virales", "Guiones cortos", "Contenido vertical"],
-    price: "+25€/mes",
+    availability: "🔒 Disponible en Local IA",
     href: "/dashboard/tiktok-shorts",
   },
   {
@@ -125,7 +125,7 @@ const availableModules: ModuleCard[] = [
     description:
       "Adapta ideas y publicaciones a formatos breves para reforzar la presencia en YouTube.",
     benefits: ["Formato corto", "Mayor alcance", "Reutilización de contenido"],
-    price: "+25€/mes",
+    availability: "🔒 Disponible en Local IA",
     href: "/dashboard/tiktok-shorts",
   },
 ];
@@ -139,33 +139,28 @@ function normalize(value: string) {
     .replace(/^_|_$/g, "");
 }
 
-function findModule(modules: Module[], card: ModuleCard) {
-  return modules.find(
-    (module) =>
-      normalize(module.name) === normalize(card.name) ||
-      module.key === normalize(card.name),
-  );
-}
-
-function getModulePrice(card: ModuleCard, modules: Module[]) {
-  const moduleData = findModule(modules, card);
-
-  if (!moduleData) {
-    return card.price;
+function getModuleAvailability(moduleName: string, status: ModuleStatus) {
+  if (status === "Activo") {
+    return "✅ Incluido en tu plan";
   }
 
-  if (moduleData.monthly_price_cents === null) {
-    return card.status === "Activo" ? "Incluido" : card.price;
+  const key = normalize(moduleName);
+
+  if (
+    key.includes("google_business") ||
+    key.includes("reviewia") ||
+    key.includes("insightia")
+  ) {
+    return "🔒 Disponible en Crecimiento o superior";
   }
 
-  return `+${Math.round(moduleData.monthly_price_cents / 100)}€/mes`;
+  return "🔒 Disponible en Local IA";
 }
 
-function mergeModulePrices(cards: ModuleCard[], modules: Module[]) {
-  return cards.map((card) => ({
-    ...card,
-    price: getModulePrice(card, modules),
-  }));
+function getModuleDisplayName(moduleName: string) {
+  return normalize(moduleName) === "whatsappia"
+    ? "WhatsApp Business"
+    : moduleName;
 }
 
 function getModuleHref(module: Pick<Module, "key" | "name">) {
@@ -199,23 +194,15 @@ function getFallbackBenefits(moduleName: string) {
   return card?.benefits ?? ["Ahorro de tiempo", "Seguimiento claro", "Preparado para IA"];
 }
 
-function formatModulePrice(module: Module, status: ModuleStatus) {
-  if (module.monthly_price_cents === null) {
-    return status === "Activo" ? "Incluido" : "Incluido según plan";
-  }
-
-  return `+${Math.round(module.monthly_price_cents / 100)}€/mes`;
-}
-
 function toModuleCard(module: Module, status: ModuleStatus): ModuleCard {
   return {
-    name: module.name,
+    name: getModuleDisplayName(module.name),
     status,
     description:
       module.description ??
       "Módulo preparado para ampliar automatizaciones y seguimiento del negocio.",
     benefits: getFallbackBenefits(module.name),
-    price: formatModulePrice(module, status),
+    availability: getModuleAvailability(module.name, status),
     href: getModuleHref(module),
   };
 }
@@ -267,10 +254,10 @@ function getActionLabel(status: ModuleStatus) {
   }
 
   if (status === "Recomendado") {
-    return "Activar módulo";
+    return "Ver plan recomendado";
   }
 
-  return "Ver detalles";
+  return "Comparar planes";
 }
 
 function ModuleGrid({
@@ -307,7 +294,7 @@ function ModuleGrid({
               <div>
                 <h3 className="text-2xl font-black">{module.name}</h3>
                 <p className="mt-2 text-sm font-bold text-slate-400">
-                  {module.price}
+                  {module.availability}
                 </p>
               </div>
 
@@ -337,7 +324,7 @@ function ModuleGrid({
             </div>
 
             <Link
-              href={module.href}
+              href={module.status === "Activo" ? module.href : "/dashboard/suscripcion"}
               className={`mt-6 block rounded-2xl px-5 py-3 text-center text-sm font-bold transition ${
                 module.status === "Activo"
                   ? "border border-white/10 text-white hover:bg-white/10"
@@ -411,13 +398,13 @@ export default async function ModulosPage() {
   );
   const activeModuleCards = realActiveModuleCards.length
     ? realActiveModuleCards
-    : mergeModulePrices(activeModules, modules);
+    : activeModules;
   const recommendedModuleCards = realRecommendedModuleCards.length
     ? realRecommendedModuleCards
-    : mergeModulePrices(recommendedModules, modules);
+    : recommendedModules;
   const availableModuleCards = realAvailableModuleCards.length
     ? realAvailableModuleCards
-    : mergeModulePrices(availableModules, modules);
+    : availableModules;
 
   return (
     <section className="p-4 sm:p-6 lg:p-10">
@@ -435,9 +422,9 @@ export default async function ModulosPage() {
             <h1 className="text-3xl font-black sm:text-4xl">Módulos de AutonomIA</h1>
 
             <p className="mt-4 max-w-3xl text-slate-300">
-              Activa solo los módulos que tu negocio necesita ahora y amplía la
-              plataforma cuando quieras automatizar más tareas, captar más
-              clientes o mejorar la atención.
+              Tu plan desbloquea las herramientas adecuadas para cada etapa.
+              Actualiza tu plan cuando necesites más automatización, visibilidad
+              o capacidad de atención.
             </p>
           </div>
 
@@ -473,9 +460,9 @@ export default async function ModulosPage() {
             </p>
 
             <p className="mt-4 max-w-4xl text-lg leading-8 text-amber-50">
-              AutonomIA recomienda activar ReviewIA y ReservaIA para mejorar
-              reputación, responder más rápido y convertir más consultas en
-              reservas.
+              AutonomIA recomienda avanzar al plan que incluye ReviewIA y
+              ReservaIA para mejorar reputación, responder más rápido y
+              convertir más consultas en reservas.
             </p>
           </div>
 
@@ -517,7 +504,7 @@ export default async function ModulosPage() {
             <p className="mt-2 text-sm leading-6 text-slate-400">
               {commercialAccess.isGifted
                 ? "Estás utilizando una versión profesional con acceso VIP especial. Los módulos activos mantienen el valor real del plan mientras esta condición permanezca activa."
-                : "Incluye 2 usuarios, SocialIA, Google Business, ReviewIA básico e InsightIA básico. Para más usuarios o módulos principales, Local IA amplía el límite hasta 5 usuarios."}
+                : "Incluye 2 usuarios, SocialIA, Google Business, ReviewIA básico e InsightIA básico. Local IA amplía el límite hasta 5 usuarios y desbloquea la experiencia completa."}
             </p>
           </div>
 

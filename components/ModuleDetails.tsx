@@ -111,8 +111,8 @@ export default function ModuleDetails() {
         </h2>
 
         <p className="mt-5 text-lg leading-8 text-slate-400">
-          Empieza con el plan que necesites y añade nuevas capacidades cuando tu
-          negocio crezca.
+          Empieza con el plan que necesites y desbloquea nuevas capacidades
+          cuando tu negocio crezca.
         </p>
       </div>
 

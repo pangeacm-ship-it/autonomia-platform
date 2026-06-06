@@ -76,6 +76,7 @@ export default async function ConexionesPage() {
   const metaConnections = [
     {
       name: "Facebook",
+      icon: "f",
       status: statusLabel(facebookConnection?.status ?? "disconnected"),
       description:
         "Página de Facebook preparada para futuras publicaciones aprobadas desde SocialIA.",
@@ -84,12 +85,13 @@ export default async function ConexionesPage() {
       action:
         facebookConnection?.status === "connected"
           ? "Revisar conexión"
-          : "Conectar Facebook e Instagram",
-      oauthHref: metaOAuthHref,
+          : "Conectar Facebook",
+      oauthHref: `${metaOAuthHref}&platform=facebook`,
       notice: "OAuth real preparado. La conexión quedará en revisión antes de publicar.",
     },
     {
       name: "Instagram",
+      icon: "◎",
       status: statusLabel(instagramConnection?.status ?? "disconnected"),
       description:
         "Instagram Business preparado para futuras publicaciones SocialIA.",
@@ -98,8 +100,8 @@ export default async function ConexionesPage() {
       action:
         instagramConnection?.status === "connected"
           ? "Revisar conexión"
-          : "Conectar Facebook e Instagram",
-      oauthHref: metaOAuthHref,
+          : "Conectar Instagram",
+      oauthHref: `${metaOAuthHref}&platform=instagram`,
       notice: "OAuth real preparado. La conexión quedará en revisión antes de publicar.",
     },
   ];
@@ -156,7 +158,14 @@ export default async function ConexionesPage() {
           >
             <div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-start">
               <div>
-                <h2 className="text-2xl font-black">{connection.name}</h2>
+                <div className="flex items-center gap-3">
+                  {"icon" in connection && connection.icon ? (
+                    <span className="flex size-10 items-center justify-center rounded-2xl bg-white text-lg font-black text-blue-700 shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
+                      {connection.icon}
+                    </span>
+                  ) : null}
+                  <h2 className="text-2xl font-black">{connection.name}</h2>
+                </div>
 
                 <p className="mt-2 text-sm leading-6 text-slate-400">
                   {connection.description}
@@ -216,8 +225,13 @@ export default async function ConexionesPage() {
               {"oauthHref" in connection && connection.oauthHref ? (
                 <a
                   href={connection.oauthHref}
-                  className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3 text-sm font-bold text-white hover:opacity-90"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3 text-sm font-bold text-white hover:opacity-90"
                 >
+                  {"icon" in connection && connection.icon ? (
+                    <span className="flex size-6 items-center justify-center rounded-full bg-white/15 text-sm">
+                      {connection.icon}
+                    </span>
+                  ) : null}
                   {connection.action}
                 </a>
               ) : (

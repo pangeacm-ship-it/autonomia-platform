@@ -150,12 +150,12 @@ export default function Pricing() {
 
       <div className="mt-16 text-center">
         <h3 className="text-2xl font-black text-slate-950">
-          Añade módulos cuando los necesites
+          Cada plan desbloquea nuevas capacidades
         </h3>
 
         <p className="mt-4 text-slate-600">
-          ReviewIA · WhatsAppIA · ReservaIA · LeadIA · InsightIA · Google
-          Business · TikTok & Shorts
+          Empieza con SocialIA y actualiza tu plan cuando necesites más
+          visibilidad, automatización y atención inteligente.
         </p>
       </div>
     </section>

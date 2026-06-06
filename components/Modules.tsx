@@ -1,8 +1,8 @@
 const modules = [
   {
     name: "SocialIA",
-    type: "Módulo base",
-    price: "Incluido",
+    type: "Desde Gratuito",
+    availability: "Incluido según plan",
     description:
       "Publicaciones para Instagram y Facebook preparadas desde AutonomIA, con aprobación antes de publicar.",
     features: [
@@ -15,56 +15,56 @@ const modules = [
   },
   {
     name: "Google Business",
-    type: "Extra",
-    price: "+10€/mes",
+    type: "Desde Crecimiento",
+    availability: "Desbloqueado por tu plan",
     description:
       "Publicaciones y optimización básica de la ficha de Google Business.",
     features: ["Publicaciones Google", "Ficha del negocio", "Visibilidad local"],
   },
   {
     name: "ReviewIA",
-    type: "Extra",
-    price: "+19€/mes",
+    type: "Desde Crecimiento",
+    availability: "Básico o completo según plan",
     description:
       "Respuestas inteligentes a reseñas para mejorar la reputación online.",
     features: ["Reseñas Google", "Respuestas IA", "Aprobación manual"],
   },
   {
-    name: "WhatsAppIA",
-    type: "Extra",
-    price: "+29€/mes",
+    name: "WhatsApp Business",
+    type: "Local IA",
+    availability: "Incluido en Local IA",
     description:
       "Atención automática al cliente por WhatsApp para dudas frecuentes.",
     features: ["Preguntas frecuentes", "Horarios", "Servicios", "Mensajes 24/7"],
   },
   {
     name: "ReservaIA",
-    type: "Extra",
-    price: "+19€/mes",
+    type: "Local IA",
+    availability: "Incluido en Local IA",
     description:
       "Gestión automática de reservas, confirmaciones y recordatorios.",
     features: ["Reservas", "Calendario", "Confirmaciones", "Recordatorios"],
   },
   {
     name: "LeadIA",
-    type: "Extra",
-    price: "+29€/mes",
+    type: "Local IA",
+    availability: "Incluido en Local IA",
     description:
       "Captación de clientes mediante formularios, auditorías y seguimiento.",
     features: ["Leads", "Auditorías", "Seguimiento", "Oportunidades"],
   },
   {
     name: "InsightIA",
-    type: "Extra",
-    price: "+15€/mes",
+    type: "Desde Crecimiento",
+    availability: "Básico o completo según plan",
     description:
       "Informes automáticos para entender qué funciona y qué mejorar.",
     features: ["Informes", "Métricas", "Recomendaciones", "Resumen mensual"],
   },
   {
     name: "TikTok & Shorts",
-    type: "Extra",
-    price: "+25€/mes",
+    type: "Local IA",
+    availability: "Incluido en Local IA",
     description:
       "Contenido avanzado para TikTok y YouTube Shorts a partir de fotos, vídeos o ideas.",
     features: ["TikTok", "YouTube Shorts", "Ideas de vídeo", "Guiones cortos"],
@@ -82,13 +82,13 @@ export default function Modules() {
         <h2 className="text-4xl font-black text-slate-950 md:text-5xl">
           Empieza con SocialIA.
           <br />
-          Añade solo lo que necesites.
+          Desbloquea nuevas capacidades al crecer.
         </h2>
 
         <p className="mt-5 text-lg leading-8 text-slate-600">
-          Todos los clientes empiezan con el módulo base de publicaciones y
-          calendario editorial. Después pueden activar módulos extra según las
-          necesidades reales de su negocio.
+          Cada plan incorpora nuevas herramientas para automatizar el negocio.
+          Actualiza tu plan cuando necesites más visibilidad, atención o
+          automatización.
         </p>
       </div>
 
@@ -114,7 +114,7 @@ export default function Modules() {
               </span>
 
               <span className="text-sm font-bold text-slate-500">
-                {module.price}
+                {module.availability}
               </span>
             </div>
 

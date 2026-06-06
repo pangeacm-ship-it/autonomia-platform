@@ -264,15 +264,21 @@ function SocialConnectionsPanel({
   const items = [
     {
       name: "Facebook",
+      icon: "f",
       platform: "facebook",
+      oauthHref: `${metaOAuthHref}&platform=facebook`,
       status: status.facebook,
       description: "Página de Facebook para futuras publicaciones aprobadas.",
+      action: "Conectar Facebook",
     },
     {
       name: "Instagram",
+      icon: "◎",
       platform: "instagram",
+      oauthHref: `${metaOAuthHref}&platform=instagram`,
       status: status.instagram,
       description: "Cuenta Instagram Business para futuras publicaciones SocialIA.",
+      action: "Conectar Instagram",
     },
   ];
 
@@ -304,7 +310,12 @@ function SocialConnectionsPanel({
           >
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
               <div>
-                <h3 className="text-xl font-black text-slate-950">{item.name}</h3>
+                <div className="flex items-center gap-3">
+                  <span className="flex size-10 items-center justify-center rounded-2xl bg-white text-lg font-black text-blue-700 shadow-[0_12px_28px_rgba(15,23,42,0.10)]">
+                    {item.icon}
+                  </span>
+                  <h3 className="text-xl font-black text-slate-950">{item.name}</h3>
+                </div>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   {item.description}
                 </p>
@@ -320,10 +331,13 @@ function SocialConnectionsPanel({
 
             <div className="mt-5 flex flex-wrap gap-3">
               <a
-                href={metaOAuthHref}
-                className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-3 text-sm font-black text-white shadow-[0_12px_35px_rgba(79,70,229,0.22)]"
+                href={item.oauthHref}
+                className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-3 text-sm font-black text-white shadow-[0_12px_35px_rgba(79,70,229,0.22)]"
               >
-                Conectar Facebook e Instagram
+                <span className="flex size-6 items-center justify-center rounded-full bg-white/15 text-sm">
+                  {item.icon}
+                </span>
+                {item.action}
               </a>
               <button className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700 hover:bg-blue-50">
                 Desconectar

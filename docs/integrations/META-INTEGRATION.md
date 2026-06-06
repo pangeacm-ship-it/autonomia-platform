@@ -56,8 +56,8 @@ Meta puede exigir revisión de app y justificación de uso para permisos avanzad
 
 ## Flujo OAuth previsto
 
-1. Cliente pulsa `Conectar Facebook e Instagram`.
-2. AutonomIA llama a `/api/integrations/meta/start?companyId=...`.
+1. Cliente pulsa `Conectar Facebook` o `Conectar Instagram`.
+2. AutonomIA llama a `/api/integrations/meta/start?companyId=...&platform=facebook` o `/api/integrations/meta/start?companyId=...&platform=instagram`.
 3. El servidor valida sesión y acceso a la empresa.
 4. El servidor genera `state` seguro y lo guarda en cookie `httpOnly`.
 5. AutonomIA redirige a Meta.
@@ -81,6 +81,7 @@ Flujo completo pendiente:
 `/start`:
 
 - Recibe `companyId`.
+- Recibe `platform=facebook` o `platform=instagram` para identificar desde qué tarjeta se inició el flujo.
 - Valida sesión real.
 - Valida que el usuario pertenece a la empresa o es `superadmin`.
 - Permite `company_admin` y `marketing`.
@@ -97,7 +98,7 @@ Flujo completo pendiente:
 
 ## Flujo OAuth previsto completo
 
-1. Cliente pulsa `Conectar Facebook e Instagram`.
+1. Cliente pulsa una acción separada: `Conectar Facebook` o `Conectar Instagram`.
 2. AutonomIA genera una URL OAuth segura desde servidor.
 3. Meta redirige a `META_REDIRECT_URI` con código temporal.
 4. Servidor intercambia el código por tokens.
@@ -105,6 +106,15 @@ Flujo completo pendiente:
 6. AutonomIA sincroniza Facebook Pages disponibles.
 7. Cliente elige la página y la cuenta Instagram Business vinculada.
 8. SocialIA muestra estado `connected`.
+
+## UX por red social
+
+Visualmente AutonomIA muestra acciones separadas:
+
+- Facebook: `Conectar Facebook`.
+- Instagram Business: `Conectar Instagram`.
+
+Técnicamente Meta puede requerir un flujo conjunto porque Instagram Business depende de una Facebook Page conectada. Por eso ambos botones pueden compartir el endpoint interno OAuth, pero envían el parámetro `platform` para preparar la selección y el diagnóstico por red en fases posteriores.
 
 ## Facebook Page
 

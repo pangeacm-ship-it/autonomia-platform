@@ -9,7 +9,7 @@ const steps = [
     number: "02",
     title: "AutonomIA genera la mejor acción",
     description:
-      "La IA prepara publicaciones, respuestas, mensajes, reservas o informes según el módulo contratado.",
+      "La IA prepara publicaciones, respuestas, mensajes, reservas o informes según las herramientas incluidas en tu plan.",
   },
   {
     number: "03",

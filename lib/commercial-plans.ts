@@ -19,10 +19,10 @@ export const commercialPlans = [
       "Para probar AutonomIA con SocialIA limitado y presencia básica en redes.",
     features: [
       "1 usuario",
-      "Instagram + Facebook",
+      "SocialIA limitado",
+      "Calendario Inteligente básico",
+      "Elena IA básica limitada",
       "2 publicaciones semanales",
-      "Publicación de apoyo semanal",
-      "Centro IA limitado",
     ],
   },
   {
@@ -38,9 +38,9 @@ export const commercialPlans = [
       "1 usuario",
       "SocialIA completo",
       "Instagram + Facebook",
-      "Calendario SocialIA",
+      "Calendario Inteligente",
+      "Elena IA básica",
       "Aprobación antes de publicar",
-      "Recordatorios básicos",
     ],
   },
   {
@@ -58,7 +58,6 @@ export const commercialPlans = [
       "Google Business",
       "ReviewIA básico",
       "InsightIA básico",
-      "Seguimiento mensual",
     ],
     highlighted: true,
   },
@@ -74,10 +73,10 @@ export const commercialPlans = [
     features: [
       "Hasta 5 usuarios",
       "Todo Crecimiento",
-      "Módulos principales",
-      "InsightIA avanzado",
-      "Prioridad soporte",
-      "Automatizaciones preparadas",
+      "WhatsApp Business + TikTok",
+      "ReviewIA completo",
+      "InsightIA completo",
+      "Elena IA avanzada",
     ],
   },
 ];
@@ -122,14 +121,14 @@ export function getCommercialPrice(value: string | null | undefined) {
 export const planComparisonRows = [
   { feature: "Facebook", gratuito: true, inicio: true, crecimiento: true, localIa: true },
   { feature: "Instagram", gratuito: true, inicio: true, crecimiento: true, localIa: true },
-  { feature: "Calendario SocialIA", gratuito: false, inicio: true, crecimiento: true, localIa: true },
+  { feature: "Calendario Inteligente", gratuito: "Básico", inicio: true, crecimiento: true, localIa: true },
   { feature: "Publicaciones programadas", gratuito: false, inicio: true, crecimiento: true, localIa: true },
   { feature: "Google Business", gratuito: false, inicio: false, crecimiento: true, localIa: true },
   { feature: "ReviewIA", gratuito: false, inicio: false, crecimiento: "Básico", localIa: true },
   { feature: "InsightIA", gratuito: false, inicio: false, crecimiento: "Básico", localIa: "Avanzado" },
   { feature: "WhatsApp Business", gratuito: false, inicio: false, crecimiento: false, localIa: true },
   { feature: "TikTok", gratuito: false, inicio: false, crecimiento: false, localIa: "Preparado" },
-  { feature: "Elena IA básica", gratuito: true, inicio: true, crecimiento: true, localIa: true },
+  { feature: "Elena IA básica", gratuito: "Limitada", inicio: true, crecimiento: true, localIa: true },
   { feature: "Elena IA avanzada", gratuito: false, inicio: false, crecimiento: false, localIa: true },
   { feature: "Usuarios incluidos", gratuito: "1", inicio: "1", crecimiento: "2", localIa: "Hasta 5" },
 ];
@@ -145,18 +144,18 @@ export const planGuide = [
     plan: "Inicio",
     title: "Autónomos y pequeños negocios",
     description:
-      "Para publicar con constancia y ordenar el contenido social del negocio.",
+      "La base para publicar con constancia con SocialIA completo.",
   },
   {
     plan: "Crecimiento",
     title: "Negocios que quieren captar más clientes",
     description:
-      "Añade Google Business, ReviewIA básico e informes para mejorar presencia local.",
+      "Más visibilidad local con Google Business, ReviewIA e InsightIA básicos.",
   },
   {
     plan: "Local IA",
     title: "Empresas que quieren automatizar marketing y atención",
     description:
-      "Reúne los módulos principales y prepara una operación más completa.",
+      "La experiencia completa para automatizar marketing, atención y análisis.",
   },
 ];

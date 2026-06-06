@@ -147,12 +147,12 @@ export default async function SuscripcionPage() {
         </p>
 
         <h1 className="mt-4 text-4xl font-black">
-          Plan y servicios contratados
+          Plan y herramientas incluidas
         </h1>
 
         <p className="mt-4 max-w-3xl text-slate-300">
-              Consulta tu plan actual, conserva tu tarifa de lanzamiento y amplía
-              AutonomIA con nuevos módulos cuando tu negocio lo necesite.
+          Consulta qué incluye tu plan actual y actualízalo cuando necesites
+          desbloquear más funcionalidades.
         </p>
       </div>
 
@@ -289,7 +289,9 @@ export default async function SuscripcionPage() {
       <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_380px]">
         <div className="space-y-6">
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-8">
-            <h2 className="text-2xl font-black">Módulos activos</h2>
+            <h2 className="text-2xl font-black">
+              Tu plan actual incluye las siguientes herramientas
+            </h2>
 
             <div className="mt-6 flex flex-wrap gap-3">
               {activeModuleNames.map((module) => (
@@ -304,7 +306,12 @@ export default async function SuscripcionPage() {
           </div>
 
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-8">
-            <h2 className="text-2xl font-black">Módulos disponibles</h2>
+            <h2 className="text-2xl font-black">
+              Herramientas disponibles en planes superiores
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              Actualiza tu plan para desbloquear más funcionalidades.
+            </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
               {availableModuleNames.map((module) => (
@@ -349,7 +356,7 @@ export default async function SuscripcionPage() {
           </button>
 
           <button className="w-full rounded-2xl border border-white/10 px-6 py-4 font-bold hover:bg-white/10">
-            Añadir módulo
+            Comparar herramientas por plan
           </button>
 
           <button className="w-full rounded-2xl border border-white/10 px-6 py-4 font-bold hover:bg-white/10">

@@ -46,8 +46,8 @@ export default function PlanComparison() {
           Compara antes de elegir
         </h2>
         <p className="mt-5 text-lg leading-8 text-slate-600">
-          Una vista clara de qué incluye cada plan para empezar con el nivel
-          adecuado de automatización.
+          Inicio cubre la base, Crecimiento amplía la visibilidad local y Local
+          IA reúne la experiencia completa de automatización.
         </p>
       </div>
 
@@ -156,6 +156,42 @@ export default function PlanComparison() {
               </p>
             </article>
           ))}
+        </div>
+      </div>
+
+      <div className="mt-16 rounded-[2rem] border border-blue-200 bg-gradient-to-br from-blue-50 via-white to-violet-50 p-7 shadow-[0_24px_70px_rgba(37,99,235,0.10)] md:p-10">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-center">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-violet-700">
+              🏆 Experiencia AutonomIA Completa
+            </p>
+            <h2 className="mt-4 text-3xl font-black text-slate-950 md:text-4xl">
+              ¿Por qué elegir Local IA?
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              El plan para empresas que quieren centralizar marketing,
+              atención y automatizaciones sin contratar herramientas por
+              separado.
+            </p>
+          </div>
+
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {[
+              "WhatsApp Business",
+              "TikTok",
+              "Elena IA avanzada",
+              "Más automatizaciones",
+              "Menos trabajo manual",
+              "Más tiempo para tu negocio",
+            ].map((benefit) => (
+              <li
+                key={benefit}
+                className="rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm font-bold text-slate-700"
+              >
+                ✓ {benefit}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

@@ -20,6 +20,17 @@ Los módulos previstos incluyen:
 
 Algunos módulos pueden estar simulados, en demo o pendientes de integración real según la fase del producto.
 
+AutonomIA vende planes, no módulos individuales. Cada plan desbloquea un
+conjunto de herramientas y capacidades. Para acceder a más funcionalidades, el
+cliente actualiza su plan.
+
+Distribución comercial:
+
+- Gratuito: SocialIA limitado, Calendario Inteligente básico y Elena IA básica limitada.
+- Inicio: SocialIA completo, Calendario Inteligente y Elena IA básica.
+- Crecimiento: todo Inicio, Google Business, ReviewIA básico e InsightIA básico.
+- Local IA: todo Crecimiento, WhatsApp Business, TikTok, ReviewIA completo, InsightIA completo y Elena IA avanzada.
+
 ## Cuánto cuesta
 
 Los planes previstos son:
@@ -57,7 +68,7 @@ Para evitar un nuevo cargo, la cancelación debe realizarse antes de la siguient
 
 ## Hay costes ocultos
 
-No. AutonomIA debe mostrar de forma clara el plan, el precio mensual, los módulos incluidos y cualquier coste adicional antes de contratar.
+No. AutonomIA debe mostrar de forma clara el plan, el precio mensual, las herramientas incluidas y cualquier coste externo adicional antes de contratar.
 
 ## Qué ocurre si hay un cargo por error
 
@@ -77,7 +88,7 @@ Si no se regulariza, la cuenta podrá pasar a **suspended** y bloquear el acceso
 
 Las demos permiten probar o ver AutonomIA antes de contratar.
 
-Pueden ser gratuitas, comerciales, VIP o configuradas por módulos.
+Pueden ser gratuitas, comerciales, VIP o configuradas con distintos niveles de acceso según plan.
 
 La demo no implica obligación de contratación.
 
@@ -99,7 +110,10 @@ En futuras fases se utilizarán proveedores como Supabase, Stripe, OpenAI, Meta 
 
 Sí, el modelo previsto permite cambiar de plan cuando la plataforma tenga activada la gestión real de suscripciones.
 
-Los cambios de plan podrán afectar a módulos, precio, límites y periodo facturado.
+Los cambios de plan podrán afectar a herramientas desbloqueadas, precio, límites y periodo facturado.
+
+No existe contratación individual de módulos. El cliente cambia de plan cuando
+necesita desbloquear nuevas capacidades.
 
 ## Puedo empezar sin esperar aprobación
 

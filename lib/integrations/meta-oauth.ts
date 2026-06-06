@@ -10,6 +10,7 @@ export const META_OAUTH_STATE_COOKIE = "autonomia_meta_oauth_state";
 
 export type MetaOAuthState = {
   companyId: string;
+  platform: SocialConnection["platform"] | null;
   nonce: string;
   createdAt: number;
 };
@@ -41,9 +42,13 @@ export function getMetaOAuthScopes() {
   return metaScopes;
 }
 
-export function createMetaOAuthState(companyId: string): MetaOAuthState {
+export function createMetaOAuthState(
+  companyId: string,
+  platform: SocialConnection["platform"] | null = null,
+): MetaOAuthState {
   return {
     companyId,
+    platform,
     nonce: randomBytes(24).toString("hex"),
     createdAt: Date.now(),
   };
@@ -71,6 +76,10 @@ export function decodeMetaOAuthState(value: string | null): MetaOAuthState | nul
 
     return {
       companyId: parsed.companyId,
+      platform:
+        parsed.platform === "facebook" || parsed.platform === "instagram"
+          ? parsed.platform
+          : null,
       nonce: parsed.nonce,
       createdAt: parsed.createdAt,
     };
@@ -201,4 +210,3 @@ export async function saveMetaConnectionNeedsReview({
 
   return { ok: true, message: "Conexión Meta registrada en revisión." };
 }
-

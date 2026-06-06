@@ -6,6 +6,14 @@ El objetivo del MVP no es tener todos los módulos reales, sino vender una prime
 
 No implica conectar Supabase, Stripe ni facturación real todavía. Es una definición de alcance.
 
+## Modelo comercial oficial
+
+- AutonomIA vende planes, no módulos individuales.
+- Los módulos existen como herramientas y capacidades de la plataforma.
+- Cada plan desbloquea un conjunto definido de herramientas.
+- El cliente actualiza su plan cuando necesita más funcionalidades.
+- No existe contratación individual ni precio independiente por módulo.
+
 ## 1. MVP obligatorio para primeros clientes
 
 La primera versión vendible debe incluir:
@@ -88,7 +96,8 @@ Reglas del plan Gratuito:
 - 1 usuario.
 - Instagram + Facebook.
 - 2 publicaciones propias por semana.
-- Centro IA limitado.
+- Calendario Inteligente básico.
+- Elena IA básica limitada.
 - Sin ReviewIA.
 - Sin WhatsAppIA.
 - Sin LeadIA.
@@ -722,7 +731,7 @@ Permite:
 - Cambiar sector.
 - Cambiar plan.
 - Cambiar estado de empresa.
-- Activar o desactivar módulos.
+- Gestionar técnicamente qué herramientas quedan desbloqueadas según el plan.
 - Resetear acceso del administrador con contraseña temporal.
 - Generar invitación si Supabase Auth/email está disponible.
 - Revisar notas internas.
@@ -742,10 +751,10 @@ Reglas incluidas:
 
 Protección por plan:
 
-- Gratuito: dashboard, SocialIA limitado, empresa, suscripción y facturación.
-- Inicio: SocialIA completo y gestión básica.
-- Crecimiento: SocialIA, Google Business, ReviewIA básico, InsightIA básico y usuarios.
-- Local IA: módulos principales.
+- Gratuito: SocialIA limitado, Calendario Inteligente básico y Elena IA básica limitada.
+- Inicio: SocialIA completo, Calendario Inteligente y Elena IA básica.
+- Crecimiento: todo Inicio, Google Business, ReviewIA básico e InsightIA básico.
+- Local IA: todo Crecimiento, WhatsApp Business, TikTok, ReviewIA completo, InsightIA completo y Elena IA avanzada.
 - Enterprise: oculto comercialmente y reservado para compatibilidad interna futura.
 
 Las páginas no incluidas en el plan deben mostrar una tarjeta de acceso limitado con enlace a planes y solicitud de ampliación.

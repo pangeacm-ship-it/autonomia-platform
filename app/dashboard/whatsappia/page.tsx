@@ -92,7 +92,7 @@ export default async function WhatsAppIAPage() {
           "Revisión humana antes de activar automatizaciones reales.",
         ]}
         nextSteps={[
-          "Revisar el plan y módulos contratados.",
+          "Revisar el plan y las herramientas incluidas.",
           "Conectar WhatsApp cuando la integración esté activa.",
           "Mantener por ahora la bandeja como vista simulada interna.",
         ]}

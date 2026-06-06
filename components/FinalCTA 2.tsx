@@ -13,8 +13,8 @@ export default function FinalCTA() {
         </h2>
 
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-          Empieza con SocialIA y activa nuevos módulos cuando tu negocio los
-          necesite.
+          Empieza con SocialIA y actualiza tu plan cuando tu negocio necesite
+          nuevas capacidades.
         </p>
 
         <Link

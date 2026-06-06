@@ -7,7 +7,7 @@ const faqs = [
   {
     question: "¿Hay costes ocultos?",
     answer:
-      "No. Lo que ves en cada plan es lo que contratas. Si algún módulo externo pudiera tener costes adicionales, se avisará antes.",
+      "No. Lo que ves en cada plan es lo que contratas. Si algún servicio externo pudiera tener costes adicionales, se avisará antes.",
   },
   {
     question: "¿Qué ocurre si cancelo?",
