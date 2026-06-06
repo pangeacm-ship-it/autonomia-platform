@@ -51,6 +51,10 @@ export async function GET(request: NextRequest) {
 
   const state = createMetaOAuthState(companyId, platform);
   const encodedState = encodeMetaOAuthState(state);
+  console.log("[META START REQUEST]", {
+    companyId,
+    platform,
+  });
   const url = new URL(metaOAuthDialogUrl);
 
   url.searchParams.set("client_id", config.appId);
