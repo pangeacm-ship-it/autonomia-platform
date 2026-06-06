@@ -21,10 +21,10 @@ type MetaOAuthConfig = {
   redirectUri: string | null;
 };
 
+// Permisos básicos para validar OAuth. Pages/Instagram se añadirán después con configuración Meta adecuada.
 const metaScopes = [
-  "pages_show_list",
-  "pages_read_engagement",
-  "instagram_basic",
+  "public_profile",
+  "email",
 ];
 
 function readEnvironmentVariable(name: string) {
