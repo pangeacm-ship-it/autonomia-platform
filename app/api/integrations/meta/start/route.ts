@@ -3,7 +3,6 @@ import {
   createMetaOAuthState,
   encodeMetaOAuthState,
   getMetaOAuthConfig,
-  getMetaOAuthEnvironmentStatus,
   getMetaOAuthScopes,
   META_OAUTH_STATE_COOKIE,
   validateMetaCompanyAccess,
@@ -12,11 +11,6 @@ import {
 const metaOAuthDialogUrl = "https://www.facebook.com/v20.0/dialog/oauth";
 
 export async function GET(request: NextRequest) {
-  console.info(
-    "[AutonomIA][Meta OAuth] Environment status",
-    getMetaOAuthEnvironmentStatus(),
-  );
-
   const companyId = request.nextUrl.searchParams.get("companyId");
   const platformParam = request.nextUrl.searchParams.get("platform");
   const platform =
@@ -51,10 +45,6 @@ export async function GET(request: NextRequest) {
 
   const state = createMetaOAuthState(companyId, platform);
   const encodedState = encodeMetaOAuthState(state);
-  console.log("[META START REQUEST]", {
-    companyId,
-    platform,
-  });
   const url = new URL(metaOAuthDialogUrl);
 
   url.searchParams.set("client_id", config.appId);
@@ -62,8 +52,6 @@ export async function GET(request: NextRequest) {
   url.searchParams.set("state", encodedState);
   url.searchParams.set("scope", getMetaOAuthScopes().join(","));
   url.searchParams.set("response_type", "code");
-
-  console.log("[META TEST]", getMetaOAuthScopes());
 
   const response = NextResponse.redirect(url);
 

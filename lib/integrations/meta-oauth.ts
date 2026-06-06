@@ -1,10 +1,11 @@
 import "server-only";
 
 import { randomBytes } from "crypto";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isCompanyAdmin, isSuperadmin } from "@/lib/auth/roles";
+import { isCompanyAdmin, isSuperadmin, isUserRole } from "@/lib/auth/roles";
 import { getCurrentProfileContext } from "@/lib/data/profiles";
-import type { SocialConnection } from "@/types/database";
+import type { SocialConnection, UserRole } from "@/types/database";
 
 export const META_OAUTH_STATE_COOKIE = "autonomia_meta_oauth_state";
 
@@ -118,6 +119,21 @@ export function isMetaOAuthStateFresh(state: MetaOAuthState) {
   return Date.now() - state.createdAt <= 10 * 60 * 1000;
 }
 
+type MetaAccessMembershipRow = {
+  company_id: string | null;
+  status: string;
+  roles:
+    | { key: string | null }
+    | Array<{ key: string | null }>
+    | null;
+};
+
+function getMembershipRole(row: MetaAccessMembershipRow): UserRole | null {
+  const role = Array.isArray(row.roles) ? row.roles[0]?.key : row.roles?.key;
+
+  return isUserRole(role) ? role : null;
+}
+
 export async function validateMetaCompanyAccess(companyId: string) {
   const supabase = await createSupabaseServerClient();
 
@@ -142,6 +158,78 @@ export async function validateMetaCompanyAccess(companyId: string) {
     };
   }
 
+  const admin = createSupabaseAdminClient();
+
+  if (admin) {
+    const { data: profile, error: profileError } = await admin
+      .from("profiles")
+      .select("id, status")
+      .eq("auth_user_id", user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      return {
+        ok: false,
+        status: 503,
+        message: "No se pudo comprobar tu perfil para conectar Meta.",
+      };
+    }
+
+    if (!profile || profile.status !== "active") {
+      return {
+        ok: false,
+        status: 403,
+        message:
+          "Tu cuenta no tiene un perfil activo vinculado. Revisa el alta del usuario antes de conectar Meta.",
+      };
+    }
+
+    const { data: membershipData, error: membershipError } = await admin
+      .from("company_users")
+      .select("company_id, status, roles(key)")
+      .eq("profile_id", profile.id)
+      .eq("status", "active");
+
+    if (membershipError) {
+      return {
+        ok: false,
+        status: 503,
+        message: "No se pudieron comprobar tus permisos para conectar Meta.",
+      };
+    }
+
+    const memberships = (membershipData ?? []) as MetaAccessMembershipRow[];
+    const superadminMembership = memberships.find(
+      (membership) => getMembershipRole(membership) === "superadmin",
+    );
+    const matchingMembership = memberships.find(
+      (membership) => membership.company_id === companyId,
+    );
+    const role = superadminMembership
+      ? "superadmin"
+      : matchingMembership
+        ? getMembershipRole(matchingMembership)
+        : null;
+    const allowed =
+      Boolean(superadminMembership) ||
+      Boolean(
+        matchingMembership &&
+          (isCompanyAdmin(role) || role === "marketing"),
+      );
+
+    if (allowed) {
+      return { ok: true, status: 200, message: "OK" };
+    }
+
+    return {
+      ok: false,
+      status: 403,
+      message: matchingMembership
+        ? "Tu rol no permite conectar Meta en esta empresa."
+        : "Tu usuario no está vinculado activamente a esta empresa.",
+    };
+  }
+
   const context = await getCurrentProfileContext();
 
   if (isSuperadmin(context.primaryRole)) {
@@ -152,8 +240,11 @@ export async function validateMetaCompanyAccess(companyId: string) {
     (item) => item.company_id === companyId,
   );
   const role = membership?.role?.key ?? context.primaryRole;
+  const allowed = Boolean(
+    membership && (isCompanyAdmin(role) || role === "marketing"),
+  );
 
-  if (membership && (isCompanyAdmin(role) || role === "marketing")) {
+  if (allowed) {
     return { ok: true, status: 200, message: "OK" };
   }
 
