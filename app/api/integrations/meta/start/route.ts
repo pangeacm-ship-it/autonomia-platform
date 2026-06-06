@@ -59,6 +59,8 @@ export async function GET(request: NextRequest) {
   url.searchParams.set("scope", getMetaOAuthScopes().join(","));
   url.searchParams.set("response_type", "code");
 
+  console.log("[META TEST]", getMetaOAuthScopes());
+
   const response = NextResponse.redirect(url);
 
   response.cookies.set(META_OAUTH_STATE_COOKIE, encodedState, {
