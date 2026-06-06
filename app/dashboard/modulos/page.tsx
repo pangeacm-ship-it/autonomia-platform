@@ -2,409 +2,169 @@ import Link from "next/link";
 import SubscriptionWarningBanner from "@/components/SubscriptionWarningBanner";
 import VipAccessBanner from "@/components/VipAccessBanner";
 import { shouldShowSubscriptionWarning } from "@/lib/auth/access-control";
-import { getCommercialPrice } from "@/lib/commercial-plans";
+import {
+  getCommercialPlan,
+  getCommercialPrice,
+  normalizeCommercialPlanKey,
+} from "@/lib/commercial-plans";
 import { getCompanyCommercialAccess } from "@/lib/data/commercial-access";
 import { getCurrentCompany } from "@/lib/data/companies";
-import {
-  getCompanyModules,
-  getModules,
-} from "@/lib/data/modules";
 import { getPlans } from "@/lib/data/plans";
 import { getCurrentSubscription } from "@/lib/data/subscriptions";
-import type { CompanyModule, Module } from "@/types/database";
 
-type ModuleStatus = "Activo" | "Recomendado" | "Disponible";
-
-type ModuleCard = {
+type ToolDefinition = {
+  key: string;
   name: string;
-  status: ModuleStatus;
   description: string;
-  benefits: string[];
-  availability: string;
   href: string;
+  minimumPlan: "gratuito" | "inicio" | "crecimiento" | "local-ia";
 };
 
-const fallbackSummary = [
-  { label: "Módulos activos", value: "4", detail: "Operativos ahora" },
-  { label: "Módulos recomendados", value: "3", detail: "Prioridad IA" },
-  { label: "Disponibles", value: "5", detail: "En planes superiores" },
-  { label: "Ahorro estimado", value: "12h/mes", detail: "Tiempo recuperado" },
-];
+const planOrder = ["gratuito", "inicio", "crecimiento", "local-ia"] as const;
 
-const activeModules: ModuleCard[] = [
+const tools: ToolDefinition[] = [
   {
+    key: "socialia",
     name: "SocialIA",
-    status: "Activo",
-    description:
-      "Crea publicaciones para Instagram y Facebook desde ideas, fotos o mensajes enviados por WhatsApp.",
-    benefits: ["Contenido recurrente", "Aprobación previa", "Calendario social"],
-    availability: "✅ Incluido en tu plan",
+    description: "Crea, revisa y programa contenido para tus redes.",
     href: "/dashboard/socialia",
+    minimumPlan: "gratuito",
   },
   {
-    name: "Google Business",
-    status: "Activo",
-    description:
-      "Mantiene la presencia local del negocio en Google con publicaciones, ficha y visibilidad básica.",
-    benefits: ["Visibilidad local", "Publicaciones Google", "Mejor presencia en Maps"],
-    availability: "✅ Incluido en tu plan",
-    href: "/dashboard/google-business",
-  },
-  {
-    name: "InsightIA",
-    status: "Activo",
-    description:
-      "Resume métricas, actividad y oportunidades para entender qué acciones están funcionando mejor.",
-    benefits: ["Informes claros", "Recomendaciones IA", "Seguimiento mensual"],
-    availability: "✅ Incluido en tu plan",
-    href: "/dashboard/insightia",
-  },
-  {
-    name: "Calendario IA",
-    status: "Activo",
-    description:
-      "Organiza publicaciones, campañas, reservas y tareas importantes desde una vista centralizada.",
-    benefits: ["Planificación visual", "Fechas clave", "Control operativo"],
-    availability: "✅ Incluido en tu plan",
+    key: "calendario",
+    name: "Calendario Inteligente",
+    description: "Centraliza publicaciones, tareas, citas y recomendaciones.",
     href: "/dashboard/calendario",
+    minimumPlan: "gratuito",
   },
-];
-
-const recommendedModules: ModuleCard[] = [
   {
+    key: "elena_ia",
+    name: "Elena IA",
+    description: "Recibe orientación y recomendaciones adaptadas a tu negocio.",
+    href: "/dashboard/centro-ia",
+    minimumPlan: "gratuito",
+  },
+  {
+    key: "google_business",
+    name: "Google Business",
+    description: "Mejora la presencia local y la actividad de tu ficha.",
+    href: "/dashboard/google-business",
+    minimumPlan: "crecimiento",
+  },
+  {
+    key: "reviewia",
     name: "ReviewIA",
-    status: "Recomendado",
-    description:
-      "Prepara respuestas profesionales a reseñas para proteger la reputación y acelerar la atención.",
-    benefits: ["Respuestas rápidas", "Mejor reputación", "Aprobación manual"],
-    availability: "🔒 Disponible en Crecimiento o superior",
+    description: "Prepara respuestas profesionales para cuidar tu reputación.",
     href: "/dashboard/reviewia",
+    minimumPlan: "crecimiento",
   },
   {
-    name: "LeadIA",
-    status: "Recomendado",
-    description:
-      "Detecta oportunidades comerciales y ayuda a hacer seguimiento de contactos interesados.",
-    benefits: ["Más oportunidades", "Seguimiento comercial", "Prioridad por lead"],
-    availability: "🔒 Disponible en Local IA",
-    href: "/dashboard/leadia",
+    key: "insightia",
+    name: "InsightIA",
+    description: "Convierte actividad y métricas en decisiones más claras.",
+    href: "/dashboard/insightia",
+    minimumPlan: "crecimiento",
   },
   {
-    name: "ReservaIA",
-    status: "Recomendado",
-    description:
-      "Ayuda a gestionar consultas de reserva, confirmaciones y recordatorios para reducir olvidos.",
-    benefits: ["Más reservas", "Recordatorios", "Menos tareas manuales"],
-    availability: "🔒 Disponible en Local IA",
-    href: "/dashboard/reservaia",
-  },
-];
-
-const availableModules: ModuleCard[] = [
-  {
+    key: "whatsappia",
     name: "WhatsApp Business",
-    status: "Disponible",
-    description:
-      "Automatiza respuestas frecuentes por WhatsApp para horarios, servicios y dudas habituales.",
-    benefits: ["Atención 24/7", "Menos mensajes repetidos", "Respuestas consistentes"],
-    availability: "🔒 Disponible en Local IA",
+    description: "Prepara una atención más ágil y automatizada por WhatsApp.",
     href: "/dashboard/whatsappia",
+    minimumPlan: "local-ia",
   },
   {
+    key: "tiktok_shorts",
     name: "TikTok & Shorts",
-    status: "Disponible",
-    description:
-      "Genera ideas y guiones para vídeos cortos pensados para captar atención en redes.",
-    benefits: ["Ideas virales", "Guiones cortos", "Contenido vertical"],
-    availability: "🔒 Disponible en Local IA",
+    description: "Organiza ideas y contenido para formatos de vídeo corto.",
     href: "/dashboard/tiktok-shorts",
+    minimumPlan: "local-ia",
   },
   {
-    name: "YouTube Shorts",
-    status: "Disponible",
-    description:
-      "Adapta ideas y publicaciones a formatos breves para reforzar la presencia en YouTube.",
-    benefits: ["Formato corto", "Mayor alcance", "Reutilización de contenido"],
-    availability: "🔒 Disponible en Local IA",
-    href: "/dashboard/tiktok-shorts",
+    key: "elena_ia_avanzada",
+    name: "Elena IA avanzada",
+    description: "Amplía recomendaciones, memoria y automatizaciones inteligentes.",
+    href: "/dashboard/centro-ia",
+    minimumPlan: "local-ia",
   },
 ];
 
-function normalize(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_|_$/g, "");
-}
+const planSteps = [
+  {
+    key: "gratuito",
+    name: "Gratuito",
+    label: "Primer contacto",
+    tools: ["SocialIA básico", "Calendario básico", "Elena IA básica"],
+  },
+  {
+    key: "inicio",
+    name: "Inicio",
+    label: "Todo lo anterior +",
+    tools: ["SocialIA completo", "Calendario Inteligente", "Elena IA básica"],
+  },
+  {
+    key: "crecimiento",
+    name: "Crecimiento",
+    label: "Todo lo anterior +",
+    tools: ["Google Business", "ReviewIA", "InsightIA"],
+  },
+  {
+    key: "local-ia",
+    name: "🏆 Local IA",
+    label: "Todo lo anterior +",
+    tools: [
+      "WhatsApp Business",
+      "TikTok & Shorts",
+      "Elena IA avanzada",
+      "Automatizaciones avanzadas",
+    ],
+  },
+] as const;
 
-function getModuleAvailability(moduleName: string, status: ModuleStatus) {
-  if (status === "Activo") {
-    return "✅ Incluido en tu plan";
-  }
-
-  const key = normalize(moduleName);
-
-  if (
-    key.includes("google_business") ||
-    key.includes("reviewia") ||
-    key.includes("insightia")
-  ) {
-    return "🔒 Disponible en Crecimiento o superior";
-  }
-
-  return "🔒 Disponible en Local IA";
-}
-
-function getModuleDisplayName(moduleName: string) {
-  return normalize(moduleName) === "whatsappia"
-    ? "WhatsApp Business"
-    : moduleName;
-}
-
-function getModuleHref(module: Pick<Module, "key" | "name">) {
-  const hrefs: Record<string, string> = {
-    socialia: "/dashboard/socialia",
-    google_business: "/dashboard/google-business",
-    insightia: "/dashboard/insightia",
-    calendario_ia: "/dashboard/calendario",
-    calendario: "/dashboard/calendario",
-    reviewia: "/dashboard/reviewia",
-    leadia: "/dashboard/leadia",
-    reservaia: "/dashboard/reservaia",
-    whatsappia: "/dashboard/whatsappia",
-    tiktok_shorts: "/dashboard/tiktok-shorts",
-    youtube_shorts: "/dashboard/tiktok-shorts",
-  };
-
-  return hrefs[module.key] ?? `/dashboard/${normalize(module.name)}`;
-}
-
-function getFallbackBenefits(moduleName: string) {
-  const fallbackCards = [
-    ...activeModules,
-    ...recommendedModules,
-    ...availableModules,
-  ];
-  const card = fallbackCards.find(
-    (item) => normalize(item.name) === normalize(moduleName),
-  );
-
-  return card?.benefits ?? ["Ahorro de tiempo", "Seguimiento claro", "Preparado para IA"];
-}
-
-function toModuleCard(module: Module, status: ModuleStatus): ModuleCard {
-  return {
-    name: getModuleDisplayName(module.name),
-    status,
-    description:
-      module.description ??
-      "Módulo preparado para ampliar automatizaciones y seguimiento del negocio.",
-    benefits: getFallbackBenefits(module.name),
-    availability: getModuleAvailability(module.name, status),
-    href: getModuleHref(module),
-  };
-}
-
-function buildModuleCards(
-  modules: Module[],
-  companyModules: CompanyModule[],
-  status: ModuleStatus,
-) {
-  const statusByModuleId = new Map(
-    companyModules.map((companyModule) => [
-      companyModule.module_id,
-      companyModule.status,
-    ]),
-  );
-
-  return modules
-    .filter((module) => {
-      const companyStatus = statusByModuleId.get(module.id);
-
-      if (status === "Activo") {
-        return companyStatus === "active";
-      }
-
-      if (status === "Recomendado") {
-        return companyStatus === "recommended";
-      }
-
-      return !companyStatus || companyStatus === "available";
-    })
-    .map((module) => toModuleCard(module, status));
-}
-
-function getStatusClass(status: ModuleStatus) {
-  if (status === "Activo") {
-    return "bg-emerald-500/20 text-emerald-300";
-  }
-
-  if (status === "Recomendado") {
-    return "bg-amber-500/20 text-amber-300";
-  }
-
-  return "bg-violet-500/20 text-violet-300";
-}
-
-function getActionLabel(status: ModuleStatus) {
-  if (status === "Activo") {
-    return "Entrar al módulo";
-  }
-
-  if (status === "Recomendado") {
-    return "Ver plan recomendado";
-  }
-
-  return "Comparar planes";
-}
-
-function ModuleGrid({
-  title,
-  description,
-  modules,
-}: {
-  title: string;
-  description: string;
-  modules: ModuleCard[];
-}) {
+function planAllowsTool(currentPlanKey: string, minimumPlan: ToolDefinition["minimumPlan"]) {
   return (
-    <section className="mt-8">
-      <div className="mb-5 flex flex-col justify-between gap-3 xl:flex-row xl:items-end">
-        <div>
-          <h2 className="text-2xl font-black">{title}</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
-            {description}
-          </p>
-        </div>
-
-        <span className="w-fit rounded-full bg-white/10 px-4 py-2 text-xs font-black text-slate-300">
-          {modules.length} módulos
-        </span>
-      </div>
-
-      <div className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-4">
-        {modules.map((module) => (
-          <article
-            key={module.name}
-            className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 transition hover:border-violet-400/40 hover:bg-white/[0.07]"
-          >
-            <div className="mb-5 flex items-start justify-between gap-4">
-              <div>
-                <h3 className="text-2xl font-black">{module.name}</h3>
-                <p className="mt-2 text-sm font-bold text-slate-400">
-                  {module.availability}
-                </p>
-              </div>
-
-              <span
-                className={`shrink-0 rounded-full px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] ${getStatusClass(
-                  module.status,
-                )}`}
-              >
-                {module.status}
-              </span>
-            </div>
-
-            <p className="text-sm leading-6 text-slate-300">
-              {module.description}
-            </p>
-
-            <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
-              <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-violet-300">
-                Beneficios
-              </p>
-
-              <ul className="space-y-2 text-sm text-slate-300">
-                {module.benefits.map((benefit) => (
-                  <li key={benefit}>✓ {benefit}</li>
-                ))}
-              </ul>
-            </div>
-
-            <Link
-              href={module.status === "Activo" ? module.href : "/dashboard/suscripcion"}
-              className={`mt-6 block rounded-2xl px-5 py-3 text-center text-sm font-bold transition ${
-                module.status === "Activo"
-                  ? "border border-white/10 text-white hover:bg-white/10"
-                  : "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-[0_0_28px_rgba(124,58,237,0.24)] hover:opacity-90"
-              }`}
-            >
-              {getActionLabel(module.status)}
-            </Link>
-          </article>
-        ))}
-      </div>
-    </section>
+    planOrder.indexOf(currentPlanKey as (typeof planOrder)[number]) >=
+    planOrder.indexOf(minimumPlan)
   );
+}
+
+function planAvailabilityLabel(minimumPlan: ToolDefinition["minimumPlan"]) {
+  if (minimumPlan === "crecimiento") {
+    return "Disponible en Crecimiento o superior";
+  }
+
+  if (minimumPlan === "local-ia") {
+    return "Disponible en Local IA";
+  }
+
+  return "Incluido según plan";
 }
 
 export default async function ModulosPage() {
-  const [company, modules, plans] = await Promise.all([
+  const [company, plans] = await Promise.all([
     getCurrentCompany(),
-    getModules(),
     getPlans(),
   ]);
-  const [companyModules, subscription] = await Promise.all([
-    getCompanyModules(company.id),
-    getCurrentSubscription(company.id),
-  ]);
-  const activeCount = companyModules.filter(
-    (companyModule) => companyModule.status === "active",
-  ).length;
-  const recommendedCount = companyModules.filter(
-    (companyModule) => companyModule.status === "recommended",
-  ).length;
-  const availableCount = Math.max(modules.length - activeCount - recommendedCount, 0);
+  const subscription = await getCurrentSubscription(company.id);
   const currentPlan = plans.find((plan) => plan.id === subscription?.plan_id);
-  const currentCommercialPrice = getCommercialPrice(currentPlan?.key ?? "crecimiento");
+  const currentPlanKey = normalizeCommercialPlanKey(
+    currentPlan?.key ?? "crecimiento",
+  );
+  const currentCommercialPlan = getCommercialPlan(currentPlanKey);
+  const currentCommercialPrice = getCommercialPrice(currentPlanKey);
   const commercialAccess = await getCompanyCommercialAccess({
     company,
     subscription,
     plan: currentPlan,
   });
-  const summary = [
-    {
-      ...fallbackSummary[0],
-      value: activeCount ? String(activeCount) : fallbackSummary[0].value,
-    },
-    {
-      ...fallbackSummary[1],
-      value: recommendedCount
-        ? String(recommendedCount)
-        : fallbackSummary[1].value,
-    },
-    {
-      ...fallbackSummary[2],
-      value: availableCount ? String(availableCount) : fallbackSummary[2].value,
-    },
-    fallbackSummary[3],
-  ];
-  const realActiveModuleCards = buildModuleCards(
-    modules,
-    companyModules,
-    "Activo",
+  const includedTools = tools.filter((tool) =>
+    planAllowsTool(currentPlanKey, tool.minimumPlan),
   );
-  const realRecommendedModuleCards = buildModuleCards(
-    modules,
-    companyModules,
-    "Recomendado",
+  const upgradeTools = tools.filter(
+    (tool) =>
+      !includedTools.some((included) => included.key === tool.key) &&
+      !planAllowsTool(currentPlanKey, tool.minimumPlan),
   );
-  const realAvailableModuleCards = buildModuleCards(
-    modules,
-    companyModules,
-    "Disponible",
-  );
-  const activeModuleCards = realActiveModuleCards.length
-    ? realActiveModuleCards
-    : activeModules;
-  const recommendedModuleCards = realRecommendedModuleCards.length
-    ? realRecommendedModuleCards
-    : recommendedModules;
-  const availableModuleCards = realAvailableModuleCards.length
-    ? realAvailableModuleCards
-    : availableModules;
+  const isLocalIa = currentPlanKey === "local-ia";
 
   return (
     <section className="p-4 sm:p-6 lg:p-10">
@@ -412,159 +172,219 @@ export default async function ModulosPage() {
         <SubscriptionWarningBanner />
       ) : null}
 
-      <div className="mb-8 rounded-[2rem] border border-white/10 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-sky-500/10 p-6 lg:p-8">
+      <header className="mb-8 rounded-[2rem] border border-white/10 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-sky-500/10 p-6 lg:p-8">
         <p className="text-sm font-bold uppercase tracking-[0.25em] text-violet-200">
-          Módulos
+          Planes y herramientas
         </p>
+        <h1 className="mt-4 text-3xl font-black sm:text-4xl">
+          Cada plan desbloquea nuevas herramientas
+        </h1>
+        <p className="mt-4 max-w-3xl text-slate-300">
+          Consulta qué incluye tu plan actual y qué capacidades puedes
+          desbloquear cuando tu negocio necesite dar el siguiente paso.
+        </p>
+      </header>
 
-        <div className="mt-5 flex flex-col justify-between gap-6 xl:flex-row xl:items-end">
+      <section className="rounded-[2rem] border border-emerald-400/30 bg-gradient-to-br from-emerald-500/15 via-white/[0.05] to-violet-500/10 p-6 lg:p-8">
+        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div>
-            <h1 className="text-3xl font-black sm:text-4xl">Módulos de AutonomIA</h1>
-
-            <p className="mt-4 max-w-3xl text-slate-300">
-              Tu plan desbloquea las herramientas adecuadas para cada etapa.
-              Actualiza tu plan cuando necesites más automatización, visibilidad
-              o capacidad de atención.
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-300">
+              Tu plan actual
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <h2 className="text-4xl font-black uppercase">
+                {currentCommercialPlan.name}
+              </h2>
+              <span className="rounded-full border border-emerald-400/30 bg-emerald-500/20 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-emerald-200">
+                Activo
+              </span>
+            </div>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">
+              {currentCommercialPlan.description}
+            </p>
+            <p className="mt-3 text-sm font-bold text-emerald-300">
+              {commercialAccess.isGifted
+                ? `${commercialAccess.label} activo · Precio oficial ${commercialAccess.officialPrice}`
+                : `${currentCommercialPrice.priceTypeLabel} · ${currentCommercialPrice.monthlyLabel}`}
             </p>
           </div>
 
           <Link
             href="/dashboard/suscripcion"
-            className="rounded-2xl border border-white/10 px-6 py-3 text-center text-sm font-bold hover:bg-white/10"
+            className="w-fit rounded-2xl bg-white px-6 py-4 text-sm font-black text-slate-950 hover:bg-slate-200"
           >
-            Revisar suscripción
+            Ver suscripción
           </Link>
         </div>
-      </div>
-
-      <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {summary.map((item) => (
-          <article
-            key={item.label}
-            className="rounded-3xl border border-white/10 bg-white/[0.04] p-6"
-          >
-            <p className="text-sm text-slate-400">{item.label}</p>
-            <p className="mt-2 text-3xl font-black sm:text-4xl">{item.value}</p>
-            <p className="mt-3 text-sm font-bold text-violet-300">
-              {item.detail}
-            </p>
-          </article>
-        ))}
-      </div>
-
-      <div className="rounded-[2rem] border border-amber-400/20 bg-amber-500/10 p-6">
-        <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-center">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.22em] text-amber-300">
-              Recomendación IA
-            </p>
-
-            <p className="mt-4 max-w-4xl text-lg leading-8 text-amber-50">
-              AutonomIA recomienda avanzar al plan que incluye ReviewIA y
-              ReservaIA para mejorar reputación, responder más rápido y
-              convertir más consultas en reservas.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row">
-            {(recommendedModuleCards.length
-              ? recommendedModuleCards.slice(0, 2)
-              : [
-                  { name: "ReviewIA", href: "/dashboard/reviewia" },
-                  { name: "ReservaIA", href: "/dashboard/reservaia" },
-                ]
-            ).map((module, index) => (
-              <Link
-                key={module.name}
-                href={module.href}
-                className={
-                  index === 0
-                    ? "rounded-2xl bg-white px-5 py-3 text-center text-sm font-bold text-slate-950 hover:bg-slate-200"
-                    : "rounded-2xl border border-amber-300/30 px-5 py-3 text-center text-sm font-bold text-amber-100 hover:bg-amber-300/10"
-                }
-              >
-                Ver {module.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
-        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
-          <div>
-            <h2 className="text-xl font-black">
-              Plan actual: {currentPlan?.name ?? "Crecimiento"}
-            </h2>
-            <p className="mt-2 text-sm font-bold text-emerald-300">
-              {commercialAccess.isGifted
-                ? `Precio oficial ${commercialAccess.officialPrice} · Acceso VIP activo`
-                : `${currentCommercialPrice.priceTypeLabel} · ${currentCommercialPrice.monthlyLabel}`}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-slate-400">
-              {commercialAccess.isGifted
-                ? "Estás utilizando una versión profesional con acceso VIP especial. Los módulos activos mantienen el valor real del plan mientras esta condición permanezca activa."
-                : "Incluye 2 usuarios, SocialIA, Google Business, ReviewIA básico e InsightIA básico. Local IA amplía el límite hasta 5 usuarios y desbloquea la experiencia completa."}
-            </p>
-          </div>
-
-          <Link
-            href="/dashboard/usuarios"
-            className="rounded-2xl border border-white/10 px-5 py-3 text-center text-sm font-bold hover:bg-white/10"
-          >
-            Ver usuarios
-          </Link>
-        </div>
-      </div>
+      </section>
 
       <div className="mt-6">
         <VipAccessBanner access={commercialAccess} />
       </div>
 
-      {!commercialAccess.isGifted ? (
-      <div className="mt-6 rounded-[2rem] border border-emerald-400/20 bg-emerald-500/10 p-6">
-        <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-center">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.22em] text-emerald-300">
-              Plan Gratuito
-            </p>
-            <h2 className="mt-3 text-2xl font-black">
-              Solo incluye SocialIA limitado
-            </h2>
-            <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300">
-              1 usuario, Instagram + Facebook, 2 publicaciones propias por
-              semana y Centro IA limitado. ReviewIA, WhatsAppIA, LeadIA,
-              ReservaIA e InsightIA avanzado quedan fuera del plan gratuito.
-            </p>
+      <section className="mt-10">
+        <div className="mb-5">
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-300">
+            Incluido ahora
+          </p>
+          <h2 className="mt-3 text-2xl font-black sm:text-3xl">
+            Herramientas incluidas en tu plan
+          </h2>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {includedTools.map((tool) => (
+            <article
+              key={tool.key}
+              className="flex h-full flex-col rounded-[2rem] border border-emerald-400/20 bg-emerald-500/10 p-6"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <h3 className="text-2xl font-black">{tool.name}</h3>
+                <span className="shrink-0 rounded-full bg-emerald-500/20 px-3 py-2 text-xs font-black text-emerald-200">
+                  ✓ Incluido
+                </span>
+              </div>
+              <p className="mt-4 text-sm leading-6 text-slate-300">
+                {tool.description}
+              </p>
+              <Link
+                href={tool.href}
+                className="mt-6 block rounded-2xl border border-white/10 px-5 py-3 text-center text-sm font-bold hover:bg-white/10"
+              >
+                Abrir herramienta
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {!isLocalIa && upgradeTools.length ? (
+        <section className="mt-10 rounded-[2rem] border border-violet-400/25 bg-violet-500/10 p-6 lg:p-8">
+          <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-300">
+                Siguiente nivel
+              </p>
+              <h2 className="mt-3 text-2xl font-black sm:text-3xl">
+                Herramientas disponibles al actualizar
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                Actualiza tu plan para desbloquear más funcionalidades. No
+                necesitas contratar herramientas por separado.
+              </p>
+            </div>
+            <Link
+              href="/dashboard/suscripcion"
+              className="w-fit rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-4 text-sm font-black text-white shadow-[0_14px_40px_rgba(124,58,237,0.25)]"
+            >
+              Ver ventajas de Local IA
+            </Link>
           </div>
 
-          <Link
-            href="/dashboard/socialia"
-            className="rounded-2xl bg-white px-5 py-3 text-center text-sm font-bold text-slate-950 hover:bg-slate-200"
-          >
-            Ver SocialIA limitado
-          </Link>
-        </div>
-      </div>
+          <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {upgradeTools.map((tool) => (
+              <article
+                key={tool.key}
+                className="rounded-3xl border border-white/10 bg-black/20 p-5"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-xl">🔒</span>
+                  <div>
+                    <h3 className="text-xl font-black">{tool.name}</h3>
+                    <p className="mt-2 text-xs font-black uppercase tracking-[0.12em] text-violet-300">
+                      {planAvailabilityLabel(tool.minimumPlan)}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm leading-6 text-slate-400">
+                  {tool.description}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
       ) : null}
 
-      <ModuleGrid
-        title="Módulos activos"
-        description="Estos módulos ya están disponibles para operar el negocio y revisar actividad diaria."
-        modules={activeModuleCards}
-      />
+      <section className="mt-10">
+        <div className="mb-6">
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-300">
+            Evolución AutonomIA
+          </p>
+          <h2 className="mt-3 text-2xl font-black sm:text-3xl">
+            Más capacidad en cada plan
+          </h2>
+        </div>
 
-      <ModuleGrid
-        title="Recomendados para tu negocio"
-        description="AutonomIA prioriza estos módulos por impacto directo en reputación, captación y reservas."
-        modules={recommendedModuleCards}
-      />
+        <div className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-4">
+          {planSteps.map((plan, index) => {
+            const isCurrent = plan.key === currentPlanKey;
+            const isComplete = plan.key === "local-ia";
 
-      <ModuleGrid
-        title="Disponibles"
-        description="Módulos adicionales que puedes revisar cuando quieras ampliar automatizaciones o contenidos."
-        modules={availableModuleCards}
-      />
+            return (
+              <article
+                key={plan.key}
+                className={`relative flex h-full flex-col rounded-[2rem] border p-6 ${
+                  isComplete
+                    ? "border-violet-300/40 bg-gradient-to-br from-blue-600/20 to-violet-600/20"
+                    : isCurrent
+                      ? "border-emerald-400/40 bg-emerald-500/10"
+                      : "border-white/10 bg-white/[0.04]"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                    Paso {index + 1}
+                  </span>
+                  {isCurrent ? (
+                    <span className="rounded-full bg-emerald-500/20 px-3 py-2 text-[10px] font-black uppercase text-emerald-200">
+                      Tu plan
+                    </span>
+                  ) : null}
+                </div>
+                <h3 className="mt-5 text-2xl font-black uppercase">{plan.name}</h3>
+                <p className="mt-3 text-sm font-bold text-violet-300">{plan.label}</p>
+                <ul className="mt-5 space-y-3 text-sm text-slate-300">
+                  {plan.tools.map((tool) => (
+                    <li key={tool}>✓ {tool}</li>
+                  ))}
+                </ul>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="mt-10 rounded-[2rem] border border-blue-200 bg-gradient-to-br from-blue-50 via-white to-violet-50 p-7 text-slate-950 shadow-[0_24px_70px_rgba(37,99,235,0.10)] lg:p-10">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-center">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-violet-700">
+              🏆 Experiencia AutonomIA Completa
+            </p>
+            <h2 className="mt-4 text-3xl font-black">¿Por qué elegir Local IA?</h2>
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              La experiencia más completa para reducir trabajo manual y
+              centralizar marketing, atención y automatización.
+            </p>
+          </div>
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {[
+              "WhatsApp Business",
+              "TikTok & Shorts",
+              "Elena IA avanzada",
+              "Más automatizaciones",
+              "Menos trabajo manual",
+              "Más tiempo para tu negocio",
+            ].map((benefit) => (
+              <li
+                key={benefit}
+                className="rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm font-bold text-slate-700"
+              >
+                ✓ {benefit}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
     </section>
   );
 }

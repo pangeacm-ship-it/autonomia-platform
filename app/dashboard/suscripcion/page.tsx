@@ -151,8 +151,8 @@ export default async function SuscripcionPage() {
         </h1>
 
         <p className="mt-4 max-w-3xl text-slate-300">
-          Consulta qué incluye tu plan actual y actualízalo cuando necesites
-          desbloquear más funcionalidades.
+          Cada plan desbloquea nuevas herramientas. Consulta qué incluye tu
+          plan actual y actualízalo cuando necesites más funcionalidades.
         </p>
       </div>
 

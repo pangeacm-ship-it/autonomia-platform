@@ -27,14 +27,41 @@ const metaScopes = [
   "instagram_basic",
 ];
 
+function readEnvironmentVariable(name: string) {
+  const value = process.env[name]?.trim();
+
+  return value || null;
+}
+
 export function getMetaOAuthConfig(): MetaOAuthConfig {
+  const serverAppId = readEnvironmentVariable("META_APP_ID");
+  const publicAppId = readEnvironmentVariable("NEXT_PUBLIC_META_APP_ID");
+
   return {
-    appId:
-      process.env.META_APP_ID?.trim() ??
-      process.env.NEXT_PUBLIC_META_APP_ID?.trim() ??
-      null,
-    appSecret: process.env.META_APP_SECRET?.trim() ?? null,
-    redirectUri: process.env.META_REDIRECT_URI?.trim() ?? null,
+    appId: serverAppId ?? publicAppId,
+    appSecret: readEnvironmentVariable("META_APP_SECRET"),
+    redirectUri: readEnvironmentVariable("META_REDIRECT_URI"),
+  };
+}
+
+export function getMetaOAuthEnvironmentStatus() {
+  const metaAppId = Boolean(readEnvironmentVariable("META_APP_ID"));
+  const nextPublicMetaAppId = Boolean(
+    readEnvironmentVariable("NEXT_PUBLIC_META_APP_ID"),
+  );
+  const metaAppSecret = Boolean(readEnvironmentVariable("META_APP_SECRET"));
+  const metaRedirectUri = Boolean(readEnvironmentVariable("META_REDIRECT_URI"));
+
+  return {
+    META_APP_ID: metaAppId ? "present" : "missing",
+    NEXT_PUBLIC_META_APP_ID: nextPublicMetaAppId ? "present" : "missing",
+    META_APP_SECRET: metaAppSecret ? "present" : "missing",
+    META_REDIRECT_URI: metaRedirectUri ? "present" : "missing",
+    resolvedAppIdSource: metaAppId
+      ? "META_APP_ID"
+      : nextPublicMetaAppId
+        ? "NEXT_PUBLIC_META_APP_ID"
+        : "missing",
   };
 }
 

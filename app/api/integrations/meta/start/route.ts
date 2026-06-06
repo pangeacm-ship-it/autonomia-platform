@@ -3,6 +3,7 @@ import {
   createMetaOAuthState,
   encodeMetaOAuthState,
   getMetaOAuthConfig,
+  getMetaOAuthEnvironmentStatus,
   getMetaOAuthScopes,
   META_OAUTH_STATE_COOKIE,
   validateMetaCompanyAccess,
@@ -11,6 +12,11 @@ import {
 const metaOAuthDialogUrl = "https://www.facebook.com/v20.0/dialog/oauth";
 
 export async function GET(request: NextRequest) {
+  console.info(
+    "[AutonomIA][Meta OAuth] Environment status",
+    getMetaOAuthEnvironmentStatus(),
+  );
+
   const companyId = request.nextUrl.searchParams.get("companyId");
   const platformParam = request.nextUrl.searchParams.get("platform");
   const platform =
@@ -37,7 +43,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         error:
-          "Meta OAuth no está configurado. Revisa META_APP_ID y META_REDIRECT_URI.",
+          "Meta OAuth no está configurado. Revisa META_APP_ID o NEXT_PUBLIC_META_APP_ID, y META_REDIRECT_URI.",
       },
       { status: 503 },
     );
