@@ -24,7 +24,6 @@ type MetaOAuthConfig = {
 // Permisos básicos para validar OAuth. Pages/Instagram se añadirán después con configuración Meta adecuada.
 const metaScopes = [
   "public_profile",
-  "email",
 ];
 
 function readEnvironmentVariable(name: string) {
