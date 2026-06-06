@@ -5,7 +5,7 @@ import {
   getMetaOAuthScopes,
   isMetaOAuthStateFresh,
   META_OAUTH_STATE_COOKIE,
-  saveMetaConnectionNeedsReview,
+  saveMetaConnectionConnected,
   validateMetaCompanyAccess,
 } from "@/lib/integrations/meta-oauth";
 
@@ -32,9 +32,8 @@ export async function GET(request: NextRequest) {
   const cookieState = request.cookies.get(META_OAUTH_STATE_COOKIE)?.value ?? null;
   const state = decodeMetaOAuthState(stateParam);
   const storedState = decodeMetaOAuthState(cookieState);
-  const response = NextResponse.redirect(
-    redirectToConnections(request, "error"),
-  );
+  const errorRedirectUrl = redirectToConnections(request, "error");
+  const response = NextResponse.redirect(errorRedirectUrl);
 
   response.cookies.set(META_OAUTH_STATE_COOKIE, "", {
     httpOnly: true,
@@ -44,7 +43,7 @@ export async function GET(request: NextRequest) {
     path: "/",
   });
 
-  if (!code || !state || !storedState) {
+  if (!code || !state || !storedState || !state.platform) {
     return response;
   }
 
@@ -85,8 +84,9 @@ export async function GET(request: NextRequest) {
     const tokenExpiresAt = tokenPayload.expires_in
       ? new Date(Date.now() + tokenPayload.expires_in * 1000).toISOString()
       : null;
-    const saveResult = await saveMetaConnectionNeedsReview({
+    const saveResult = await saveMetaConnectionConnected({
       companyId: state.companyId,
+      platform: state.platform,
       scopes: getMetaOAuthScopes(),
       tokenExpiresAt,
     });
@@ -95,9 +95,8 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
-    const successResponse = NextResponse.redirect(
-      redirectToConnections(request, "needs_review"),
-    );
+    const successRedirectUrl = redirectToConnections(request, "connected");
+    const successResponse = NextResponse.redirect(successRedirectUrl);
 
     successResponse.cookies.set(META_OAUTH_STATE_COOKIE, "", {
       httpOnly: true,
@@ -112,4 +111,3 @@ export async function GET(request: NextRequest) {
     return response;
   }
 }
-

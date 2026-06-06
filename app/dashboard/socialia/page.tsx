@@ -269,7 +269,7 @@ function SocialConnectionsPanel({
       oauthHref: `${metaOAuthHref}&platform=facebook`,
       status: status.facebook,
       description: "Página de Facebook para futuras publicaciones aprobadas.",
-      action: "Conectar Facebook",
+      action: status.facebook === "connected" ? "Facebook conectado" : "Conectar Facebook",
     },
     {
       name: "Instagram",
@@ -278,7 +278,8 @@ function SocialConnectionsPanel({
       oauthHref: `${metaOAuthHref}&platform=instagram`,
       status: status.instagram,
       description: "Cuenta Instagram Business para futuras publicaciones SocialIA.",
-      action: "Conectar Instagram",
+      action:
+        status.instagram === "connected" ? "Instagram conectado" : "Conectar Instagram",
     },
   ];
 
@@ -319,6 +320,11 @@ function SocialConnectionsPanel({
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   {item.description}
                 </p>
+                {item.status === "connected" ? (
+                  <p className="mt-2 text-xs font-bold text-amber-700">
+                    Permisos avanzados pendientes. Todavía no se publica.
+                  </p>
+                ) : null}
               </div>
               <span
                 className={`w-fit rounded-full border px-3 py-2 text-xs font-black ${connectionClass(

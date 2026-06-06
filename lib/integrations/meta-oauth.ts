@@ -255,12 +255,14 @@ export async function validateMetaCompanyAccess(companyId: string) {
   };
 }
 
-export async function saveMetaConnectionNeedsReview({
+export async function saveMetaConnectionConnected({
   companyId,
+  platform,
   scopes,
   tokenExpiresAt,
 }: {
   companyId: string;
+  platform: SocialConnection["platform"];
   scopes: string[];
   tokenExpiresAt: string | null;
 }) {
@@ -271,59 +273,52 @@ export async function saveMetaConnectionNeedsReview({
   }
 
   const now = new Date().toISOString();
-  const platforms: Array<SocialConnection["platform"]> = [
-    "facebook",
-    "instagram",
-  ];
+  const { data: existingRows, error: selectError } = await supabase
+    .from("social_connections")
+    .select("id")
+    .eq("company_id", companyId)
+    .eq("provider", "meta")
+    .eq("platform", platform)
+    .is("deleted_at", null)
+    .limit(1);
 
-  for (const platform of platforms) {
-    const { data: existingRows, error: selectError } = await supabase
-      .from("social_connections")
-      .select("id")
-      .eq("company_id", companyId)
-      .eq("provider", "meta")
-      .eq("platform", platform)
-      .is("deleted_at", null)
-      .limit(1);
-
-    if (selectError) {
-      return { ok: false, message: selectError.message };
-    }
-
-    const payload = {
-      company_id: companyId,
-      provider: "meta" as const,
-      platform,
-      account_name: "Meta OAuth iniciado",
-      account_id: null,
-      page_id: null,
-      instagram_business_account_id: null,
-      access_token_encrypted: null,
-      refresh_token_encrypted: null,
-      token_expires_at: tokenExpiresAt,
-      scopes,
-      status: "needs_review" as const,
-      last_sync_at: now,
-      is_demo: false,
-      archived_at: null,
-      deleted_at: null,
-      updated_at: now,
-    };
-
-    const existingId = existingRows?.[0]?.id;
-    const mutation = existingId
-      ? supabase.from("social_connections").update(payload).eq("id", existingId)
-      : supabase.from("social_connections").insert({
-          ...payload,
-          created_at: now,
-        });
-
-    const { error } = await mutation;
-
-    if (error) {
-      return { ok: false, message: error.message };
-    }
+  if (selectError) {
+    return { ok: false, message: selectError.message };
   }
 
-  return { ok: true, message: "Conexión Meta registrada en revisión." };
+  const payload = {
+    company_id: companyId,
+    provider: "meta" as const,
+    platform,
+    account_name: "OAuth básico Meta conectado",
+    account_id: null,
+    page_id: null,
+    instagram_business_account_id: null,
+    access_token_encrypted: null,
+    refresh_token_encrypted: null,
+    token_expires_at: tokenExpiresAt,
+    scopes,
+    status: "connected" as const,
+    last_sync_at: now,
+    is_demo: false,
+    archived_at: null,
+    deleted_at: null,
+    updated_at: now,
+  };
+
+  const existingId = existingRows?.[0]?.id;
+  const mutation = existingId
+    ? supabase.from("social_connections").update(payload).eq("id", existingId)
+    : supabase.from("social_connections").insert({
+        ...payload,
+        created_at: now,
+      });
+
+  const { error } = await mutation;
+
+  if (error) {
+    return { ok: false, message: error.message };
+  }
+
+  return { ok: true, message: "OAuth básico Meta conectado." };
 }

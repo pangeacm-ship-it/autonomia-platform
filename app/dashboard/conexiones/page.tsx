@@ -87,7 +87,10 @@ export default async function ConexionesPage() {
           ? "Revisar conexión"
           : "Conectar Facebook",
       oauthHref: `${metaOAuthHref}&platform=facebook`,
-      notice: "OAuth real preparado. La conexión quedará en revisión antes de publicar.",
+      notice:
+        facebookConnection?.status === "connected"
+          ? "Facebook conectado mediante OAuth básico. Permisos avanzados pendientes; todavía no se publica."
+          : "Conecta el OAuth básico. Los permisos avanzados y la publicación real siguen pendientes.",
     },
     {
       name: "Instagram",
@@ -102,7 +105,10 @@ export default async function ConexionesPage() {
           ? "Revisar conexión"
           : "Conectar Instagram",
       oauthHref: `${metaOAuthHref}&platform=instagram`,
-      notice: "OAuth real preparado. La conexión quedará en revisión antes de publicar.",
+      notice:
+        instagramConnection?.status === "connected"
+          ? "Instagram conectado mediante OAuth básico. Permisos avanzados pendientes; todavía no se publica."
+          : "Conecta el OAuth básico. Los permisos avanzados y la publicación real siguen pendientes.",
     },
   ];
   const connections = [...metaConnections, ...staticConnections];
