@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ElenaAvatar } from "@/components/elena/ElenaAvatar";
 
 interface Message {
   role: "user" | "assistant";
@@ -126,11 +127,14 @@ export default function ChatPanel({ messages: initialMessages, quickPrompts, com
     <div className="flex flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04]">
       <div className="border-b border-white/10 bg-[#0b1024] p-5">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-black">Asistente AutonomIA</h2>
-            <p className="mt-1 text-sm text-slate-400">
-              Marketing · Redes Sociales · Ventas · Reseñas · Reservas
-            </p>
+          <div className="flex items-center gap-3">
+            <ElenaAvatar size="md" showRing />
+            <div>
+              <h2 className="text-xl font-black">Elena IA</h2>
+              <p className="mt-0.5 text-xs text-slate-400">
+                Marketing · Redes Sociales · Ventas · Reseñas · Reservas
+              </p>
+            </div>
           </div>
 
           <span
@@ -149,10 +153,13 @@ export default function ChatPanel({ messages: initialMessages, quickPrompts, com
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+            className={`flex items-end gap-2 ${message.role === "user" ? "justify-end" : "justify-start"}`}
           >
+            {message.role === "assistant" ? (
+              <ElenaAvatar size="sm" />
+            ) : null}
             <div
-              className={`max-w-[92%] rounded-3xl p-4 sm:max-w-[80%] sm:p-5 ${
+              className={`max-w-[88%] rounded-3xl p-4 sm:max-w-[78%] sm:p-5 ${
                 message.role === "user"
                   ? "bg-gradient-to-r from-blue-600 to-violet-600"
                   : "border border-white/10 bg-[#0b1024]"

@@ -2,6 +2,7 @@ import Link from "next/link";
 import ActionCards from "@/components/centroia/ActionCards";
 import ChatPanel from "@/components/centroia/ChatPanel";
 import ConversationSidebar from "@/components/centroia/ConversationSidebar";
+import { ElenaAvatar } from "@/components/elena/ElenaAvatar";
 import { getCurrentCompany } from "@/lib/data/companies";
 import { getCompanyConversations } from "@/lib/data/ai-chat";
 import { getDashboardStats } from "@/lib/data/dashboard-stats";
@@ -283,7 +284,9 @@ export default async function CentroIAPage() {
 
       <section className="mb-8 rounded-[2rem] border border-cyan-400/20 bg-cyan-500/10 p-6 lg:p-8">
         <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
-          <div>
+          <div className="flex items-center gap-5">
+            <ElenaAvatar size="xl" showRing />
+            <div>
             <p className="text-sm font-black uppercase tracking-[0.22em] text-cyan-200">
               Elena IA
             </p>
@@ -295,6 +298,7 @@ export default async function CentroIAPage() {
               recordatorios y objetivos del negocio. Esta sección está preparada
               con datos simulados para futura conexión IA.
             </p>
+            </div>
           </div>
           <span className="w-fit rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-300">
             IA activa
