@@ -6,6 +6,7 @@ import {
 import { getCurrentCompany } from "@/lib/data/companies";
 import { getCompanyModules, getModules } from "@/lib/data/modules";
 import { getCurrentProfileContext } from "@/lib/data/profiles";
+import { EmpresaForm } from "./EmpresaForm";
 
 const fallbackActiveModules = [
   "SocialIA",
@@ -116,95 +117,27 @@ export default async function EmpresaPage() {
             </p>
           </div>
 
-          <button className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3 font-bold shadow-[0_0_35px_rgba(124,58,237,0.35)]">
-            Guardar cambios
-          </button>
         </div>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
         <div className="space-y-6">
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 lg:p-8">
-            <h2 className="text-2xl font-black">Información del negocio</h2>
+            <h2 className="mb-6 text-2xl font-black">Información del negocio</h2>
 
-            <div className="mt-8 grid gap-5 md:grid-cols-2">
-              <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-bold text-slate-300">
-                  Nombre comercial
-                </label>
-                <input
-                  defaultValue={company.name}
-                  className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 text-white outline-none focus:border-violet-400"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-bold text-slate-300">
-                  Sector
-                </label>
-                <select
-                  defaultValue={currentSector.name}
-                  className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 text-white outline-none focus:border-violet-400"
-                >
-                  {businessSectors.map((sector) => (
-                    <option key={sector.key} value={sector.name}>
-                      {sector.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-bold text-slate-300">
-                  Ciudad
-                </label>
-                <input
-                  defaultValue={company.city ?? ""}
-                  className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 text-white outline-none focus:border-violet-400"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-bold text-slate-300">
-                  Teléfono
-                </label>
-                <input
-                  defaultValue={companyPhone}
-                  className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 text-white outline-none focus:border-violet-400"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-bold text-slate-300">
-                  Email
-                </label>
-                <input
-                  defaultValue={company.owner_email ?? ""}
-                  className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 text-white outline-none focus:border-violet-400"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-bold text-slate-300">
-                  Dirección
-                </label>
-                <input
-                  defaultValue={companyAddress}
-                  className="w-full rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 text-white outline-none focus:border-violet-400"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-bold text-slate-300">
-                  Descripción del negocio
-                </label>
-                <textarea
-                  defaultValue={companyDescription}
-                  rows={4}
-                  className="w-full resize-none rounded-2xl border border-white/10 bg-[#0b1024] px-4 py-4 text-white outline-none focus:border-violet-400"
-                />
-              </div>
-            </div>
+            <EmpresaForm
+              companyId={company.id}
+              name={company.name}
+              city={company.city ?? ""}
+              ownerEmail={company.owner_email ?? ""}
+              industry={company.industry ?? ""}
+              sectorId={company.sector_id}
+              businessSectors={businessSectors.map((s) => ({
+                key: s.key,
+                name: s.name,
+                id: (s as { id?: string }).id,
+              }))}
+            />
           </div>
 
           <div className="rounded-[2rem] border border-cyan-400/20 bg-cyan-500/10 p-6 lg:p-8">
