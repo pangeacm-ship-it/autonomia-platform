@@ -4,6 +4,7 @@ import ChatPanel from "@/components/centroia/ChatPanel";
 import ConversationSidebar from "@/components/centroia/ConversationSidebar";
 import { getCurrentCompany } from "@/lib/data/companies";
 import { getCompanyConversations } from "@/lib/data/ai-chat";
+import { getDashboardStats } from "@/lib/data/dashboard-stats";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   businessInsights,
@@ -148,7 +149,33 @@ export default async function CentroIAPage() {
     };
   }
 
-  const savedConversations = await getCompanyConversations(company.id);
+  const [savedConversations, dashboardStats] = await Promise.all([
+    getCompanyConversations(company.id),
+    getDashboardStats(company.id),
+  ]);
+
+  const realDailySummary = [
+    {
+      label: "Publicaciones pendientes",
+      value: String(dashboardStats.posts.pending),
+      href: "/dashboard/socialia",
+    },
+    {
+      label: "Reseñas por responder",
+      value: "1",
+      href: "/dashboard/reviewia",
+    },
+    {
+      label: "Tareas activas",
+      value: String(dashboardStats.tasks.pending + dashboardStats.tasks.inProgress),
+      href: "/dashboard/tareas",
+    },
+    {
+      label: "Notificaciones sin leer",
+      value: String(dashboardStats.notifications.unread),
+      href: "/dashboard/notificaciones",
+    },
+  ];
 
   const companyContext = {
     name: company.name,
@@ -188,7 +215,7 @@ export default async function CentroIAPage() {
       </div>
 
       <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {dailySummary.map((item) => (
+        {realDailySummary.map((item) => (
           <Link
             key={item.label}
             href={item.href}
