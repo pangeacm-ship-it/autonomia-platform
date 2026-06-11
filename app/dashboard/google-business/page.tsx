@@ -1,25 +1,34 @@
 import AccessDeniedCard from "@/components/AccessDeniedCard";
 import ModuleStatusPanel from "@/components/ModuleStatusPanel";
 import { getDashboardRouteAccess } from "@/lib/auth/access-control";
+import { ReviewResponseCard } from "@/components/reviewia/ReviewResponseCard";
+import { getCurrentCompany } from "@/lib/data/companies";
+import { getCompanyAiSettings } from "@/lib/data/ai-settings";
 
 const reviews = [
   {
-    name: "María López",
+    author: "María López",
     rating: 5,
+    date: "Ayer",
     text: "Excelente atención y comida casera. Volveremos.",
     status: "Respondida",
+    sentiment: "Positiva",
   },
   {
-    name: "Antonio Ruiz",
+    author: "Antonio Ruiz",
     rating: 4,
+    date: "Hace 2 días",
     text: "Buen servicio y ambiente agradable.",
     status: "Pendiente",
+    sentiment: "Positiva",
   },
   {
-    name: "Laura Sánchez",
+    author: "Laura Sánchez",
     rating: 2,
+    date: "Hace 3 días",
     text: "La espera fue demasiado larga.",
     status: "Pendiente",
+    sentiment: "Negativa",
   },
 ];
 
@@ -31,7 +40,10 @@ const suggestions = [
 ];
 
 export default async function GoogleBusinessPage() {
-  const access = await getDashboardRouteAccess("/dashboard/google-business");
+  const [access, company] = await Promise.all([
+    getDashboardRouteAccess("/dashboard/google-business"),
+    getCurrentCompany(),
+  ]);
 
   if (!access.allowed) {
     return (
@@ -42,6 +54,14 @@ export default async function GoogleBusinessPage() {
       />
     );
   }
+
+  const aiSettings = await getCompanyAiSettings(company.id);
+  const companyContext = {
+    name: company.name,
+    sector: company.industry ?? undefined,
+    tone: aiSettings?.tone ?? undefined,
+    city: company.city ?? undefined,
+  };
 
   return (
     <section className="p-6 lg:p-10">
@@ -112,38 +132,11 @@ export default async function GoogleBusinessPage() {
 
             <div className="mt-6 space-y-4">
               {reviews.map((review) => (
-                <article
-                  key={review.name}
-                  className="rounded-3xl border border-white/10 bg-[#0b1024] p-5"
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-black">{review.name}</h3>
-
-                    <span className="text-amber-300">
-                      {"⭐".repeat(review.rating)}
-                    </span>
-                  </div>
-
-                  <p className="mt-4 text-sm leading-6 text-slate-300">
-                    {review.text}
-                  </p>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold ${
-                        review.status === "Respondida"
-                          ? "bg-emerald-500/20 text-emerald-300"
-                          : "bg-amber-500/20 text-amber-300"
-                      }`}
-                    >
-                      {review.status}
-                    </span>
-
-                    <button className="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/10">
-                      Ver respuesta IA
-                    </button>
-                  </div>
-                </article>
+                <ReviewResponseCard
+                  key={review.author}
+                  review={review}
+                  companyContext={companyContext}
+                />
               ))}
             </div>
           </div>
