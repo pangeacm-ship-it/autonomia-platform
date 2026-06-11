@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { sendWelcomeEmail } from "@/lib/email/send";
 import type { Company, Module, Plan, Role } from "@/types/database";
 
 export type OnboardingSignupInput = {
@@ -324,6 +325,14 @@ export async function createFreeTrialFromOnboarding(
 
     revalidatePath("/superadmin");
     revalidatePath("/dashboard");
+
+    // Email de bienvenida — falla silenciosamente si RESEND_API_KEY no está configurado
+    await sendWelcomeEmail({
+      to: email,
+      contactName,
+      companyName,
+      planName: "Gratuito",
+    });
 
     return {
       ok: true,

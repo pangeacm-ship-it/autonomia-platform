@@ -8,9 +8,11 @@ import {
 import { getCommercialPrice } from "@/lib/commercial-plans";
 import { getCompanyCommercialAccess } from "@/lib/data/commercial-access";
 import { getCurrentCompany } from "@/lib/data/companies";
+import { getDashboardStats } from "@/lib/data/dashboard-stats";
 import { getPlans } from "@/lib/data/plans";
 import { getCurrentSubscription } from "@/lib/data/subscriptions";
 
+// Datos estáticos de navegación
 const quickAccess = [
   {
     title: "Centro IA",
@@ -44,33 +46,17 @@ const quickAccess = [
   },
 ];
 
-const stats = [
-  { label: "Publicaciones", value: "24", detail: "18 aprobadas · 6 pendientes", color: "text-emerald-300" },
-  { label: "Reseñas", value: "14", detail: "Respondidas por IA", color: "text-violet-300" },
-  { label: "Leads", value: "7", detail: "Este mes", color: "text-sky-300" },
-  { label: "Reservas", value: "12", detail: "Últimos 30 días", color: "text-amber-300" },
-];
-
-const pendingTasks = [
-  { title: "Publicación pendiente de aprobación", module: "SocialIA" },
-  { title: "Nueva reseña para responder", module: "ReviewIA" },
-  { title: "Lead pendiente de contactar", module: "LeadIA" },
-];
-
-const activity = [
-  "SocialIA generó 3 publicaciones.",
-  "ReviewIA preparó una respuesta para Google.",
-  "LeadIA detectó un nuevo cliente potencial.",
-  "InsightIA encontró una oportunidad de mejora.",
-];
-
-const activeModules = ["SocialIA", "Google Business", "ReviewIA", "LeadIA"];
 
 export default async function DashboardPage() {
-  const access = await getCurrentDashboardAccess();
-  const company = await getCurrentCompany();
-  const subscription = await getCurrentSubscription(company.id);
-  const plans = await getPlans();
+  const [access, company] = await Promise.all([
+    getCurrentDashboardAccess(),
+    getCurrentCompany(),
+  ]);
+  const [subscription, plans, stats] = await Promise.all([
+    getCurrentSubscription(company.id),
+    getPlans(),
+    getDashboardStats(company.id),
+  ]);
   const currentPlan = plans.find((plan) => plan.id === subscription?.plan_id);
   const currentCommercialPrice = getCommercialPrice(currentPlan?.key ?? "crecimiento");
   const commercialAccess = await getCompanyCommercialAccess({
@@ -78,6 +64,41 @@ export default async function DashboardPage() {
     subscription,
     plan: currentPlan,
   });
+
+  const statCards = [
+    {
+      label: "Publicaciones",
+      value: String(stats.posts.total),
+      detail: stats.posts.pending > 0
+        ? `${stats.posts.pending} pendiente${stats.posts.pending !== 1 ? "s" : ""} de aprobación`
+        : stats.posts.scheduled > 0
+          ? `${stats.posts.scheduled} programada${stats.posts.scheduled !== 1 ? "s" : ""}`
+          : "Sin actividad reciente",
+      color: "text-emerald-300",
+    },
+    {
+      label: "Tareas",
+      value: String(stats.tasks.pending + stats.tasks.inProgress),
+      detail: stats.tasks.inProgress > 0
+        ? `${stats.tasks.inProgress} en curso`
+        : "Sin tareas activas",
+      color: "text-violet-300",
+    },
+    {
+      label: "Notificaciones",
+      value: String(stats.notifications.unread),
+      detail: stats.notifications.unread > 0 ? "Sin leer" : "Todo al día",
+      color: "text-sky-300",
+    },
+    {
+      label: "Módulos activos",
+      value: String(stats.modules.active.length || "—"),
+      detail: stats.modules.active.length > 0
+        ? stats.modules.active.slice(0, 2).join(" · ")
+        : "Sin módulos activos",
+      color: "text-amber-300",
+    },
+  ];
 
   return (
     <section className="p-4 sm:p-6 lg:p-10">
@@ -130,7 +151,7 @@ export default async function DashboardPage() {
       ) : null}
 
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <div key={stat.label} className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
             <p className="text-sm text-slate-400">{stat.label}</p>
             <p className="mt-2 text-3xl font-black sm:text-4xl">{stat.value}</p>
@@ -145,50 +166,82 @@ export default async function DashboardPage() {
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-2xl font-black">Pendiente de revisión</h2>
               <span className="rounded-full bg-amber-500/20 px-4 py-2 text-sm font-bold text-amber-300">
-                {pendingTasks.length} pendientes
+                {stats.posts.pending + stats.tasks.pending} pendientes
               </span>
             </div>
 
             <div className="space-y-4">
-              {pendingTasks.map((task) => (
-                <div key={task.title} className="rounded-2xl border border-white/10 bg-[#0b1024] p-4">
+              {stats.posts.pending > 0 ? (
+                <div className="rounded-2xl border border-white/10 bg-[#0b1024] p-4">
                   <div className="flex items-center justify-between gap-4">
-                    <p className="font-bold">{task.title}</p>
-                    <span className="rounded-full bg-violet-500/20 px-3 py-1 text-xs font-bold text-violet-300">
-                      {task.module}
-                    </span>
+                    <p className="font-bold">
+                      {stats.posts.pending} publicación{stats.posts.pending !== 1 ? "es" : ""} pendiente{stats.posts.pending !== 1 ? "s" : ""} de aprobación
+                    </p>
+                    <Link href="/dashboard/socialia" className="rounded-full bg-violet-500/20 px-3 py-1 text-xs font-bold text-violet-300">
+                      SocialIA
+                    </Link>
                   </div>
                 </div>
-              ))}
+              ) : null}
+              {stats.tasks.pending > 0 ? (
+                <div className="rounded-2xl border border-white/10 bg-[#0b1024] p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="font-bold">
+                      {stats.tasks.pending} tarea{stats.tasks.pending !== 1 ? "s" : ""} pendiente{stats.tasks.pending !== 1 ? "s" : ""}
+                    </p>
+                    <Link href="/dashboard/tareas" className="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-bold text-amber-300">
+                      Tareas
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
+              {stats.posts.pending === 0 && stats.tasks.pending === 0 ? (
+                <p className="rounded-2xl border border-white/10 bg-[#0b1024] p-4 text-sm text-slate-400">
+                  Todo al día. No hay pendientes ahora mismo.
+                </p>
+              ) : null}
             </div>
           </div>
 
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
-            <h2 className="text-2xl font-black">Actividad IA reciente</h2>
+            <h2 className="text-2xl font-black">Actividad reciente</h2>
 
             <div className="mt-6 space-y-3">
-              {activity.map((item) => (
-                <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0b1024] p-4">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/20 text-violet-300">
-                    ✦
+              {stats.recentActivity.length > 0 ? (
+                stats.recentActivity.map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0b1024] p-4">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-violet-300">
+                      ✦
+                    </span>
+                    <div>
+                      <p className="text-sm text-slate-300">{item.title}</p>
+                      {item.module ? (
+                        <p className="mt-1 text-xs text-slate-500">{item.module}</p>
+                      ) : null}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="rounded-2xl border border-white/10 bg-[#0b1024] p-4 text-sm text-slate-400">
+                  Aún no hay actividad registrada. Empieza creando una publicación.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {stats.modules.active.length > 0 ? (
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
+              <h2 className="text-2xl font-black">Módulos activos</h2>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                {stats.modules.active.map((module) => (
+                  <span key={module} className="rounded-full bg-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-300">
+                    {module}
                   </span>
-                  <p className="text-sm text-slate-300">{item}</p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
-            <h2 className="text-2xl font-black">Módulos activos</h2>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              {activeModules.map((module) => (
-                <span key={module} className="rounded-full bg-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-300">
-                  {module}
-                </span>
-              ))}
-            </div>
-          </div>
+          ) : null}
         </div>
 
         <aside className="space-y-6">
