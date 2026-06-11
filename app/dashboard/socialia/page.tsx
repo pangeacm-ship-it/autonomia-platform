@@ -517,10 +517,19 @@ export default async function SocialIAPage() {
     getCurrentDashboardAccess(),
     getCurrentProfileContext(),
   ]);
-  const [posts, connectionStatus] = await Promise.all([
+  const [posts, connectionStatus, aiSettings] = await Promise.all([
     getCompanyPosts(company.id),
     getConnectionStatus(company.id),
+    import("@/lib/data/ai-settings").then((m) => m.getCompanyAiSettings(company.id)),
   ]);
+
+  const companyContext = {
+    name: company.name,
+    sector: company.sector_id ?? undefined,
+    tone: aiSettings?.tone ?? undefined,
+    mainServices: aiSettings?.custom_instructions ?? undefined,
+    city: company.city ?? undefined,
+  };
   const realPosts = filterRealOperationalRecords(posts);
   const weekStart = startOfWeek(new Date());
   const weeklyRealPosts = realPosts.filter(
@@ -723,6 +732,7 @@ export default async function SocialIAPage() {
             companyId={company.id}
             canCreate={!freeLimitReached}
             canMarkDemo={canMarkDemo}
+            companyContext={companyContext}
           />
 
           {statusSections.map((section) => {

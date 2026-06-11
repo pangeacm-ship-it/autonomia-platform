@@ -2,6 +2,8 @@ import Link from "next/link";
 import ActionCards from "@/components/centroia/ActionCards";
 import ChatPanel from "@/components/centroia/ChatPanel";
 import ConversationSidebar from "@/components/centroia/ConversationSidebar";
+import { getCurrentCompany } from "@/lib/data/companies";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   businessInsights,
   conversations,
@@ -124,7 +126,35 @@ const elenaObjectives = [
   "Reducir tareas manuales repetitivas.",
 ];
 
-export default function CentroIAPage() {
+export default async function CentroIAPage() {
+  const company = await getCurrentCompany();
+
+  const supabase = await createSupabaseServerClient();
+  let aiSettings: { tone?: string; main_goal?: string; custom_instructions?: string } = {};
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+  if (supabase) {
+    const { data } = await supabase
+      .from("company_ai_settings")
+      .select("tone, main_goal, custom_instructions")
+      .eq("company_id", company.id)
+      .maybeSingle();
+
+    if (data) aiSettings = {
+      tone: data.tone ?? undefined,
+      main_goal: data.main_goal ?? undefined,
+      custom_instructions: data.custom_instructions ?? undefined,
+    };
+  }
+
+  const companyContext = {
+    name: company.name,
+    sector: company.sector_id ?? undefined,
+    tone: aiSettings.tone,
+    mainServices: aiSettings.custom_instructions ?? undefined,
+    city: company.city ?? undefined,
+  };
+
   return (
     <section className="p-4 sm:p-6 lg:p-10">
       <div className="mb-8 rounded-[2rem] border border-white/10 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-sky-500/10 p-6 lg:p-8">
@@ -236,8 +266,8 @@ export default function CentroIAPage() {
               con datos simulados para futura conexión IA.
             </p>
           </div>
-          <span className="w-fit rounded-full border border-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-100">
-            Sin conexión OpenAI todavía
+          <span className="w-fit rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-300">
+            IA activa
           </span>
         </div>
 
@@ -312,7 +342,7 @@ export default function CentroIAPage() {
         <ConversationSidebar conversations={conversations} />
 
         <div className="space-y-6">
-          <ChatPanel messages={initialMessages} quickPrompts={quickPrompts} />
+          <ChatPanel messages={initialMessages} quickPrompts={quickPrompts} companyContext={companyContext} />
 
           <ActionCards />
         </div>

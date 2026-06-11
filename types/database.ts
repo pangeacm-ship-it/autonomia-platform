@@ -1,3 +1,18 @@
+export type AutomationLevel = "assisted" | "semi_auto" | "auto";
+
+export type CompanyAiSettings = {
+  id: string;
+  company_id: string;
+  tone: string;
+  language: string;
+  approval_required: boolean;
+  automation_level: AutomationLevel;
+  main_goal: string | null;
+  custom_instructions: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type UserRole =
   | "superadmin"
   | "company_admin"
@@ -316,6 +331,12 @@ export type Database = {
         Row: SocialConnection;
         Insert: Partial<SocialConnection>;
         Update: Partial<SocialConnection>;
+        Relationships: [];
+      };
+      company_ai_settings: {
+        Row: CompanyAiSettings;
+        Insert: Partial<CompanyAiSettings>;
+        Update: Partial<CompanyAiSettings>;
         Relationships: [];
       };
       invoices: {
