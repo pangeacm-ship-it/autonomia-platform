@@ -1,6 +1,9 @@
 import AccessDeniedCard from "@/components/AccessDeniedCard";
 import ModuleStatusPanel from "@/components/ModuleStatusPanel";
 import { getDashboardRouteAccess } from "@/lib/auth/access-control";
+import { ReviewResponseCard } from "@/components/reviewia/ReviewResponseCard";
+import { getCurrentCompany } from "@/lib/data/companies";
+import { getCompanyAiSettings } from "@/lib/data/ai-settings";
 
 const reviewStats = [
   {
@@ -57,7 +60,17 @@ const reviews = [
 ];
 
 export default async function ReviewIAPage() {
-  const access = await getDashboardRouteAccess("/dashboard/reviewia");
+  const [access, company] = await Promise.all([
+    getDashboardRouteAccess("/dashboard/reviewia"),
+    getCurrentCompany(),
+  ]);
+  const aiSettings = company ? await getCompanyAiSettings(company.id) : null;
+  const companyContext = {
+    name: company?.name,
+    sector: company?.industry ?? undefined,
+    tone: aiSettings?.tone ?? undefined,
+    city: company?.city ?? undefined,
+  };
 
   if (!access.allowed) {
     return (
@@ -157,107 +170,11 @@ export default async function ReviewIAPage() {
 
             <div className="space-y-4">
               {reviews.map((review) => (
-                <article
+                <ReviewResponseCard
                   key={`${review.author}-${review.date}`}
-                  className="rounded-3xl border border-white/10 bg-[#0b1024] p-5"
-                >
-                  <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <h3 className="text-xl font-black">
-                          {review.author}
-                        </h3>
-
-                        <span className="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-bold text-yellow-300">
-                          {"★".repeat(review.rating)}
-                        </span>
-
-                        <span className="text-xs text-slate-500">
-                          {review.date}
-                        </span>
-                      </div>
-
-                      <p className="mt-4 leading-7 text-slate-300">
-                        “{review.text}”
-                      </p>
-                    </div>
-
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold ${
-                        review.status === "Respondida"
-                          ? "bg-emerald-500/20 text-emerald-300"
-                          : review.status === "Requiere revisión"
-                          ? "bg-red-500/20 text-red-300"
-                          : "bg-amber-500/20 text-amber-300"
-                      }`}
-                    >
-                      {review.status}
-                    </span>
-                  </div>
-
-                  <div className="mt-5 rounded-2xl border border-violet-400/20 bg-violet-500/10 p-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="rounded-full bg-violet-500/20 px-3 py-1 text-xs font-bold text-violet-300">
-                        Análisis IA
-                      </span>
-
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-bold ${
-                          review.sentiment === "Negativa"
-                            ? "bg-red-500/20 text-red-300"
-                            : "bg-emerald-500/20 text-emerald-300"
-                        }`}
-                      >
-                        {review.sentiment}
-                      </span>
-                    </div>
-
-                    {review.sentiment === "Negativa" ? (
-                      <div className="mt-4 space-y-2 text-sm text-slate-300">
-                        <p>⚠️ Riesgo reputacional medio</p>
-                        <p>• Tiempo de espera elevado</p>
-                        <p>• Posible mejora en atención al cliente</p>
-                      </div>
-                    ) : (
-                      <div className="mt-4 space-y-2 text-sm text-slate-300">
-                        <p>✓ Cliente satisfecho</p>
-                        <p>✓ Destaca atención recibida</p>
-                        <p>✓ Posible cliente recurrente</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-5 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4">
-                    <p className="text-sm font-black text-emerald-300">
-                      Respuesta sugerida por IA
-                    </p>
-
-                    <p className="mt-3 text-sm leading-6 text-slate-300">
-                      Muchas gracias por tu reseña,{" "}
-                      {review.author.split(" ")[0]}. Nos alegra saber que tu
-                      experiencia ha sido positiva. Seguiremos trabajando para
-                      ofrecer el mejor servicio posible cada día.
-                    </p>
-                  </div>
-
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <button className="rounded-xl bg-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-300 hover:bg-emerald-500/30">
-                      Aprobar respuesta
-                    </button>
-
-                    <button className="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/10">
-                      Editar
-                    </button>
-
-                    <button className="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/10">
-                      Publicar
-                    </button>
-
-                    <button className="rounded-xl bg-red-500/10 px-4 py-2 text-sm font-bold text-red-300 hover:bg-red-500/20">
-                      Descartar
-                    </button>
-                  </div>
-                </article>
+                  review={review}
+                  companyContext={companyContext}
+                />
               ))}
             </div>
           </div>
