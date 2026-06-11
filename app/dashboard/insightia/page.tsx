@@ -1,6 +1,10 @@
 import AccessDeniedCard from "@/components/AccessDeniedCard";
 import ModuleStatusPanel from "@/components/ModuleStatusPanel";
 import { getDashboardRouteAccess } from "@/lib/auth/access-control";
+import { InsightReport } from "@/components/insightia/InsightReport";
+import { getCurrentCompany } from "@/lib/data/companies";
+import { getCompanyAiSettings } from "@/lib/data/ai-settings";
+import { getDashboardStats } from "@/lib/data/dashboard-stats";
 
 const stats = [
   { label: "Actividad IA", value: "87%", change: "+14% este mes", color: "text-emerald-300" },
@@ -36,7 +40,10 @@ const goals = [
 ];
 
 export default async function InsightIAPage() {
-  const access = await getDashboardRouteAccess("/dashboard/insightia");
+  const [access, company] = await Promise.all([
+    getDashboardRouteAccess("/dashboard/insightia"),
+    getCurrentCompany(),
+  ]);
 
   if (!access.allowed) {
     return (
@@ -47,6 +54,17 @@ export default async function InsightIAPage() {
       />
     );
   }
+
+  const [aiSettings, dashboardStats] = await Promise.all([
+    getCompanyAiSettings(company.id),
+    getDashboardStats(company.id),
+  ]);
+  const companyContext = {
+    name: company.name,
+    sector: company.industry ?? undefined,
+    tone: aiSettings?.tone ?? undefined,
+    city: company.city ?? undefined,
+  };
 
   return (
     <section className="p-6 lg:p-10">
@@ -191,9 +209,7 @@ export default async function InsightIAPage() {
             </div>
           </div>
 
-          <button className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-4 font-bold shadow-[0_0_35px_rgba(124,58,237,0.35)]">
-            Generar informe mensual
-          </button>
+          <InsightReport stats={dashboardStats} companyContext={companyContext} />
         </aside>
       </div>
     </section>
