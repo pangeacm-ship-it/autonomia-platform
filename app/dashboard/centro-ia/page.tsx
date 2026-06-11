@@ -3,6 +3,7 @@ import ActionCards from "@/components/centroia/ActionCards";
 import ChatPanel from "@/components/centroia/ChatPanel";
 import ConversationSidebar from "@/components/centroia/ConversationSidebar";
 import { getCurrentCompany } from "@/lib/data/companies";
+import { getCompanyConversations } from "@/lib/data/ai-chat";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   businessInsights,
@@ -146,6 +147,8 @@ export default async function CentroIAPage() {
       custom_instructions: data.custom_instructions ?? undefined,
     };
   }
+
+  const savedConversations = await getCompanyConversations(company.id);
 
   const companyContext = {
     name: company.name,
@@ -339,10 +342,15 @@ export default async function CentroIAPage() {
       </section>
 
       <div className="grid gap-6 xl:min-h-[740px] xl:grid-cols-[300px_1fr_360px]">
-        <ConversationSidebar conversations={conversations} />
+        <ConversationSidebar conversations={savedConversations} />
 
         <div className="space-y-6">
-          <ChatPanel messages={initialMessages} quickPrompts={quickPrompts} companyContext={companyContext} />
+          <ChatPanel
+            messages={initialMessages}
+            quickPrompts={quickPrompts}
+            companyContext={companyContext}
+            companyId={company.id}
+          />
 
           <ActionCards />
         </div>

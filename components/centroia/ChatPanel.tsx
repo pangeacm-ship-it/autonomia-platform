@@ -20,12 +20,15 @@ interface Props {
   messages: Message[];
   quickPrompts: string[];
   companyContext?: CompanyContext;
+  companyId?: string;
+  initialConversationId?: string | null;
 }
 
-export default function ChatPanel({ messages: initialMessages, quickPrompts, companyContext }: Props) {
+export default function ChatPanel({ messages: initialMessages, quickPrompts, companyContext, companyId, initialConversationId }: Props) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(initialConversationId ?? null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -56,6 +59,8 @@ export default function ChatPanel({ messages: initialMessages, quickPrompts, com
             content: m.text,
           })),
           companyContext,
+          companyId: companyId ?? null,
+          conversationId: conversationId ?? null,
         }),
       });
 
@@ -77,7 +82,20 @@ export default function ChatPanel({ messages: initialMessages, quickPrompts, com
 
         if (done) break;
 
-        accumulated += decoder.decode(value, { stream: true });
+        const chunk = decoder.decode(value, { stream: true });
+
+        // Extract conversationId from first chunk if present
+        if (chunk.startsWith("__conv:")) {
+          const match = chunk.match(/^__conv:([^_]+)__/);
+
+          if (match?.[1] && !conversationId) {
+            setConversationId(match[1]);
+          }
+
+          accumulated += chunk.replace(/^__conv:[^_]+__/, "");
+        } else {
+          accumulated += chunk;
+        }
 
         setMessages([
           ...updatedMessages,

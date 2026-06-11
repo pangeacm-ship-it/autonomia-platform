@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createConversation, saveMessage } from "@/lib/data/ai-chat";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -13,6 +14,8 @@ type MessageParam = {
 
 type RequestBody = {
   messages: MessageParam[];
+  conversationId?: string | null;
+  companyId?: string | null;
   companyContext?: {
     name?: string;
     sector?: string;
@@ -77,18 +80,43 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Petición inválida." }, { status: 400 });
   }
 
-  const { messages, companyContext } = body;
+  const { messages, companyContext, conversationId: existingConversationId, companyId } = body;
 
   if (!messages?.length) {
     return NextResponse.json({ error: "Sin mensajes." }, { status: 400 });
   }
 
   const systemPrompt = buildSystemPrompt(companyContext);
+  const lastUserMessage = messages[messages.length - 1];
+
+  // Resolve or create conversation for persistence
+  let conversationId = existingConversationId ?? null;
+
+  if (companyId && !conversationId && lastUserMessage?.role === "user") {
+    const title = lastUserMessage.content.slice(0, 60);
+
+    conversationId = await createConversation(companyId, title);
+  }
+
+  // Save the user message if this is the first one in the conversation
+  if (conversationId && companyId && lastUserMessage?.role === "user") {
+    await saveMessage({
+      conversationId,
+      companyId,
+      role: "user",
+      content: lastUserMessage.content,
+    });
+  }
 
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
     async start(controller) {
+      // Send conversationId as first chunk so client can store it
+      if (conversationId) {
+        controller.enqueue(encoder.encode(`__conv:${conversationId}__`));
+      }
+
       try {
         const anthropicStream = await client.messages.stream({
           model: "claude-haiku-4-5-20251001",
@@ -97,13 +125,25 @@ export async function POST(request: NextRequest) {
           messages,
         });
 
+        let fullResponse = "";
+
         for await (const chunk of anthropicStream) {
           if (
             chunk.type === "content_block_delta" &&
             chunk.delta.type === "text_delta"
           ) {
             controller.enqueue(encoder.encode(chunk.delta.text));
+            fullResponse += chunk.delta.text;
           }
+        }
+        // Save assistant response
+        if (conversationId && companyId && fullResponse) {
+          await saveMessage({
+            conversationId,
+            companyId,
+            role: "assistant",
+            content: fullResponse,
+          });
         }
       } catch (error) {
         const message =

@@ -1,3 +1,57 @@
+export type TaskPriority = "low" | "medium" | "high" | "urgent";
+export type TaskStatus = "pending" | "in_progress" | "done" | "canceled";
+export type NotificationType = "info" | "warning" | "action_required" | "billing" | "system";
+export type NotificationStatus = "unread" | "read" | "archived";
+
+export type Task = {
+  id: string;
+  company_id: string;
+  assigned_profile_id: string | null;
+  module_key: string | null;
+  title: string;
+  description: string | null;
+  priority: TaskPriority;
+  status: TaskStatus;
+  due_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Notification = {
+  id: string;
+  company_id: string;
+  profile_id: string | null;
+  type: NotificationType;
+  title: string;
+  body: string | null;
+  status: NotificationStatus;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AiConversation = {
+  id: string;
+  company_id: string;
+  profile_id: string | null;
+  module_key: string | null;
+  channel: "dashboard" | "whatsapp" | "email" | "instagram" | "facebook" | "google_business";
+  status: "open" | "closed" | "archived";
+  title: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AiMessage = {
+  id: string;
+  company_id: string;
+  conversation_id: string;
+  profile_id: string | null;
+  role: "user" | "assistant" | "system" | "tool";
+  content: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+};
+
 export type AutomationLevel = "assisted" | "semi_auto" | "auto";
 
 export type CompanyAiSettings = {
@@ -337,6 +391,30 @@ export type Database = {
         Row: CompanyAiSettings;
         Insert: Partial<CompanyAiSettings>;
         Update: Partial<CompanyAiSettings>;
+        Relationships: [];
+      };
+      tasks: {
+        Row: Task;
+        Insert: Partial<Task>;
+        Update: Partial<Task>;
+        Relationships: [];
+      };
+      notifications: {
+        Row: Notification;
+        Insert: Partial<Notification>;
+        Update: Partial<Notification>;
+        Relationships: [];
+      };
+      ai_conversations: {
+        Row: AiConversation;
+        Insert: Partial<AiConversation>;
+        Update: Partial<AiConversation>;
+        Relationships: [];
+      };
+      ai_messages: {
+        Row: AiMessage;
+        Insert: Partial<AiMessage>;
+        Update: Partial<AiMessage>;
         Relationships: [];
       };
       invoices: {
