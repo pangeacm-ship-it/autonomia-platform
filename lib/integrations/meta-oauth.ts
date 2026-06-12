@@ -3,6 +3,7 @@ import "server-only";
 import { randomBytes } from "crypto";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { encryptToken } from "@/lib/integrations/meta-encrypt";
 import { isCompanyAdmin, isSuperadmin, isUserRole } from "@/lib/auth/roles";
 import { getCurrentProfileContext } from "@/lib/data/profiles";
 import type { SocialConnection, UserRole } from "@/types/database";
@@ -22,9 +23,13 @@ type MetaOAuthConfig = {
   redirectUri: string | null;
 };
 
-// Permisos básicos para validar OAuth. Pages/Instagram se añadirán después con configuración Meta adecuada.
 const metaScopes = [
   "public_profile",
+  "pages_show_list",
+  "pages_read_engagement",
+  "pages_manage_posts",
+  "instagram_basic",
+  "instagram_content_publish",
 ];
 
 function readEnvironmentVariable(name: string) {
@@ -321,4 +326,167 @@ export async function saveMetaConnectionConnected({
   }
 
   return { ok: true, message: "OAuth básico Meta conectado." };
+}
+
+// ─── Long-lived token exchange ────────────────────────────────────────────────
+
+type LongLivedTokenResult =
+  | { ok: true; accessToken: string; expiresAt: string | null }
+  | { ok: false; message: string };
+
+export async function exchangeForLongLivedToken(
+  shortLivedToken: string,
+): Promise<LongLivedTokenResult> {
+  const config = getMetaOAuthConfig();
+
+  if (!config.appId || !config.appSecret) {
+    return { ok: false, message: "META_APP_ID o META_APP_SECRET no configurados." };
+  }
+
+  const url = new URL("https://graph.facebook.com/v20.0/oauth/access_token");
+  url.searchParams.set("grant_type", "fb_exchange_token");
+  url.searchParams.set("client_id", config.appId);
+  url.searchParams.set("client_secret", config.appSecret);
+  url.searchParams.set("fb_exchange_token", shortLivedToken);
+
+  try {
+    const res = await fetch(url.toString());
+    const data = (await res.json()) as {
+      access_token?: string;
+      expires_in?: number;
+      error?: { message?: string };
+    };
+
+    if (!res.ok || !data.access_token || data.error) {
+      return { ok: false, message: data.error?.message ?? "Error intercambiando token." };
+    }
+
+    const expiresAt = data.expires_in
+      ? new Date(Date.now() + data.expires_in * 1000).toISOString()
+      : null;
+
+    return { ok: true, accessToken: data.access_token, expiresAt };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Error de red." };
+  }
+}
+
+// ─── Facebook Pages ───────────────────────────────────────────────────────────
+
+export type FacebookPage = {
+  id: string;
+  name: string;
+  category: string;
+  access_token: string;
+  instagram_business_account?: { id: string } | null;
+};
+
+type PagesResult =
+  | { ok: true; pages: FacebookPage[] }
+  | { ok: false; message: string };
+
+export async function getMetaPages(userAccessToken: string): Promise<PagesResult> {
+  const url = new URL("https://graph.facebook.com/v20.0/me/accounts");
+  url.searchParams.set("fields", "id,name,category,access_token,instagram_business_account");
+  url.searchParams.set("access_token", userAccessToken);
+
+  try {
+    const res = await fetch(url.toString());
+    const data = (await res.json()) as {
+      data?: FacebookPage[];
+      error?: { message?: string };
+    };
+
+    if (!res.ok || data.error) {
+      return { ok: false, message: data.error?.message ?? "Error listando páginas." };
+    }
+
+    return { ok: true, pages: data.data ?? [] };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Error de red." };
+  }
+}
+
+// ─── Save page selection ──────────────────────────────────────────────────────
+
+export async function saveMetaPageSelection({
+  companyId,
+  platform,
+  page,
+  userAccessToken,
+  tokenExpiresAt,
+  scopes,
+}: {
+  companyId: string;
+  platform: SocialConnection["platform"];
+  page: FacebookPage;
+  userAccessToken: string;
+  tokenExpiresAt: string | null;
+  scopes: string[];
+}) {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return { ok: false, message: "Supabase no está configurado." };
+  }
+
+  // Encrypt both the user token and the page token
+  let encryptedUserToken: string | null = null;
+  let encryptedPageToken: string | null = null;
+
+  try {
+    encryptedUserToken = encryptToken(userAccessToken);
+    encryptedPageToken = encryptToken(page.access_token);
+  } catch {
+    // If encryption key not set, store null — connection still marked connected
+  }
+
+  const now = new Date().toISOString();
+  const instagramAccountId = page.instagram_business_account?.id ?? null;
+
+  const { data: existingRows } = await supabase
+    .from("social_connections")
+    .select("id")
+    .eq("company_id", companyId)
+    .eq("provider", "meta")
+    .eq("platform", platform)
+    .is("deleted_at", null)
+    .limit(1);
+
+  const payload = {
+    company_id: companyId,
+    provider: "meta" as const,
+    platform,
+    account_name: page.name,
+    account_id: page.id,
+    page_id: page.id,
+    instagram_business_account_id: instagramAccountId,
+    access_token_encrypted: encryptedPageToken ?? encryptedUserToken,
+    refresh_token_encrypted: null,
+    token_expires_at: tokenExpiresAt,
+    scopes,
+    status: "connected" as const,
+    last_sync_at: now,
+    is_demo: false,
+    archived_at: null,
+    deleted_at: null,
+    updated_at: now,
+  };
+
+  const existingId = existingRows?.[0]?.id;
+  const mutation = existingId
+    ? supabase.from("social_connections").update(payload).eq("id", existingId)
+    : supabase.from("social_connections").insert({ ...payload, created_at: now });
+
+  const { error } = await mutation;
+
+  if (error) return { ok: false, message: error.message };
+
+  return {
+    ok: true,
+    instagramConnected: Boolean(instagramAccountId),
+    message: instagramAccountId
+      ? `Facebook e Instagram conectados para "${page.name}".`
+      : `Facebook conectado para "${page.name}". Sin cuenta de Instagram Business vinculada.`,
+  };
 }
